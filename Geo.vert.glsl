@@ -1,12 +1,12 @@
 attribute float3 LocalPosition;
-varying float3 Colour;
+varying float3 FragColour;
 varying float3 WorldPosition;
 varying float3 FragLocalPosition;
 
 uniform mat4 LocalToWorldTransform;
 uniform mat4 WorldToCameraTransform;
 uniform mat4 CameraProjectionTransform;
-
+uniform float3 Colour;
 
 void main()
 {
@@ -19,7 +19,7 @@ void main()
 	gl_Position = ProjectionPos;
 	
 	WorldPosition = WorldPos.xyz;
-	Colour = LocalPosition;
+	FragColour = Colour;//LocalPosition;
 	FragLocalPosition = LocalPosition;
 }
 
