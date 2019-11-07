@@ -26,7 +26,7 @@ Params.BoneCount = 64;
 Params.RenderVideo = false;
 Params.RenderWorld = true;
 Params.CameraModelScale = 0.1;
-Params.FaceZ = 2;
+Params.FaceZ = 1;
 Params.FaceCameraColour = [0,1,0];
 Params.VideoCameraColour = [1,1,1];
 Params.BackgroundColour = [0,0,0];
@@ -37,7 +37,7 @@ var ParamsWindow = CreateParamsWindow( Params, function(){}, [800,100,500,200] )
 ParamsWindow.AddParam('MaxScore',0,1);
 ParamsWindow.AddParam('LineWidth',0.0001,0.01);
 ParamsWindow.AddParam('BoneCount',1,64,Math.floor);
-ParamsWindow.AddParam('FaceZ',0,200);
+ParamsWindow.AddParam('FaceZ',0,10);
 ParamsWindow.AddParam('RenderVideo');
 ParamsWindow.AddParam('RenderWorld');
 ParamsWindow.AddParam('CameraModelScale',0.001,2);
@@ -517,7 +517,7 @@ class TCameraWindow
 			const FaceZ = FaceUvDistance[2];
 			const RayToFace = GetCameraRay( this.VideoCamera, FaceUv, FaceZ );
 
-			this.FaceCamera.Position = RayToFace.End;
+			this.FaceCamera.Position = RayToFace.GetPosition( FaceZ );
 			Pop.Debug("this.FaceCamera.Position",this.FaceCamera.Position);
 			this.FaceCamera.LookAt = this.VideoCamera.Position.slice();
 		}
@@ -529,7 +529,7 @@ class TCameraWindow
 }
 
 
-function GetCameraRay(Camera,uv,z)
+function GetCameraRay(Camera,uv)
 {
 	//	gr: need to fix this so we don't know the aspect ratio...
 	let ScreenRect = [0,0,100,100];
@@ -541,7 +541,7 @@ function GetCameraRay(Camera,uv,z)
 	const ViewRect = [-1,-1,1,1];
 
 	//	this should be between -1 and 1 (in camera space)
-	const RayDistance = 1;
+	const RayDistance = 0.5;
 	
 	let ScreenToCameraTransform = Camera.GetProjectionMatrix( ViewRect );
 	ScreenToCameraTransform = Math.MatrixInverse4x4( ScreenToCameraTransform );
@@ -558,6 +558,13 @@ function GetCameraRay(Camera,uv,z)
 	Ray.Start = Math.GetMatrixTranslation( StartMatrix, true );
 	Ray.End = Math.GetMatrixTranslation( EndMatrix, true );
 	Ray.Direction = Math.Normalise3( Math.Subtract3( Ray.End, Ray.Start ) );
+	
+	Ray.GetPosition = function(Time)
+	{
+		const Offset = Math.Multiply3( Ray.Direction, [Time,Time,Time] );
+		const Pos = Math.Add3( Ray.Start, Offset );
+		return Pos;
+	}
 	
 	return Ray;
 }
