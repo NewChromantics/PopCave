@@ -358,6 +358,7 @@ class TCameraWindow
 		this.CameraName = CameraName;
 		this.Skeleton = null;
 		this.LastFace = null;
+		this.LastFaceUvz = null;
 		this.VideoTexture = null;
 		this.CameraFrameCounter = new Pop.FrameCounter( CameraName );
 		
@@ -484,15 +485,12 @@ class TCameraWindow
 				
 				const Luma = new Pop.Image();
 				Luma.Copy( NewTexures[0] );
-				Luma.Resize( 512, 256 );
-				Luma.SetFormat('Greyscale');
-				
-				let Face = await Coreml.AppleVisionFaceDetect( Luma );
-				if ( Face.length == 0 )
-					Face = this.LastFace;
-				this.LastFace = Face;
-				this.UpdateFaceCamera( Face );
-				this.Skeleton = LabelsToSkeleton( Face ) || this.Skeleton;
+			
+				const FaceUvz = await this.GetFaceUvz( Luma );
+
+				this.LastFaceUvz = FaceUvz || this.LastFaceUvz;
+
+				this.UpdateFaceCamera();
 				//Pop.Debug(JSON.stringify(this.Skeleton));
 				this.VideoTexture = Luma;
 				this.CameraFrameCounter.Add();
@@ -507,14 +505,12 @@ class TCameraWindow
 		}
 	}
 
-	UpdateFaceCamera(Face)
+	UpdateFaceCamera()
 	{
 		try
 		{
-			//	todo: get z from scale of face rect
-			const FaceUvDistance = GetFaceCenterDistance(Face);
-			const FaceUv = FaceUvDistance;
-			const FaceZ = FaceUvDistance[2];
+			const FaceUv = this.FaceUvz.slice(0,2);
+			const FaceZ = this.FaceUvz[2];
 			const RayToFace = GetCameraRay( this.VideoCamera, FaceUv, FaceZ );
 
 			this.FaceCamera.Position = RayToFace.GetPosition( FaceZ );
@@ -523,8 +519,23 @@ class TCameraWindow
 		}
 		catch(e)
 		{
-			Pop.Debug("UpdateFaceCamera error",e,Face);
+			Pop.Debug("UpdateFaceCamera error",e);
 		}
+	}
+	
+	async GetFaceUvz(Frame)
+	{
+		Frame.Resize( 512, 256 );
+		Frame.SetFormat('Greyscale');
+	
+		const Face = await Coreml.AppleVisionFaceDetect( Frame );
+		if ( Face.length == 0 )
+			return null;
+		
+		this.Skeleton = LabelsToSkeleton( Face );
+		this.LastFace = Face;
+		const FaceUvDistance = GetFaceCenterDistance(Face);
+		return FaceUvDistance;
 	}
 }
 
@@ -592,12 +603,12 @@ async function FindCamerasLoop()
 		{
 			//return;
 		}
-		
+		/*
 		if ( !CameraName.includes('iSight') )
 		{
 			return;
 		}
-		
+		*/
 		try
 		{
 			let Window = new TCameraWindow(CameraName);
