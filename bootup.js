@@ -26,6 +26,7 @@ Params.LineWidth = 0.0015;
 Params.BoneCount = 64;
 Params.RenderVideo = false;
 Params.RenderWorld = true;
+Params.RenderFromFaceCamera = true;
 Params.CameraModelScale = 0.1;
 Params.FaceZ = 1;
 Params.FaceCameraColour = [0,1,0];
@@ -33,9 +34,11 @@ Params.VideoCameraColour = [1,1,1];
 Params.BackgroundColour = [0,0,0];
 Params.GeoColour = [0,0,1];
 Params.GeoScale = 0.01;
+Params.GeoYaw = 90;
 Params.GeoX = 0;
 Params.GeoY = 0;
 Params.GeoZ = 0;
+Params.RenderGeo = true;
 
 
 var ParamsWindow = CreateParamsWindow( Params, function(){}, [800,100,500,200] );
@@ -45,16 +48,19 @@ ParamsWindow.AddParam('BoneCount',1,64,Math.floor);
 ParamsWindow.AddParam('FaceZ',0,10);
 ParamsWindow.AddParam('RenderVideo');
 ParamsWindow.AddParam('RenderWorld');
+ParamsWindow.AddParam('RenderFromFaceCamera');
 ParamsWindow.AddParam('CameraModelScale',0.001,2);
 ParamsWindow.AddParam('FaceCameraColour','Colour');
 ParamsWindow.AddParam('VideoCameraColour','Colour');
 ParamsWindow.AddParam('BackgroundColour','Colour');
 
+ParamsWindow.AddParam('RenderGeo');
 ParamsWindow.AddParam('GeoColour','Colour');
 ParamsWindow.AddParam('GeoScale',0.001,10);
 ParamsWindow.AddParam('GeoX',-10,10);
 ParamsWindow.AddParam('GeoY',-10,10);
 ParamsWindow.AddParam('GeoZ',-10,10);
+ParamsWindow.AddParam('GeoYaw',-180,180);
 
 
 
@@ -145,6 +151,8 @@ function GetSceneGeos(RenderTarget)
 		if ( !SceneGeos )
 			SceneGeos = [];
 		
+		Pop.Debug("Geo " + Geometry.Name);
+		
 		//	convert to triangle buffer
 		const VertexAttributeName = "LocalPosition";
 		const VertexSize = 3;
@@ -158,6 +166,7 @@ function GetSceneGeos(RenderTarget)
 	const Contents = Pop.LoadFileAsString( SceneFilename );
 	Pop.Obj.ParseGeometry( Contents, OnGeometry );
 	
+	Pop.Debug( SceneFilename + " parsed " + SceneGeos.length + " objects");
 	return SceneGeos;
 }
 
@@ -361,8 +370,12 @@ function RenderScene(RenderTarget, Camera)
 	const Position = [Params.GeoX,Params.GeoY,Params.GeoZ];
 	const Scale = Params.GeoScale;
 	const Colour = Params.GeoColour;
+	
+	const RotationTransform = Math.CreateAxisRotationMatrix( [0,1,0], Params.GeoYaw );
+	
 	const Shader = Pop.GetShader( RenderTarget, GeoColourShader, GeoVertShader );
-	const LocalToWorldTransform = Math.CreateTranslationScaleMatrix( Position, [Scale,Scale,Scale] );
+	const LocalToWorldTransform = Math.MatrixMultiply4x4( RotationTransform, Math.CreateTranslationScaleMatrix( Position, [Scale,Scale,Scale] ) );
+	
 	const WorldToCameraTransform = Camera.GetWorldToCameraMatrix();
 	const ViewRect = [-1,-1,1,1];
 	const CameraProjectionTransform = Camera.GetProjectionMatrix(ViewRect);
@@ -390,7 +403,7 @@ function RenderCube(RenderTarget,Camera,Position,Scale,Colour)
 	const WorldToCameraTransform = Camera.GetWorldToCameraMatrix();
 	const ViewRect = [-1,-1,1,1];
 	const CameraProjectionTransform = Camera.GetProjectionMatrix(ViewRect);
-	Pop.Debug(Position);
+	//Pop.Debug(Position);
 	function SetUniforms(Shader)
 	{
 		Shader.SetUniform('LocalToWorldTransform',LocalToWorldTransform);
@@ -440,7 +453,7 @@ class TCameraWindow
 		this.FaceCamera = new Pop.Camera();
 		
 		this.DebugCamera = new Pop.Camera();
-		this.DebugCamera.Position = [0,0.5,1];
+		this.DebugCamera.Position = [0,0.4,2];
 		this.DebugCamera.LookAt = [0,0,0];
 
 		this.Window = new Pop.Opengl.Window(CameraName);
@@ -506,12 +519,16 @@ class TCameraWindow
 			RenderVideoImage( RenderTarget, this.VideoTexture );
 			RenderSkeleton( RenderTarget, this.Skeleton );
 		}
-		else if ( Params.RenderWorld )
+		else if ( Params.RenderWorld || Params.RenderFromFaceCamera )
 		{
+			const RenderCamera = Params.RenderFromFaceCamera ? this.FaceCamera : this.DebugCamera;
+			
 			RenderTarget.ClearColour( ...Params.BackgroundColour );
-			RenderScene( RenderTarget, this.DebugCamera );
-			RenderCube( RenderTarget, this.DebugCamera, this.FaceCamera.Position, Params.CameraModelScale, Params.FaceCameraColour );
-			RenderCube( RenderTarget, this.DebugCamera, this.VideoCamera.Position, Params.CameraModelScale, Params.VideoCameraColour );
+			if ( Params.RenderGeo )
+				RenderScene( RenderTarget, RenderCamera );
+			if ( RenderCamera != this.FaceCamera )
+				RenderCube( RenderTarget, RenderCamera, this.FaceCamera.Position, Params.CameraModelScale, Params.FaceCameraColour );
+			RenderCube( RenderTarget, RenderCamera, this.VideoCamera.Position, Params.CameraModelScale, Params.VideoCameraColour );
 		}
 		else
 		{
@@ -580,17 +597,17 @@ class TCameraWindow
 	{
 		try
 		{
-			const FaceUv = this.FaceUvz.slice(0,2);
-			const FaceZ = this.FaceUvz[2];
+			const FaceUv = this.LastFaceUvz.slice(0,2);
+			const FaceZ = this.LastFaceUvz[2];
 			const RayToFace = GetCameraRay( this.VideoCamera, FaceUv, FaceZ );
 
 			this.FaceCamera.Position = RayToFace.GetPosition( FaceZ );
-			Pop.Debug("this.FaceCamera.Position",this.FaceCamera.Position);
+			//Pop.Debug("this.FaceCamera.Position",this.FaceCamera.Position);
 			this.FaceCamera.LookAt = this.VideoCamera.Position.slice();
 		}
 		catch(e)
 		{
-			//Pop.Debug("UpdateFaceCamera error",e);
+			Pop.Debug("UpdateFaceCamera error",e);
 		}
 	}
 	
