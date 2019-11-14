@@ -10,6 +10,7 @@ Pop.Include('PopEngineCommon/MemCheckLoop.js');
 Pop.Include('PopEngineCommon/PopMath.js');
 Pop.Include('PopEngineCommon/ParamsWindow.js');
 Pop.Include('PopEngineCommon/PopCamera.js');
+Pop.Include('PopEngineCommon/PopObj.js');
 
 const VertShader = Pop.LoadFileAsString('Quad.vert.glsl');
 const GreyscaleFragShader = Pop.LoadFileAsString('Greyscale.frag.glsl');
@@ -30,7 +31,11 @@ Params.FaceZ = 1;
 Params.FaceCameraColour = [0,1,0];
 Params.VideoCameraColour = [1,1,1];
 Params.BackgroundColour = [0,0,0];
-
+Params.GeoColour = [0,0,1];
+Params.GeoScale = 0.01;
+Params.GeoX = 0;
+Params.GeoY = 0;
+Params.GeoZ = 0;
 
 
 var ParamsWindow = CreateParamsWindow( Params, function(){}, [800,100,500,200] );
@@ -44,6 +49,12 @@ ParamsWindow.AddParam('CameraModelScale',0.001,2);
 ParamsWindow.AddParam('FaceCameraColour','Colour');
 ParamsWindow.AddParam('VideoCameraColour','Colour');
 ParamsWindow.AddParam('BackgroundColour','Colour');
+
+ParamsWindow.AddParam('GeoColour','Colour');
+ParamsWindow.AddParam('GeoScale',0.001,10);
+ParamsWindow.AddParam('GeoX',-10,10);
+ParamsWindow.AddParam('GeoY',-10,10);
+ParamsWindow.AddParam('GeoZ',-10,10);
 
 
 
@@ -104,7 +115,7 @@ function CreateCubeGeometry(RenderTarget,Min=-1,Max=1)
 	TriangleIndexes = new Int32Array(TriangleIndexes);
 	
 	//	emulate webgl on desktop
-	TriangleIndexes = undefined;
+	//TriangleIndexes = undefined;
 	
 	let TriangleBuffer = new Pop.Opengl.TriangleBuffer( RenderTarget, VertexAttributeName, VertexData, VertexSize, TriangleIndexes );
 	return TriangleBuffer;
@@ -119,6 +130,40 @@ function GetCube(RenderTarget)
 	Cube = CreateCubeGeometry(RenderTarget);
 	return Cube;
 }
+
+
+var SceneGeos;
+function GetSceneGeos(RenderTarget)
+{
+	if ( SceneGeos )
+		return SceneGeos;
+	
+	const SceneFilename = 'Assets/parallax_test_02.obj';
+	
+	function OnGeometry(Geometry)
+	{
+		if ( !SceneGeos )
+			SceneGeos = [];
+		
+		//	convert to triangle buffer
+		const VertexAttributeName = "LocalPosition";
+		const VertexSize = 3;
+		const VertexData = new Float32Array( Geometry.Positions );
+		//const TriangleIndexes = new Int32Array( Geometry.TriangleIndexes );
+		const TriangleIndexes = undefined;
+		const TriangleBuffer = new Pop.Opengl.TriangleBuffer( RenderTarget, VertexAttributeName, VertexData, VertexSize, TriangleIndexes );
+
+		SceneGeos.push( TriangleBuffer );
+	}
+	const Contents = Pop.LoadFileAsString( SceneFilename );
+	Pop.Obj.ParseGeometry( Contents, OnGeometry );
+	
+	return SceneGeos;
+}
+
+
+
+
 
 function LabelsToSkeleton(Labels)
 {
@@ -310,6 +355,31 @@ function GetSkeletonLines(Skeleton,Lines,Scores)
 	Bones.forEach( PushBone );
 }
 
+function RenderScene(RenderTarget, Camera)
+{
+	const Geos = GetSceneGeos( RenderTarget );
+	const Position = [Params.GeoX,Params.GeoY,Params.GeoZ];
+	const Scale = Params.GeoScale;
+	const Colour = Params.GeoColour;
+	const Shader = Pop.GetShader( RenderTarget, GeoColourShader, GeoVertShader );
+	const LocalToWorldTransform = Math.CreateTranslationScaleMatrix( Position, [Scale,Scale,Scale] );
+	const WorldToCameraTransform = Camera.GetWorldToCameraMatrix();
+	const ViewRect = [-1,-1,1,1];
+	const CameraProjectionTransform = Camera.GetProjectionMatrix(ViewRect);
+	
+	function SetUniforms(Shader)
+	{
+		Shader.SetUniform('LocalToWorldTransform',LocalToWorldTransform);
+		Shader.SetUniform('WorldToCameraTransform',WorldToCameraTransform);
+		Shader.SetUniform('CameraProjectionTransform',CameraProjectionTransform);
+		Shader.SetUniform('Colour',Colour);
+	}
+	function RenderGeo(Geo)
+	{
+		RenderTarget.DrawGeometry( Geo, Shader, SetUniforms );
+	}
+	Geos.forEach( RenderGeo );
+}
 
 function RenderCube(RenderTarget,Camera,Position,Scale,Colour)
 {
@@ -439,6 +509,7 @@ class TCameraWindow
 		else if ( Params.RenderWorld )
 		{
 			RenderTarget.ClearColour( ...Params.BackgroundColour );
+			RenderScene( RenderTarget, this.DebugCamera );
 			RenderCube( RenderTarget, this.DebugCamera, this.FaceCamera.Position, Params.CameraModelScale, Params.FaceCameraColour );
 			RenderCube( RenderTarget, this.DebugCamera, this.VideoCamera.Position, Params.CameraModelScale, Params.VideoCameraColour );
 		}
@@ -519,7 +590,7 @@ class TCameraWindow
 		}
 		catch(e)
 		{
-			Pop.Debug("UpdateFaceCamera error",e);
+			//Pop.Debug("UpdateFaceCamera error",e);
 		}
 	}
 	
