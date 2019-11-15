@@ -23,7 +23,6 @@ const GeoColourShader = Pop.LoadFileAsString('Colour.frag.glsl');
 var Params = {};
 Params.MaxScore = 0.5;
 Params.LineWidth = 0.0015;
-Params.BoneCount = 64;
 Params.RenderVideo = false;
 Params.RenderWorld = true;
 Params.RenderFromFaceCamera = true;
@@ -39,12 +38,15 @@ Params.GeoX = 0;
 Params.GeoY = 0;
 Params.GeoZ = 0;
 Params.RenderGeo = true;
+Params.UseAppleFace = false;
+Params.UseOpenPose = true;
 
 
 var ParamsWindow = CreateParamsWindow( Params, function(){}, [800,100,500,200] );
 ParamsWindow.AddParam('MaxScore',0,1);
+ParamsWindow.AddParam('UseAppleFace');
+ParamsWindow.AddParam('UseOpenPose');
 ParamsWindow.AddParam('LineWidth',0.0001,0.01);
-ParamsWindow.AddParam('BoneCount',1,64,Math.floor);
 ParamsWindow.AddParam('FaceZ',0,10);
 ParamsWindow.AddParam('RenderVideo');
 ParamsWindow.AddParam('RenderWorld');
@@ -63,6 +65,63 @@ ParamsWindow.AddParam('GeoZ',-10,10);
 ParamsWindow.AddParam('GeoYaw',-180,180);
 
 
+
+const SkeletonJointNames =
+[
+ 'Head',
+ 'LeftShoulder',		'LeftElbow',	'LeftHand',		'LeftHip',	'LeftKnee',		'LeftFoot',
+ 'RightShoulder',	'RightElbow',	'RightHand',	'RightHip',	'RightKnee',	'RightFoot',
+ ];
+
+function LabelMapToSkeleton(LabelMap)
+{
+	if ( !LabelMap.Meta )
+	{
+		Pop.Debug( JSON.stringify(LabelMap) );
+		throw "Label map missing meta";
+	}
+	
+	function IndexToUv(Index)
+	{
+		const Width = LabelMap.Meta.Width;
+		const Height = LabelMap.Meta.Height;
+		const x = Index / Width;
+		const y = Index % Width;
+		const u = x / Width;
+		const v = y / Height;
+		return [u,v];
+	}
+	
+	function FindBestUvScore(MapFloats)
+	{
+		if ( !MapFloats )
+			return null;
+		
+		let HighestIndex = 0;
+		let HighestValue = MapFloats[HighestIndex];
+		for ( let i=0;	i<MapFloats.length;	i++ )
+		{
+			const Value = MapFloats[i];
+			if ( Value <= HighestValue )
+				continue;
+			HighestIndex = i;
+			HighestValue = Value;
+		}
+		let uvscore = IndexToUv(HighestIndex);
+		uvscore.push( HighestValue );
+		return uvscore;
+	}
+	
+	//	todo: get a map from one label set to joints
+	const Skeleton = {};
+	function MapLabelToJoint(Label)
+	{
+		const Joint = Label;
+		Skeleton[Joint] = FindBestUvScore( LabelMap[Label] );
+	}
+	SkeletonJointNames.forEach( MapLabelToJoint );
+	return Skeleton;
+}
 
 function CreateCubeGeometry(RenderTarget,Min=-1,Max=1)
 {
@@ -260,8 +319,6 @@ function GetSkeletonLines(Skeleton,Lines,Scores)
 	
 	function PushBone(JointAB,Index)
 	{
-		if ( Index >= Params.BoneCount )
-			return;
 		try
 		{
 			const JointA = JointAB[0];
@@ -279,7 +336,7 @@ function GetSkeletonLines(Skeleton,Lines,Scores)
 	
 	//Object.keys(Skeleton).forEach( PointJointRect );
 
-	const Bones =
+	const AppleFace_Bones =
 	[
 	 //	left eyebrow
 	 ['FaceLandmark00','FaceLandmark01'],
@@ -361,7 +418,26 @@ function GetSkeletonLines(Skeleton,Lines,Scores)
 	 //['FaceLandmark62','FaceLandmark63'],
 	 ['FaceLandmark63','FaceLandmark64'],
 	];
-	Bones.forEach( PushBone );
+	
+	const Skeleton_Bones =
+	[
+		['Head','LeftShoulder'],
+		['Head','RightShoulder'],
+		['LeftShoulder','RightShoulder'],
+		['LeftHip','RightHip'],
+		['LeftShoulder','LeftElbow'],
+		['LeftElbow','LeftHand'],
+		['LeftShoulder','LeftHip'],
+		['LeftHip','LeftKnee'],
+		['LeftKnee','LeftFoot'],
+		['RightShoulder','RightElbow'],
+		['RightElbow','RightHand'],
+		['RightShoulder','RightHip'],
+		['RightHip','RightKnee'],
+		['RightKnee','RightFoot'],
+	 ];
+	AppleFace_Bones.forEach( PushBone );
+	Skeleton_Bones.forEach( PushBone );
 }
 
 function RenderScene(RenderTarget, Camera)
@@ -500,8 +576,6 @@ class TCameraWindow
 	
 	OnRender(RenderTarget)
 	{
-		this.UpdateFaceCamera( this.LastFace );
-		
 		if ( !this.Source )
 		{
 			RenderTarget.ClearColour(255,0,0);
@@ -613,6 +687,32 @@ class TCameraWindow
 	
 	async GetFaceUvz(Frame)
 	{
+		if ( Params.UseAppleFace )
+			return this.GetFaceUvz_AppleFace( Frame );
+		
+		if ( Params.UseOpenPose )
+			return this.GetFaceUvz_OpenPose( Frame );
+		
+		return null;
+	}
+	
+	async GetFaceUvz_OpenPose(Frame)
+	{
+		Frame.Resize( 368, 368 );
+		Frame.SetFormat('Greyscale');
+		
+		const LabelMap = await Coreml.OpenPoseLabelMap( Frame );
+		
+		this.Skeleton = LabelMapToSkeleton(LabelMap);
+		const HeadUvScore = this.Skeleton.Head;
+		const Distance = Params.FaceZ;
+		const FaceUvDistance = [ HeadUvScore[0], HeadUvScore[1], Distance ];
+		
+		return FaceUvDistance;
+	}
+	
+	async GetFaceUvz_AppleFace(Frame)
+	{
 		Frame.Resize( 512, 256 );
 		Frame.SetFormat('Greyscale');
 	
@@ -677,7 +777,6 @@ async function FindCamerasLoop()
 {
 	let CreateCamera = function(CameraName)
 	{
-		
 		if ( CameraWindows.hasOwnProperty(CameraName) )
 		{
 			Pop.Debug("Already have window for " + CameraName);
@@ -708,15 +807,33 @@ async function FindCamerasLoop()
 		}
 	}
 	
+	function CreateCameraMatch(Devices,Match)
+	{
+		const Matches = Devices.filter( Name => Name.includes(Match) );
+		if ( !Matches.length )
+			return false;
+		CreateCamera( Matches[0] );
+		return true;
+	}
+	
 	while ( true )
 	{
 		try
 		{
 			let Devices = await Pop.Media.EnumDevices();
 			Pop.Debug("Pop.Media.EnumDevices found(" + Devices + ") result type=" + (typeof Devices) );
-			Devices.reverse();
-			//CreateCamera(Devices[0]);
-			Devices.forEach( CreateCamera );
+			
+			if ( CreateCameraMatch( Devices, 'iSight' ) )
+			{
+				
+			}
+			else if ( CreateCameraMatch( Devices, 'FaceTime' ) )
+			{
+			}
+			else
+			{
+				Devices.forEach( CreateCamera );
+			}
 			await Pop.Yield( 1 );
 			
 			//	todo: EnumDevices needs to change to "OnDevicesChanged"
