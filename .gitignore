@@ -1,5 +1,5 @@
 # dont commit libraries
-PopEngine.framework/
+*.framework/
 
 # user data
 xcuserdata/
