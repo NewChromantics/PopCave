@@ -1,3 +1,5 @@
+Pop.Debug("PopCave");
+
 Pop.Include = function(Filename)
 {
 	const Source = Pop.LoadFileAsString(Filename);
@@ -559,7 +561,7 @@ class TCameraWindow
 		{
 			MoveCamera( x,y,Button,false );
 		}
-		/*
+ 
 		this.Window.OnMouseScroll = function(x,y,Button,Delta)
 		{
 			let Fly = Delta[1] * 50;
@@ -569,7 +571,7 @@ class TCameraWindow
 			Camera.OnCameraPanLocal( 0, 0, 0, true );
 			Camera.OnCameraPanLocal( 0, 0, Fly, false );
 		}
-*/
+ 
 		this.Source = new Pop.Media.Source(CameraName);
 		this.ListenForFrames().catch(Pop.Debug);
 	}
@@ -790,12 +792,7 @@ async function FindCamerasLoop()
 		{
 			//return;
 		}
-		/*
-		if ( !CameraName.includes('iSight') )
-		{
-			return;
-		}
-		*/
+		
 		try
 		{
 			let Window = new TCameraWindow(CameraName);
@@ -848,3 +845,4 @@ async function FindCamerasLoop()
 
 //	start tracking cameras
 FindCamerasLoop().catch(Pop.Debug);
+
