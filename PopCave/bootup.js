@@ -42,12 +42,16 @@ Params.GeoZ = 0;
 Params.RenderGeo = true;
 Params.UseAppleFace = false;
 Params.UseOpenPose = true;
+Params.UseHourglass = true;
+Params.UseCpm = true;
 
 
 var ParamsWindow = CreateParamsWindow( Params, function(){}, [800,100,500,200] );
 ParamsWindow.AddParam('MaxScore',0,1);
 ParamsWindow.AddParam('UseAppleFace');
 ParamsWindow.AddParam('UseOpenPose');
+ParamsWindow.AddParam('UseCpm');
+ParamsWindow.AddParam('UseHourglass');
 ParamsWindow.AddParam('LineWidth',0.0001,0.01);
 ParamsWindow.AddParam('FaceZ',0,10);
 ParamsWindow.AddParam('RenderVideo');
@@ -695,6 +699,12 @@ class TCameraWindow
 		if ( Params.UseOpenPose )
 			return this.GetFaceUvz_OpenPose( Frame );
 		
+		if ( Params.UseHourglass )
+			return this.GetFaceUvz_Hourglass( Frame );
+		
+		if ( Params.UseCpm )
+			return this.GetFaceUvz_Cpm( Frame );
+		
 		return null;
 	}
 	
@@ -704,6 +714,36 @@ class TCameraWindow
 		Frame.SetFormat('Greyscale');
 		
 		const LabelMap = await Coreml.OpenPoseLabelMap( Frame );
+		
+		this.Skeleton = LabelMapToSkeleton(LabelMap);
+		const HeadUvScore = this.Skeleton.Head;
+		const Distance = Params.FaceZ;
+		const FaceUvDistance = [ HeadUvScore[0], HeadUvScore[1], Distance ];
+		
+		return FaceUvDistance;
+	}
+	
+	async GetFaceUvz_Hourglass(Frame)
+	{
+		Frame.Resize( 192, 192 );
+		Frame.SetFormat('Greyscale');
+		
+		const LabelMap = await Coreml.HourglassLabelMap( Frame );
+		
+		this.Skeleton = LabelMapToSkeleton(LabelMap);
+		const HeadUvScore = this.Skeleton.Head;
+		const Distance = Params.FaceZ;
+		const FaceUvDistance = [ HeadUvScore[0], HeadUvScore[1], Distance ];
+		
+		return FaceUvDistance;
+	}
+	
+	async GetFaceUvz_Cpm(Frame)
+	{
+		Frame.Resize( 192, 192 );
+		Frame.SetFormat('Greyscale');
+		
+		const LabelMap = await Coreml.CpmLabelMap( Frame );
 		
 		this.Skeleton = LabelMapToSkeleton(LabelMap);
 		const HeadUvScore = this.Skeleton.Head;
