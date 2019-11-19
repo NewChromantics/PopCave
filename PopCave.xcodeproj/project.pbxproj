@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BF151F2623842ABF00A70EBF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BF5EAFA8237F09F50077BCF5 /* Assets.xcassets */; };
 		BF5EAFA4237F09E70077BCF5 /* PopCave in Resources */ = {isa = PBXBuildFile; fileRef = BF5EAFA3237F09E70077BCF5 /* PopCave */; };
 		BF5EB03D237F17BD0077BCF5 /* PopEngine.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BF5EB039237F176D0077BCF5 /* PopEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BF5EB03E237F181E0077BCF5 /* PopEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF5EB039237F176D0077BCF5 /* PopEngine.framework */; };
@@ -164,6 +165,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BF5EAFA4237F09E70077BCF5 /* PopCave in Resources */,
+				BF151F2623842ABF00A70EBF /* Assets.xcassets in Resources */,
 				BF5EB06E23803BC50077BCF5 /* PopEngine.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -296,6 +298,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ADDRESS_SANITIZER_CONTAINER_OVERFLOW = YES;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -320,6 +323,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ADDRESS_SANITIZER_CONTAINER_OVERFLOW = YES;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
