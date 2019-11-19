@@ -23,9 +23,9 @@ const GeoColourShader = Pop.LoadFileAsString('Colour.frag.glsl');
 
 
 var Params = {};
-Params.MaxScore = 0.5;
+Params.MaxScore = 1.0;
 Params.LineWidth = 0.0015;
-Params.RenderVideo = false;
+Params.RenderVideo = true;
 Params.RenderWorld = true;
 Params.RenderFromFaceCamera = true;
 Params.CameraModelScale = 0.1;
@@ -41,9 +41,13 @@ Params.GeoY = 0;
 Params.GeoZ = 0;
 Params.RenderGeo = true;
 Params.UseAppleFace = false;
-Params.UseOpenPose = true;
-Params.UseHourglass = true;
-Params.UseCpm = true;
+Params.UseOpenPose = false;
+Params.UseHourglass = false;
+Params.UseCpm = false;
+Params.UseResnet50 = false;
+Params.UseSsdMobileNet = false;
+Params.UseYolo = false;
+Params.UsePosenet = true;
 
 
 var ParamsWindow = CreateParamsWindow( Params, function(){}, [800,100,500,200] );
@@ -52,6 +56,10 @@ ParamsWindow.AddParam('UseAppleFace');
 ParamsWindow.AddParam('UseOpenPose');
 ParamsWindow.AddParam('UseCpm');
 ParamsWindow.AddParam('UseHourglass');
+ParamsWindow.AddParam('UseResnet50');
+ParamsWindow.AddParam('UseSsdMobileNet');
+ParamsWindow.AddParam('UseYolo');
+ParamsWindow.AddParam('UsePosenet');
 ParamsWindow.AddParam('LineWidth',0.0001,0.01);
 ParamsWindow.AddParam('FaceZ',0,10);
 ParamsWindow.AddParam('RenderVideo');
@@ -77,6 +85,8 @@ const SkeletonJointNames =
  'Head',
  'LeftShoulder',		'LeftElbow',	'LeftHand',		'LeftHip',	'LeftKnee',		'LeftFoot',
  'RightShoulder',	'RightElbow',	'RightHand',	'RightHip',	'RightKnee',	'RightFoot',
+ //	posenet has these!
+ 'LeftEye', 		'RightEye',	'LeftEar', 'RightEar'
  ];
 
 function LabelMapToSkeleton(LabelMap)
@@ -126,6 +136,45 @@ function LabelMapToSkeleton(LabelMap)
 		Skeleton[Joint] = FindBestUvScore( LabelMap[Label] );
 	}
 	SkeletonJointNames.forEach( MapLabelToJoint );
+	return Skeleton;
+}
+
+function LabelRectsToSkeleton(Rects)
+{
+	function CompareBestScore(RectA,RectB)
+	{
+		if ( RectA.Score > RectB.Score )
+			return -1;
+		if ( RectA.Score < RectB.Score )
+			return 1;
+		return 0;
+	}
+
+	//	get best
+	Rects.sort( CompareBestScore );
+
+	function RectToSkeleton(Rect)
+	{
+		const BestRect = Rects[0];
+		const Score = BestRect.Score;
+		const t = Rect.y;
+		const l = Rect.x;
+		const r = Rect.x + Rect.w;
+		const b = Rect.y + Rect.h;
+		const vm = Rect.x + (Rect.w/2);
+		const hm = Rect.y + (Rect.h/2);
+
+		const Skeleton = {};
+		Skeleton.LeftShoulder = [l,vm,Score];
+		Skeleton.RightShoulder = [r,vm,Score];
+		Skeleton.Head = [hm,t,Score];
+		Skeleton.LeftHip = [l,vm,Score];
+		Skeleton.LeftFoot = [l,b,Score];
+		Skeleton.RightHip = [r,vm,Score];
+		Skeleton.RightFoot = [r,b,Score];
+		return Skeleton;
+	}
+	const Skeleton = RectToSkeleton( Rects[0] );
 	return Skeleton;
 }
 
@@ -427,6 +476,12 @@ function GetSkeletonLines(Skeleton,Lines,Scores)
 	
 	const Skeleton_Bones =
 	[
+	 ['Head','LeftEye'],
+	 ['Head','RightEye'],
+	 ['LeftEye','RightEye'],
+	 ['LeftEye','LeftEar'],
+	 ['RightEye','RightEar'],
+	 
 		['Head','LeftShoulder'],
 		['Head','RightShoulder'],
 		['LeftShoulder','RightShoulder'],
@@ -699,12 +754,24 @@ class TCameraWindow
 		if ( Params.UseOpenPose )
 			return this.GetFaceUvz_OpenPose( Frame );
 		
-		if ( Params.UseHourglass )
-			return this.GetFaceUvz_Hourglass( Frame );
-		
 		if ( Params.UseCpm )
 			return this.GetFaceUvz_Cpm( Frame );
 		
+		if ( Params.UseHourglass )
+			return this.GetFaceUvz_Hourglass( Frame );
+		
+		if ( Params.UseResnet50 )
+			return this.GetFaceUvz_Resnet50( Frame );
+		
+		if ( Params.UseSsdMobileNet )
+			return this.GetFaceUvz_SsdMobileNet( Frame );
+		
+		if ( Params.UseYolo )
+			return this.GetFaceUvz_Yolo( Frame );
+		
+		if ( Params.UsePosenet )
+			return this.GetFaceUvz_Posenet( Frame );
+
 		return null;
 	}
 	
@@ -744,6 +811,80 @@ class TCameraWindow
 		Frame.SetFormat('Greyscale');
 		
 		const LabelMap = await Coreml.CpmLabelMap( Frame );
+		
+		this.Skeleton = LabelMapToSkeleton(LabelMap);
+		const HeadUvScore = this.Skeleton.Head;
+		const Distance = Params.FaceZ;
+		const FaceUvDistance = [ HeadUvScore[0], HeadUvScore[1], Distance ];
+		
+		return FaceUvDistance;
+	}
+	
+	async GetFaceUvz_Resnet50(Frame)
+	{
+		Frame.Resize( 224, 224 );
+		Frame.SetFormat('Greyscale');
+		
+		const LabelMap = await Coreml.Resnet50LabelMap( Frame );
+		
+		this.Skeleton = LabelMapToSkeleton(LabelMap);
+		const HeadUvScore = this.Skeleton.Head;
+		const Distance = Params.FaceZ;
+		const FaceUvDistance = [ HeadUvScore[0], HeadUvScore[1], Distance ];
+		
+		return FaceUvDistance;
+	}
+	
+	async GetFaceUvz_SsdMobileNet(Frame)
+	{
+		Frame.Resize( 300, 300 );
+		Frame.SetFormat('Greyscale');
+		
+		const Rects = await Coreml.SsdMobileNet( Frame );
+		
+		function FilterPersons(Label)
+		{
+			return Label.Label == 'person';
+		}
+		const PersonRects = Rects.filter( FilterPersons );
+		
+		//	get the person rect[s] and fake a skeleton
+		this.Skeleton = LabelRectsToSkeleton(Rects);
+		const HeadUvScore = this.Skeleton.Head;
+		const Distance = Params.FaceZ;
+		const FaceUvDistance = [ HeadUvScore[0], HeadUvScore[1], Distance ];
+		
+		return FaceUvDistance;
+	}
+	
+	async GetFaceUvz_Yolo(Frame)
+	{
+		Frame.Resize( 416, 416 );
+		Frame.SetFormat('Greyscale');
+		
+		const Rects = await Coreml.Yolo( Frame );
+		
+		function FilterPersons(Label)
+		{
+			return Label.Label == 'person';
+		}
+		const PersonRects = Rects.filter( FilterPersons );
+		
+		//	get the person rect[s] and fake a skeleton
+		this.Skeleton = LabelRectsToSkeleton(Rects);
+		const HeadUvScore = this.Skeleton.Head;
+		const Distance = Params.FaceZ;
+		const FaceUvDistance = [ HeadUvScore[0], HeadUvScore[1], Distance ];
+		
+		return FaceUvDistance;
+	}
+	
+	async GetFaceUvz_Posenet(Frame)
+	{
+		Frame.Resize( 513, 513 );
+		Frame.SetFormat('Greyscale');
+		
+		const LabelMap = await Coreml.PosenetLabelMap( Frame );
 		
 		this.Skeleton = LabelMapToSkeleton(LabelMap);
 		const HeadUvScore = this.Skeleton.Head;
