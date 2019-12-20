@@ -47,7 +47,8 @@ Params.UseCpm = false;
 Params.UseResnet50 = false;
 Params.UseSsdMobileNet = false;
 Params.UseYolo = false;
-Params.UsePosenet = true;
+Params.UsePosenet = false;
+Params.UseWinSkillSkeleton = true;
 
 
 var ParamsWindow = CreateParamsWindow( Params, function(){}, [800,100,500,200] );
@@ -60,6 +61,8 @@ ParamsWindow.AddParam('UseResnet50');
 ParamsWindow.AddParam('UseSsdMobileNet');
 ParamsWindow.AddParam('UseYolo');
 ParamsWindow.AddParam('UsePosenet');
+ParamsWindow.AddParam('UseWinSkillSkeleton');
+
 ParamsWindow.AddParam('LineWidth',0.0001,0.01);
 ParamsWindow.AddParam('FaceZ',0,10);
 ParamsWindow.AddParam('RenderVideo');
@@ -297,9 +300,12 @@ function LabelsToSkeleton(Labels)
 	
 	function LabelToPoint(Label)
 	{
-		const Rect = [ Label.x, Label.y, Label.w, Label.h ];
-		const u = Label.x + (Label.w/2);
-		const v = Label.y + (Label.h/2);
+		if (Label.Label == "Neck")
+			Label.Label = "Head";
+
+		const Rect = [Label.x,Label.y,Label.w,Label.h];
+		const u = Label.x + (Label.w/2.0);
+		const v = Label.y + (Label.h / 2.0);
 		const Score = Label.Score;	//	all 1 atm
 		Skeleton[Label.Label] = [u,v,Score];
 	}
@@ -349,7 +355,7 @@ function GetSkeletonLines(Skeleton,Lines,Scores)
 		PushLine( [1,0], [0,1], 0 );
 		return;
 	}
-	
+
 	function PointJointRect(Joint)
 	{
 		try
@@ -380,11 +386,15 @@ function GetSkeletonLines(Skeleton,Lines,Scores)
 			const JointB = JointAB[1];
 			const a = Skeleton[JointA];
 			const b = Skeleton[JointB];
+			//	gr: if I don't exit here it's throwing an exception I think should be caught?
+			if (!a || !b)
+				return;
 			const Score = (a[2] + b[2]) / 2;
-			PushLine( a, b, Score );
+			PushLine(a,b,Score);
 		}
 		catch(e)
 		{
+			Pop.Debug("Error in PushBone "+e);
 			//	missing joint
 		}
 	}
@@ -651,8 +661,8 @@ class TCameraWindow
 		
 		if ( Params.RenderVideo )
 		{
-			RenderVideoImage( RenderTarget, this.VideoTexture );
-			RenderSkeleton( RenderTarget, this.Skeleton );
+			RenderVideoImage(RenderTarget,this.VideoTexture);
+			RenderSkeleton(RenderTarget,this.Skeleton);
 		}
 		else if ( Params.RenderWorld || Params.RenderFromFaceCamera )
 		{
@@ -700,7 +710,7 @@ class TCameraWindow
 		{
 			try
 			{
-				await Pop.Yield(5);
+				//await Pop.Yield(5);
 				const fb = FrameBuffer;
 				const NewTexures = await this.ProcessNextFrame(fb);
 				if ( !NewTexures )
@@ -708,12 +718,17 @@ class TCameraWindow
 				
 				const Luma = new Pop.Image();
 				Luma.Copy( NewTexures[0] );
-			
-				const FaceUvz = await this.GetFaceUvz( Luma );
 
-				this.LastFaceUvz = FaceUvz || this.LastFaceUvz;
+				try
+				{
+					const FaceUvz = await this.GetFaceUvz(Luma);
 
-				this.UpdateFaceCamera();
+					this.LastFaceUvz = FaceUvz || this.LastFaceUvz;
+
+					this.UpdateFaceCamera();
+				}
+				catch (e)
+				{}
 				//Pop.Debug(JSON.stringify(this.Skeleton));
 				this.VideoTexture = Luma;
 				this.CameraFrameCounter.Add();
@@ -771,6 +786,9 @@ class TCameraWindow
 		
 		if ( Params.UsePosenet )
 			return this.GetFaceUvz_Posenet( Frame );
+
+		if (Params.UseWinSkillSkeleton)
+			return this.GetFaceUvz_WinSkillSkeleton(Frame);
 
 		return null;
 	}
@@ -908,6 +926,22 @@ class TCameraWindow
 		const FaceUvDistance = GetFaceCenterDistance(Face);
 		return FaceUvDistance;
 	}
+
+	async GetFaceUvz_WinSkillSkeleton(Frame)
+	{
+		Frame.Resize(128,128);
+		Frame.SetFormat('Greyscale');
+
+		const Labels = await Coreml.WinSkillSkeleton(Frame);
+		
+		this.Skeleton = LabelsToSkeleton(Labels);
+		const HeadUvScore = this.Skeleton.Head;
+		const Distance = Params.FaceZ;
+		const FaceUvDistance = [HeadUvScore[0],HeadUvScore[1],Distance];
+
+		return FaceUvDistance;
+	}
+
 }
 
 
