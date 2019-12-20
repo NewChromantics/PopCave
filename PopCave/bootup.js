@@ -300,9 +300,6 @@ function LabelsToSkeleton(Labels)
 	
 	function LabelToPoint(Label)
 	{
-		if (Label.Label == "Neck")
-			Label.Label = "Head";
-
 		const Rect = [Label.x,Label.y,Label.w,Label.h];
 		const u = Label.x + (Label.w/2.0);
 		const v = Label.y + (Label.h / 2.0);
@@ -929,7 +926,7 @@ class TCameraWindow
 
 	async GetFaceUvz_WinSkillSkeleton(Frame)
 	{
-		Frame.Resize(128,128);
+		Frame.Resize(512,512);
 		Frame.SetFormat('Greyscale');
 
 		const Labels = await Coreml.WinSkillSkeleton(Frame);
