@@ -1057,4 +1057,5 @@ async function FindCamerasLoop()
 
 //	start tracking cameras
 FindCamerasLoop().catch(Pop.Debug);
+MemCheckLoop().catch(Pop.Debug);
 
