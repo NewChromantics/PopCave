@@ -5,10 +5,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
@@ -19,39 +15,17 @@
     <Filter Include="PopCave\PopEngineCommon">
       <UniqueIdentifier>{7a356c43-2ca5-4cd0-a555-d5564bed0ed7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Dlls">
-      <UniqueIdentifier>{4d549a63-ca65-491f-8607-f5de1136ee2f}</UniqueIdentifier>
+    <Filter Include="Dlls">
+      <UniqueIdentifier>{00d28bea-7c65-45f8-9136-3e217528d32f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Src_Windows\PopEngine.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="PopCave.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="PopCave.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="small.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="PopCave.ico">
+    <Image Include="..\..\Src_Windows\PopCave.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
@@ -152,36 +126,9 @@
     <None Include="..\..\Src_Osx\main.mm">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="packages.config" />
-    <None Include="..\..\Src_Windows\Microsoft.AI.Skills.SkillInterfacePreview.dll">
-      <Filter>Source Files\Dlls</Filter>
+    <None Include="packages.config">
+      <Filter>Dlls</Filter>
     </None>
-    <None Include="..\..\Src_Windows\Microsoft.AI.Skills.Vision.SkeletalDetectorPreview.dll">
-      <Filter>Source Files\Dlls</Filter>
-    </None>
-    <None Include="..\..\Src_Windows\msvcp140_app.dll">
-      <Filter>Source Files\Dlls</Filter>
-    </None>
-    <None Include="..\..\Src_Windows\msvcp140d_app.dll">
-      <Filter>Source Files\Dlls</Filter>
-    </None>
-    <None Include="..\..\Src_Windows\PopCameraDevice.dll">
-      <Filter>Source Files\Dlls</Filter>
-    </None>
-    <None Include="..\..\Src_Windows\PopCoreml.dll">
-      <Filter>Source Files\Dlls</Filter>
-    </None>
-    <None Include="..\..\Src_Windows\vcruntime140_app.dll">
-      <Filter>Source Files\Dlls</Filter>
-    </None>
-    <None Include="..\..\Src_Windows\vcruntime140d_app.dll">
-      <Filter>Source Files\Dlls</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\..\Src_Windows\PopEngine.lib">
-      <Filter>Source Files</Filter>
-    </Library>
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="..\..\Src_Windows\PopCoreml.manifest">
@@ -190,7 +137,46 @@
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="..\..\Src_Windows\PopEngine.dll">
-      <Filter>Source Files\Dlls</Filter>
+      <Filter>Dlls</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\Microsoft.AI.Skills.SkillInterfacePreview.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\Microsoft.AI.Skills.Vision.SkeletalDetectorPreview.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\msvcp140_app.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\msvcp140d_app.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\PopCameraDevice.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\PopCoreml.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\vcruntime140_app.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\vcruntime140d_app.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\Src_Windows\PopEngine.lib">
+      <Filter>Dlls</Filter>
+    </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Src_Windows\PopCave.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\Src_Windows\PopCave.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

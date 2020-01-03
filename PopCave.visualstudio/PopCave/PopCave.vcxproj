@@ -158,19 +158,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Src_Windows\PopEngine.h" />
-    <ClInclude Include="framework.h" />
-    <ClInclude Include="Resource.h" />
-    <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="PopCave.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="PopCave.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="PopCave.ico" />
-    <Image Include="small.ico" />
+    <Image Include="..\..\Src_Windows\PopCave.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\PopCave\bootup.js" />
@@ -253,6 +243,12 @@
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="..\..\Src_Windows\PopCoreml.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Src_Windows\PopCave.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\Src_Windows\PopCave.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,10 +1,3 @@
-// PopCave.cpp : Defines the entry point for the application.
-//
-
-//#include "framework.h"
-//#include "PopCave.h"
-
-#include "targetver.h"
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 // Windows Header Files
 #include <windows.h>
@@ -14,7 +7,7 @@
 #include <memory.h>
 #include <tchar.h>
 
-#include "..\..\Src_Windows\PopEngine.h"
+#include "PopEngine.h"
 #pragma comment(lib, "PopEngine.lib")
 
 #include <string>
