@@ -3,3 +3,11 @@
 
 # user data
 xcuserdata/
+
+PopCave.visualstudio/PopCave/x64/
+
+PopCave.visualstudio/PopCave/packages/
+
+*.user
+
+PopCave.visualstudio/PopCave/.vs/
