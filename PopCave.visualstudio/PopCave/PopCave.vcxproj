@@ -158,6 +158,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Src_Windows\PopEngine.h" />
+    <ClInclude Include="..\..\Src_Windows\Resource.h" />
+    <ClInclude Include="..\..\Src_Windows\TargetVer.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\Src_Windows\PopCave.ico" />

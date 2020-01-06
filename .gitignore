@@ -11,3 +11,5 @@ PopCave.visualstudio/PopCave/packages/
 *.user
 
 PopCave.visualstudio/PopCave/.vs/
+
+*.aps

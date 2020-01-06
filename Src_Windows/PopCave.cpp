@@ -59,6 +59,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
-	return PopEngine("d:/PopCave/PopCave");
+	return PopEngine("./");
 }
 
