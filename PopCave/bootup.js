@@ -37,6 +37,7 @@ Expose.ListenPorts = [9001,9002,9003,9004,9005];
 var Params = {};
 Params.MaxScore = 1.0;
 Params.LineWidth = 0.0015;
+Params.WorldVerticalFov = 45;
 Params.RenderVideo = true;
 Params.RenderWorld = true;
 Params.RenderFromFaceCamera = true;
@@ -61,7 +62,7 @@ Params.UseSsdMobileNet = false;
 Params.UseYolo = false;
 Params.UsePosenet = false;
 Params.UseWinSkillSkeleton = true;
-Params.EnableStreamFramePng = true;
+Params.EnableStreamFramePng = false;
 
 
 var ParamsWindow = CreateParamsWindow( Params, function(){}, [800,100,500,200] );
@@ -78,6 +79,7 @@ ParamsWindow.AddParam('UseWinSkillSkeleton');
 
 ParamsWindow.AddParam('LineWidth',0.0001,0.01);
 ParamsWindow.AddParam('FaceZ',0,10);
+ParamsWindow.AddParam('WorldVerticalFov',4,90);
 ParamsWindow.AddParam('RenderVideo');
 ParamsWindow.AddParam('RenderWorld');
 ParamsWindow.AddParam('RenderFromFaceCamera');
@@ -292,7 +294,7 @@ function GetSceneGeos(RenderTarget)
 	if ( SceneGeos )
 		return SceneGeos;
 	
-	const SceneFilename = 'Assets/parallax_test_02.obj';
+	const SceneFilename = 'parallax_test_02.obj';
 	
 	function OnGeometry(Geometry)
 	{
@@ -541,6 +543,7 @@ function GetSkeletonLines(Skeleton,Lines,Scores)
 
 function RenderScene(RenderTarget, Camera)
 {
+	Camera.FovVertical = Params.WorldVerticalFov;
 	const Geos = GetSceneGeos( RenderTarget );
 	const Position = [Params.GeoX,Params.GeoY,Params.GeoZ];
 	const Scale = Params.GeoScale;
@@ -1228,7 +1231,7 @@ async function RunServer(OnMessage)
 
 //	start tracking cameras
 FindCamerasLoop().catch(Pop.Debug);
-MemCheckLoop().catch(Pop.Debug);
+//MemCheckLoop().catch(Pop.Debug);
 
 
 //RunBroadcast(OnBroadcastMessage).then(Pop.Debug).catch(Pop.Debug);
