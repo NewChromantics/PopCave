@@ -1031,8 +1031,12 @@ async function FindCamerasLoop()
 		{
 			let Devices = await Pop.Media.EnumDevices();
 			Pop.Debug("Pop.Media.EnumDevices found(" + Devices + ") result type=" + (typeof Devices) );
-			
-			if ( CreateCameraMatch( Devices, 'iSight' ) )
+
+			if (CreateCameraMatch(Devices,'USB  Live  Camera'))
+			{
+
+			}
+			else if ( CreateCameraMatch( Devices, 'iSight' ) )
 			{
 				
 			}

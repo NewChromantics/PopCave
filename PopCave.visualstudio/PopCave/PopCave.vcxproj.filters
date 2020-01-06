@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -46,12 +46,6 @@
       <Filter>PopCave</Filter>
     </None>
     <None Include="..\..\PopCave\Geo.vert.glsl">
-      <Filter>PopCave</Filter>
-    </None>
-    <None Include="..\..\PopCave\Greyscale.frag.glsl">
-      <Filter>PopCave</Filter>
-    </None>
-    <None Include="..\..\PopCave\Quad.vert.glsl">
       <Filter>PopCave</Filter>
     </None>
     <None Include="..\..\PopCave\PopEngineCommon\LICENSE.md">
@@ -126,9 +120,6 @@
     <None Include="..\..\PopCave\PopEngineCommon\PopWebXrApi.js">
       <Filter>PopCave\PopEngineCommon</Filter>
     </None>
-    <None Include="..\..\PopCave\PopEngineCommon\Readme.md">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
     <None Include="..\..\Src_Osx\main.mm">
       <Filter>Source Files</Filter>
     </None>
@@ -168,6 +159,15 @@
     </CopyFileToFolders>
     <CopyFileToFolders Include="..\..\Src_Windows\vcruntime140d_app.dll">
       <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\Greyscale.frag.glsl">
+      <Filter>PopCave</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\Quad.vert.glsl">
+      <Filter>PopCave</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\Readme.md">
+      <Filter>PopCave\PopEngineCommon</Filter>
     </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
