@@ -21,6 +21,18 @@ const GeoVertShader = Pop.LoadFileAsString('Geo.vert.glsl');
 const GeoColourShader = Pop.LoadFileAsString('Colour.frag.glsl');
 
 
+const RenderCounter = new Pop.FrameCounter('Render');
+const PoseCounter = new Pop.FrameCounter('Poses');
+const FrameImageCounter = new Pop.FrameCounter('FrameImage');
+const PngKbCounter = new Pop.FrameCounter('Png kb');
+
+
+
+//	namespace for Expose network API
+const Expose = {};
+Expose.BroadcastPorts = [9000];
+Expose.ListenPorts = [9001,9002,9003,9004,9005];
+
 
 var Params = {};
 Params.MaxScore = 1.0;
@@ -49,6 +61,7 @@ Params.UseSsdMobileNet = false;
 Params.UseYolo = false;
 Params.UsePosenet = false;
 Params.UseWinSkillSkeleton = true;
+Params.EnableStreamFramePng = true;
 
 
 var ParamsWindow = CreateParamsWindow( Params, function(){}, [800,100,500,200] );
@@ -80,6 +93,24 @@ ParamsWindow.AddParam('GeoX',-10,10);
 ParamsWindow.AddParam('GeoY',-10,10);
 ParamsWindow.AddParam('GeoZ',-10,10);
 ParamsWindow.AddParam('GeoYaw',-180,180);
+
+ParamsWindow.AddParam('EnableStreamFramePng');
+
+
+
+//	send callback
+let SendPose = null;
+let SendFramePng = null;
+
+
+
+function OnNewPose(Pose)
+{
+	if (!SendPose)
+		return;
+
+	SendPose(Pose);
+}
 
 
 
@@ -729,6 +760,14 @@ class TCameraWindow
 				//Pop.Debug(JSON.stringify(this.Skeleton));
 				this.VideoTexture = Luma;
 				this.CameraFrameCounter.Add();
+
+				if (Params.EnableStreamFramePng && SendFramePng)
+				{
+					const PngData = Luma.GetPngData(0.5);
+					PngKbCounter.Add(PngData.length / 1024);
+					if (SendFramePng)
+						SendFramePng(PngData);
+				}
 			}
 			catch(e)
 			{
@@ -751,6 +790,8 @@ class TCameraWindow
 			this.FaceCamera.Position = RayToFace.GetPosition( FaceZ );
 			//Pop.Debug("this.FaceCamera.Position",this.FaceCamera.Position);
 			this.FaceCamera.LookAt = this.VideoCamera.Position.slice();
+
+			OnNewPose(this.FaceCamera);
 		}
 		catch(e)
 		{
@@ -1059,7 +1100,136 @@ async function FindCamerasLoop()
 	}
 }
 
+
+
+
+function OnBroadcastMessage(Message,Socket)
+{
+	//	send back our address
+	Pop.Debug("Got broadcast message",JSON.stringify(Message));
+	Socket.Send(Message.Peer,"Hello");
+}
+
+function OnRecievedMessage(Message,Socket)
+{
+	//	send to expose api for decoding
+	Pop.Debug("Got message",JSON.stringify(Message));
+}
+
+
+//	create discovery udp
+async function RunBroadcast(OnMessage)
+{
+	while (true)
+	{
+		try
+		{
+			const Socket = new Pop.Socket.UdpBroadcastServer(Expose.BroadcastPorts[0]);
+			Pop.Debug("Broadcast listening on ",JSON.stringify(Socket.GetAddress()));
+
+			while (true)
+			{
+				Pop.Debug("Waiting for message");
+				const Message = await Socket.WaitForMessage();
+				OnMessage(Message,Socket);
+			}
+		}
+		catch (e)
+		{
+			Pop.Debug("Exception in broadcast loop: " + e);
+			await Pop.Yield(2000);
+		}
+	}
+}
+
+//	keep trying to run servers
+async function RunServer(OnMessage)
+{
+	let PortIndex = 0;
+	function GetPortIndex()
+	{
+		const PortCount = Expose.ListenPorts.length;
+		PortIndex = (PortIndex + 1) % PortCount;
+		return Expose.ListenPorts[PortIndex];
+	}
+
+	while (true)
+	{
+		try
+		{
+			const Port = GetPortIndex();
+			const Socket = new Pop.Websocket.Server(Port);
+
+
+			Pop.Debug("Websocket listening on ",JSON.stringify(Socket.GetAddress()));
+
+			while (true)
+			{
+				if (!SendPose)
+				{
+					//	gr: this was causing an error, because I THINK we send a packet before handshake is finished?
+					//		temp fix, added to WaitForMessage
+					//	gr: maybe need peer's to finish connecting?
+					SendPose = function (Object)
+					{
+						const Peers = Socket.GetPeers();
+						const Message = JSON.stringify(Object);
+						function SendToPeer(Peer)
+						{
+							try
+							{
+								//Pop.Debug("Sending to " + Peer,Message);
+								Socket.Send(Peer,Message);
+							}
+							catch (e)
+							{
+								Pop.Debug("Error sending pose to " + Peer + "; " + e);
+							}
+						}
+						Peers.forEach(SendToPeer);
+					}
+
+					SendFramePng = function (Object)
+					{
+						const Peers = Socket.GetPeers();
+						const Message = (Object);
+						function SendToPeer(Peer)
+						{
+							try
+							{
+								//Pop.Debug("Sending to " + Peer,Message);
+								Socket.Send(Peer,Message);
+							}
+							catch (e)
+							{
+								Pop.Debug("Error sending png to " + Peer + "; " + e);
+							}
+						}
+						Peers.forEach(SendToPeer);
+					}
+				}
+
+				const Message = await Socket.WaitForMessage();
+				OnMessage(Message,Socket);
+			}
+		}
+		catch (e)
+		{
+			SendPose = null;
+			Pop.Debug("Exception in server loop: " + e);
+			await Pop.Yield(2000);
+		}
+	}
+}
+
+
+
+
+
 //	start tracking cameras
 FindCamerasLoop().catch(Pop.Debug);
 MemCheckLoop().catch(Pop.Debug);
 
+
+//RunBroadcast(OnBroadcastMessage).then(Pop.Debug).catch(Pop.Debug);
+RunServer(OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
