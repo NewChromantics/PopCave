@@ -61,9 +61,13 @@ Params.UseResnet50 = false;
 Params.UseSsdMobileNet = false;
 Params.UseYolo = false;
 Params.UsePosenet = false;
-Params.UseWinSkillSkeleton = true;
+Params.UseWinSkillSkeleton = false;
+Params.UseKinectAzureSkeleton = true;
 Params.EnableStreamFramePng = false;
-
+Params.SkeletonWorldMinX = -3;
+Params.SkeletonWorldMaxX = 3;
+Params.SkeletonWorldMinY = -3;
+Params.SkeletonWorldMaxY = 3;
 
 var ParamsWindow = CreateParamsWindow( Params, function(){}, [800,100,500,200] );
 ParamsWindow.AddParam('MaxScore',0,1);
@@ -76,6 +80,7 @@ ParamsWindow.AddParam('UseSsdMobileNet');
 ParamsWindow.AddParam('UseYolo');
 ParamsWindow.AddParam('UsePosenet');
 ParamsWindow.AddParam('UseWinSkillSkeleton');
+ParamsWindow.AddParam('UseKinectAzureSkeleton');
 
 ParamsWindow.AddParam('LineWidth',0.0001,0.01);
 ParamsWindow.AddParam('FaceZ',0,10);
@@ -97,7 +102,10 @@ ParamsWindow.AddParam('GeoZ',-10,10);
 ParamsWindow.AddParam('GeoYaw',-180,180);
 
 ParamsWindow.AddParam('EnableStreamFramePng');
-
+ParamsWindow.AddParam('SkeletonWorldMinX',-10,10);
+ParamsWindow.AddParam('SkeletonWorldMaxX',-10,10);
+ParamsWindow.AddParam('SkeletonWorldMinY',-10,10);
+ParamsWindow.AddParam('SkeletonWorldMaxY',-10,10);
 
 
 //	send callback
@@ -333,11 +341,22 @@ function LabelsToSkeleton(Labels)
 	
 	function LabelToPoint(Label)
 	{
-		const Rect = [Label.x,Label.y,Label.w,Label.h];
-		const u = Label.x + (Label.w/2.0);
-		const v = Label.y + (Label.h / 2.0);
-		const Score = Label.Score;	//	all 1 atm
-		Skeleton[Label.Label] = [u,v,Score];
+		//	world space label
+		if (Label.z !== undefined)
+		{
+			const Score = Label.Score;
+			const u = Math.Range(Params.SkeletonWorldMinX,Params.SkeletonWorldMaxX,Label.x);
+			const v = Math.Range(Params.SkeletonWorldMinY,Params.SkeletonWorldMaxY,Label.y);
+			Skeleton[Label.Label] = [u,v,Score];
+		}
+		else
+		{
+			const Rect = [Label.x,Label.y,Label.w,Label.h];
+			const u = Label.x + (Label.w / 2.0);
+			const v = Label.y + (Label.h / 2.0);
+			const Score = Label.Score;
+			Skeleton[Label.Label] = [u,v,Score];
+		}
 	}
 	Labels.forEach( LabelToPoint );
 
@@ -751,10 +770,11 @@ class TCameraWindow
 				Luma.Copy( NewTexures[0] );
 
 				try
-				{
-					const FaceUvz = await this.GetFaceUvz(Luma);
+				{					
+					const FaceXyz = await this.GetFaceXyz(Luma);
 
-					this.LastFaceUvz = FaceUvz || this.LastFaceUvz;
+					Pop.Debug("FaceXyz",FaceXyz);
+					this.LastFacePosition = FaceXyz || this.LastFacePosition;
 
 					this.UpdateFaceCamera();
 				}
@@ -786,11 +806,8 @@ class TCameraWindow
 	{
 		try
 		{
-			const FaceUv = this.LastFaceUvz.slice(0,2);
-			const FaceZ = this.LastFaceUvz[2];
-			const RayToFace = GetCameraRay( this.VideoCamera, FaceUv, FaceZ );
+			this.FaceCamera.Position = this.LastFacePosition.slice();
 
-			this.FaceCamera.Position = RayToFace.GetPosition( FaceZ );
 			//Pop.Debug("this.FaceCamera.Position",this.FaceCamera.Position);
 			this.FaceCamera.LookAt = this.VideoCamera.Position.slice();
 
@@ -801,7 +818,24 @@ class TCameraWindow
 			Pop.Debug("UpdateFaceCamera error",e);
 		}
 	}
-	
+
+
+	async GetFaceXyz(Frame)
+	{
+		//	model that gets position
+		if (Params.UseKinectAzureSkeleton)
+			return this.GetFaceXyz_KinectAzureSkeleton(Frame);
+
+		//	convert uv to pos
+		const uvz = await this.GetFaceUvz(Frame);
+		this.LastFaceUvz = uvz;
+		const FaceUv = uvz.slice(0,2);
+		const FaceZ = uvz[2];
+		const RayToFace = GetCameraRay(this.VideoCamera,FaceUv,FaceZ);
+		const xyz = RayToFace.GetPosition(FaceZ);
+		return xyz;
+	}
+
 	async GetFaceUvz(Frame)
 	{
 		if ( Params.UseAppleFace )
@@ -983,6 +1017,27 @@ class TCameraWindow
 		return FaceUvDistance;
 	}
 
+
+	async GetFaceXyz_KinectAzureSkeleton(Frame)
+	{
+		Frame.Resize(256,256);
+		Frame.SetFormat('Greyscale');
+
+		const Labels = await Coreml.KinectAzureSkeleton(Frame);
+
+		const HeadLabels = Labels.filter(Object => Object.Label == "Head");
+
+		//	todo: flatten skeleton for rendering
+		this.Skeleton = LabelsToSkeleton(Labels);
+		Pop.Debug("Skeleton",JSON.stringify(this.Skeleton));
+
+		if (!HeadLabels.length)
+			return null;
+
+		const Head = HeadLabels[0];
+		//Pop.Debug("Head",JSON.stringify(Head));
+		return [Head.x,Head.y,Head.z];
+	}
 }
 
 
