@@ -42,6 +42,30 @@
     <None Include="packages.config">
       <Filter>Dlls</Filter>
     </None>
+    <None Include="..\..\Src_Windows\cudnn64_7.dll">
+      <Filter>Dlls</Filter>
+    </None>
+    <None Include="..\..\Src_Windows\dnn_model_2_0.onnx">
+      <Filter>Dlls</Filter>
+    </None>
+    <None Include="..\..\Src_Windows\cublas64_100.dll">
+      <Filter>Dlls</Filter>
+    </None>
+    <None Include="..\..\Src_Windows\cudart64_100.dll">
+      <Filter>Dlls</Filter>
+    </None>
+    <None Include="..\..\Src_Windows\onnxruntime.dll">
+      <Filter>Dlls</Filter>
+    </None>
+    <None Include="..\..\Src_Windows\k4abt.dll">
+      <Filter>Dlls</Filter>
+    </None>
+    <None Include="..\..\Src_Windows\k4a.dll">
+      <Filter>Dlls</Filter>
+    </None>
+    <None Include="..\..\Src_Windows\depthengine_2_0.dll">
+      <Filter>Dlls</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="..\..\Src_Windows\PopCoreml.manifest">
