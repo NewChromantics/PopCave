@@ -8,7 +8,7 @@ Pop.Include = function(Filename)
 
 Pop.Include('PopEngineCommon/PopShaderCache.js');
 Pop.Include('PopEngineCommon/PopFrameCounter.js');
-Pop.Include('PopEngineCommon/MemCheckLoop.js');
+//Pop.Include('PopEngineCommon/MemCheckLoop.js');
 Pop.Include('PopEngineCommon/PopMath.js');
 Pop.Include('PopEngineCommon/ParamsWindow.js');
 Pop.Include('PopEngineCommon/PopCamera.js');
@@ -452,109 +452,129 @@ function GetSkeletonLines(Skeleton,Lines,Scores)
 
 	const AppleFace_Bones =
 	[
-	 //	left eyebrow
-	 ['FaceLandmark00','FaceLandmark01'],
-	 ['FaceLandmark01','FaceLandmark02'],
-	 ['FaceLandmark02','FaceLandmark03'],
-	 //	right eyebrow
-	 ['FaceLandmark04','FaceLandmark05'],
-	 ['FaceLandmark05','FaceLandmark06'],
-	 ['FaceLandmark06','FaceLandmark07'],
-	 //	left eye
-	 ['FaceLandmark08','FaceLandmark09'],
-	 ['FaceLandmark09','FaceLandmark10'],
-	 ['FaceLandmark10','FaceLandmark11'],
-	 ['FaceLandmark11','FaceLandmark12'],
-	 ['FaceLandmark12','FaceLandmark13'],
-	 ['FaceLandmark13','FaceLandmark14'],
-	 ['FaceLandmark14','FaceLandmark15'],
-	  ['FaceLandmark15','FaceLandmark08'],	//	close eye loop
+		//	left eyebrow
+		['FaceLandmark00','FaceLandmark01'],
+		['FaceLandmark01','FaceLandmark02'],
+		['FaceLandmark02','FaceLandmark03'],
+		//	right eyebrow
+		['FaceLandmark04','FaceLandmark05'],
+		['FaceLandmark05','FaceLandmark06'],
+		['FaceLandmark06','FaceLandmark07'],
+		//	left eye
+		['FaceLandmark08','FaceLandmark09'],
+		['FaceLandmark09','FaceLandmark10'],
+		['FaceLandmark10','FaceLandmark11'],
+		['FaceLandmark11','FaceLandmark12'],
+		['FaceLandmark12','FaceLandmark13'],
+		['FaceLandmark13','FaceLandmark14'],
+		['FaceLandmark14','FaceLandmark15'],
+		['FaceLandmark15','FaceLandmark08'],	//	close eye loop
 		//	right eye
-	['FaceLandmark16','FaceLandmark17'],
-	 ['FaceLandmark17','FaceLandmark18'],
-	 ['FaceLandmark18','FaceLandmark19'],
-	 ['FaceLandmark19','FaceLandmark20'],
-	 ['FaceLandmark20','FaceLandmark21'],
-	 ['FaceLandmark21','FaceLandmark22'],
-	 ['FaceLandmark22','FaceLandmark23'],
-	 ['FaceLandmark23','FaceLandmark16'],	//	close eye loop
-	 //['FaceLandmark23','FaceLandmark24'],
-	 //	mouth
-	 ['FaceLandmark24','FaceLandmark25'],
-	 ['FaceLandmark25','FaceLandmark26'],
-	 ['FaceLandmark26','FaceLandmark27'],
-	 ['FaceLandmark27','FaceLandmark28'],
-	 ['FaceLandmark28','FaceLandmark29'],
-	 ['FaceLandmark29','FaceLandmark30'],
-	 ['FaceLandmark30','FaceLandmark31'],
-	 ['FaceLandmark31','FaceLandmark32'],
-	 ['FaceLandmark32','FaceLandmark33'],
-	 ['FaceLandmark33','FaceLandmark24'],	//	close mouth loop
-	 //['FaceLandmark33','FaceLandmark34'],
-	 //teeth
-	 ['FaceLandmark34','FaceLandmark35'],
-	 ['FaceLandmark35','FaceLandmark36'],
-	 ['FaceLandmark36','FaceLandmark37'],
-	 ['FaceLandmark37','FaceLandmark38'],
-	 ['FaceLandmark38','FaceLandmark39'],
-	 ['FaceLandmark39','FaceLandmark34'],	//	close teeth loop
+		['FaceLandmark16','FaceLandmark17'],
+		['FaceLandmark17','FaceLandmark18'],
+		['FaceLandmark18','FaceLandmark19'],
+		['FaceLandmark19','FaceLandmark20'],
+		['FaceLandmark20','FaceLandmark21'],
+		['FaceLandmark21','FaceLandmark22'],
+		['FaceLandmark22','FaceLandmark23'],
+		['FaceLandmark23','FaceLandmark16'],	//	close eye loop
+		//['FaceLandmark23','FaceLandmark24'],
+		//	mouth
+		['FaceLandmark24','FaceLandmark25'],
+		['FaceLandmark25','FaceLandmark26'],
+		['FaceLandmark26','FaceLandmark27'],
+		['FaceLandmark27','FaceLandmark28'],
+		['FaceLandmark28','FaceLandmark29'],
+		['FaceLandmark29','FaceLandmark30'],
+		['FaceLandmark30','FaceLandmark31'],
+		['FaceLandmark31','FaceLandmark32'],
+		['FaceLandmark32','FaceLandmark33'],
+		['FaceLandmark33','FaceLandmark24'],	//	close mouth loop
+		//['FaceLandmark33','FaceLandmark34'],
+		//teeth
+		['FaceLandmark34','FaceLandmark35'],
+		['FaceLandmark35','FaceLandmark36'],
+		['FaceLandmark36','FaceLandmark37'],
+		['FaceLandmark37','FaceLandmark38'],
+		['FaceLandmark38','FaceLandmark39'],
+		['FaceLandmark39','FaceLandmark34'],	//	close teeth loop
 
-	 //	chin
-	 //['FaceLandmark39','FaceLandmark40'],
-	 ['FaceLandmark40','FaceLandmark41'],
-	 ['FaceLandmark41','FaceLandmark42'],
-	 ['FaceLandmark42','FaceLandmark43'],
-	 ['FaceLandmark43','FaceLandmark44'],
-	 ['FaceLandmark44','FaceLandmark45'],
-	 ['FaceLandmark45','FaceLandmark46'],
-	 ['FaceLandmark46','FaceLandmark47'],
-	 ['FaceLandmark47','FaceLandmark48'],
-	 ['FaceLandmark48','FaceLandmark49'],
-	 ['FaceLandmark49','FaceLandmark50'],
+		//	chin
+		//['FaceLandmark39','FaceLandmark40'],
+		['FaceLandmark40','FaceLandmark41'],
+		['FaceLandmark41','FaceLandmark42'],
+		['FaceLandmark42','FaceLandmark43'],
+		['FaceLandmark43','FaceLandmark44'],
+		['FaceLandmark44','FaceLandmark45'],
+		['FaceLandmark45','FaceLandmark46'],
+		['FaceLandmark46','FaceLandmark47'],
+		['FaceLandmark47','FaceLandmark48'],
+		['FaceLandmark48','FaceLandmark49'],
+		['FaceLandmark49','FaceLandmark50'],
 	 
-	 //	nose
-	 //['FaceLandmark50','FaceLandmark51'],
-	 ['FaceLandmark51','FaceLandmark52'],
-	 ['FaceLandmark52','FaceLandmark53'],
-	 ['FaceLandmark53','FaceLandmark54'],
-	 ['FaceLandmark54','FaceLandmark55'],
-	 ['FaceLandmark55','FaceLandmark56'],
-	 ['FaceLandmark56','FaceLandmark57'],
-	 ['FaceLandmark57','FaceLandmark58'],
-	 ['FaceLandmark58','FaceLandmark59'],
-	 //['FaceLandmark59','FaceLandmark60'],
+		//	nose
+		//['FaceLandmark50','FaceLandmark51'],
+		['FaceLandmark51','FaceLandmark52'],
+		['FaceLandmark52','FaceLandmark53'],
+		['FaceLandmark53','FaceLandmark54'],
+		['FaceLandmark54','FaceLandmark55'],
+		['FaceLandmark55','FaceLandmark56'],
+		['FaceLandmark56','FaceLandmark57'],
+		['FaceLandmark57','FaceLandmark58'],
+		['FaceLandmark58','FaceLandmark59'],
+		//['FaceLandmark59','FaceLandmark60'],
 	 
-	 //	nose center line
-	 ['FaceLandmark60','FaceLandmark61'],
-	 ['FaceLandmark61','FaceLandmark62'],
+		//	nose center line
+		['FaceLandmark60','FaceLandmark61'],
+		['FaceLandmark61','FaceLandmark62'],
 	 
-	 //	eyes
-	 //['FaceLandmark62','FaceLandmark63'],
-	 ['FaceLandmark63','FaceLandmark64'],
+		//	eyes
+		//['FaceLandmark62','FaceLandmark63'],
+		['FaceLandmark63','FaceLandmark64'],
 	];
 	
 	const Skeleton_Bones =
 	[
-	 ['Head','LeftEye'],
-	 ['Head','RightEye'],
-	 ['LeftEye','RightEye'],
-	 ['LeftEye','LeftEar'],
-	 ['RightEye','RightEar'],
-	 
+		['Head','LeftEye'],
+		['Head','RightEye'],
+		['LeftEye','RightEye'],
+		['LeftEye','LeftEar'],
+		['RightEye','RightEar'],
+
 		['Head','LeftShoulder'],
 		['Head','RightShoulder'],
 		['LeftShoulder','RightShoulder'],
 		['LeftHip','RightHip'],
 		['LeftShoulder','LeftElbow'],
-		['LeftElbow','LeftHand'],
+			['LeftElbow','LeftHand'],
+			['LeftHand','LeftFinger'],
+			['LeftHand','LeftThumb'],
 		['LeftShoulder','LeftHip'],
 		['LeftHip','LeftKnee'],
 		['LeftKnee','LeftFoot'],
+			['LeftKnee','LeftAnkle'],
+			['LeftAnkle','LeftFoot'],
 		['RightShoulder','RightElbow'],
 		['RightElbow','RightHand'],
+			['RightHand','RightFinger'],
+			['RightHand','RightThumb'],
 		['RightShoulder','RightHip'],
 		['RightHip','RightKnee'],
 		['RightKnee','RightFoot'],
+			['RightKnee','RightAnkle'],
+			['RightAnkle','RightFoot'],
+
+		//	extra kinect bones!
+		['Head','Neck'],
+		['Neck','Chest'],
+		['Chest','Navel'],
+		['Navel','Pelvis'],
+		['LeftHip','Pelvis'],
+		['RightHip','Pelvis'],
+		['Chest','LeftClavicle'],
+		['LeftClavicle','LeftShoulder'],
+		['Chest','RightClavicle'],
+		['RightClavicle','RightShoulder'],
 	 ];
 	AppleFace_Bones.forEach( PushBone );
 	Skeleton_Bones.forEach( PushBone );
