@@ -36,90 +36,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\PopCave\bootup.js">
-      <Filter>PopCave</Filter>
-    </None>
-    <None Include="..\..\PopCave\Colour.frag.glsl">
-      <Filter>PopCave</Filter>
-    </None>
-    <None Include="..\..\PopCave\DrawLines.frag.glsl">
-      <Filter>PopCave</Filter>
-    </None>
-    <None Include="..\..\PopCave\Geo.vert.glsl">
-      <Filter>PopCave</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\LICENSE.md">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\MemCheckLoop.js">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\ParamsWindow.js">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\PopApi.js">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\PopAruco.js">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\PopCamera.js">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\PopCinema4d.js">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\PopCollada.js">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\PopDll.js">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\PopFrameCounter.js">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\PopMath.js">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\PopMedia.js">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\PopMp4.js">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\PopObj.js">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\PopPly.js">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\PopShaderCache.js">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\PopSvg.js">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\PopTexture.js">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\PopWebApi.js">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\PopWebGuiApi.js">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\PopWebImageApi.js">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\PopWebOpenglApi.js">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\PopWebSocketApi.js">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
-    <None Include="..\..\PopCave\PopEngineCommon\PopWebXrApi.js">
-      <Filter>PopCave\PopEngineCommon</Filter>
-    </None>
     <None Include="..\..\Src_Osx\main.mm">
       <Filter>Source Files</Filter>
     </None>
@@ -168,6 +84,37 @@
     </CopyFileToFolders>
     <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\Readme.md">
       <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\bootup.js" />
+    <CopyFileToFolders Include="..\..\PopCave\Colour.frag.glsl" />
+    <CopyFileToFolders Include="..\..\PopCave\DrawLines.frag.glsl" />
+    <CopyFileToFolders Include="..\..\PopCave\Geo.vert.glsl" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\LICENSE.md" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\MemCheckLoop.js" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\ParamsWindow.js" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopApi.js" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopAruco.js" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopCamera.js" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopCinema4d.js" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopCollada.js" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopDll.js" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopFrameCounter.js" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopMath.js" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopMedia.js" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopMp4.js" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopObj.js" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopPly.js" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopShaderCache.js" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopSvg.js" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopTexture.js" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopWebApi.js" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopWebGuiApi.js" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopWebImageApi.js" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopWebOpenglApi.js" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopWebSocketApi.js" />
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopWebXrApi.js" />
+    <CopyFileToFolders Include="..\..\PopCave\parallax_test_02.obj">
+      <Filter>PopCave</Filter>
     </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>

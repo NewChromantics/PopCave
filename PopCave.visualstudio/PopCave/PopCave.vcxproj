@@ -329,6 +329,11 @@
   <ItemGroup>
     <ResourceCompile Include="..\..\Src_Windows\PopCave.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\..\PopCave\parallax_test_02.obj">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="packages\Microsoft.AI.Skills.SkillInterfacePreview.0.6.0\build\native\Microsoft.AI.Skills.SkillInterfacePreview.targets" Condition="Exists('packages\Microsoft.AI.Skills.SkillInterfacePreview.0.6.0\build\native\Microsoft.AI.Skills.SkillInterfacePreview.targets')" />
