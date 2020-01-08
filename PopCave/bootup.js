@@ -68,6 +68,7 @@ Params.SkeletonWorldMinX = -3;
 Params.SkeletonWorldMaxX = 3;
 Params.SkeletonWorldMinY = -3;
 Params.SkeletonWorldMaxY = 3;
+Params.SkeletonModelScale = 0.03;
 
 var ParamsWindow = CreateParamsWindow( Params, function(){}, [800,100,500,200] );
 ParamsWindow.AddParam('MaxScore',0,1);
@@ -89,6 +90,7 @@ ParamsWindow.AddParam('RenderVideo');
 ParamsWindow.AddParam('RenderWorld');
 ParamsWindow.AddParam('RenderFromFaceCamera');
 ParamsWindow.AddParam('CameraModelScale',0.001,2);
+ParamsWindow.AddParam('SkeletonModelScale',0.001,1);
 ParamsWindow.AddParam('FaceCameraColour','Colour');
 ParamsWindow.AddParam('VideoCameraColour','Colour');
 ParamsWindow.AddParam('BackgroundColour','Colour');
@@ -347,7 +349,7 @@ function LabelsToSkeleton(Labels)
 			const Score = Label.Score;
 			const u = Math.Range(Params.SkeletonWorldMinX,Params.SkeletonWorldMaxX,Label.x);
 			const v = Math.Range(Params.SkeletonWorldMinY,Params.SkeletonWorldMaxY,Label.y);
-			Skeleton[Label.Label] = [u,v,Score];
+			Skeleton[Label.Label] = [u,v,Score,Label.x,Label.y,Label.z];
 		}
 		else
 		{
@@ -385,46 +387,43 @@ function RenderVideoImage(RenderTarget,VideoTexture)
 	RenderTarget.DrawQuad( FragShader, SetUniforms );
 }
 
-
+//	get 2D lines [x,y,x,y]
 function GetSkeletonLines(Skeleton,Lines,Scores)
 {
 	function PushLine(Start,End,Score)
 	{
-		Lines.push( Start[0] );
-		Lines.push( Start[1] );
-		Lines.push( End[0] );
-		Lines.push( End[1] );
-		Scores.push( Score );
+		Lines.push(Start[0]);
+		Lines.push(Start[1]);
+		Lines.push(End[0]);
+		Lines.push(End[1]);
+		Scores.push(Score);
 	}
-	
+	EnumSkeletonBones(Skeleton,PushLine);
+}
+
+function GetSkeletonLines3D(Skeleton,Lines,Scores)
+{
+	function PushLine(Start,End)
+	{
+		const StartScore = Start[2];
+		const EndScore = End[2];
+		const StartPos = Start.slice(3,6);
+		const EndPos = End.slice(3,6);
+		Lines.push([StartPos,EndPos]);
+		Scores.push([StartScore,EndScore]);
+	}
+	EnumSkeletonBones(Skeleton,PushLine);
+}
+
+function EnumSkeletonBones(Skeleton,EnumBone)
+{
 	if ( !Skeleton )
 	{
 		//	draw x
-		PushLine( [0,0], [1,1], 0 );
-		PushLine( [1,0], [0,1], 0 );
+		const z = 0;
+		EnumBone( [0,0,z], [1,1,z], 0 );
+		EnumBone( [1,0,z], [0,1,z], 0 );
 		return;
-	}
-
-	function PointJointRect(Joint)
-	{
-		try
-		{
-			const uvscore = Skeleton[Joint];
-			const Score = uvscore[2];
-			const Size = Params.LineWidth;
-			const l = uvscore[0]-Size;
-			const r = uvscore[0]+Size;
-			const t = uvscore[1]-Size;
-			const b = uvscore[1]+Size;
-			PushLine( [l,t], [r,t], Score );
-			PushLine( [r,t], [r,b], Score );
-			PushLine( [r,b], [l,b], Score );
-			PushLine( [l,b], [l,t], Score );
-		}
-		catch(e)
-		{
-			Pop.Debug(e);
-		}
 	}
 	
 	function PushBone(JointAB,Index)
@@ -439,7 +438,7 @@ function GetSkeletonLines(Skeleton,Lines,Scores)
 			if (!a || !b)
 				return;
 			const Score = (a[2] + b[2]) / 2;
-			PushLine(a,b,Score);
+			EnumBone(a,b,Score);
 		}
 		catch(e)
 		{
@@ -448,8 +447,7 @@ function GetSkeletonLines(Skeleton,Lines,Scores)
 		}
 	}
 	
-	//Object.keys(Skeleton).forEach( PointJointRect );
-
+	
 	const AppleFace_Bones =
 	[
 		//	left eyebrow
@@ -632,7 +630,7 @@ function RenderCube(RenderTarget,Camera,Position,Scale,Colour)
 }
 
 
-function RenderSkeleton(RenderTarget,Skeleton)
+function RenderSkeleton2D(RenderTarget,Skeleton)
 {
 	//	make lines from skeleton
 	let Lines = [];
@@ -649,6 +647,52 @@ function RenderSkeleton(RenderTarget,Skeleton)
 	}
 	RenderTarget.EnableBlend(true);
 	RenderTarget.DrawQuad( FragShader, SetUniforms );
+}
+
+
+function ScoreToColour(Score)
+{
+	if (Score < 0)
+	{
+		return [1,0,1];
+	}
+	else if (Score < 0.5)
+	{
+		Score = Math.Range(0,0.5,Score);
+		return [1,Score,0];
+	}
+	else if (Score < 1.0)
+	{
+		Score = Math.Range(0.5,1.0,Score);
+		return [1 - Score,1,0];
+	}
+	else
+	{
+		return [0,0,1];
+	}
+}
+
+function RenderSkeleton3D(RenderTarget,Camera,Skeleton)
+{
+	//	make lines from skeleton
+	let Lines = [];
+	let Scores = [];
+	GetSkeletonLines3D(Skeleton,Lines,Scores);
+
+	const Scale = Params.SkeletonModelScale;
+
+	function RenderBone(Bone,BoneIndex)
+	{
+		const BoneScores = Scores[BoneIndex];
+		const StartColour = ScoreToColour(BoneScores[0]);
+		const EndColour = ScoreToColour(BoneScores[1]);
+		const StartPos = Bone[0];
+		const EndPos = Bone[1];
+		//Pop.Debug("RenderCube at ",JSON.stringify(StartPos));
+		RenderCube(RenderTarget,Camera,StartPos,Scale,StartColour);
+		RenderCube(RenderTarget,Camera,EndPos,Scale,EndColour);
+	}
+	Lines.forEach(RenderBone);
 }
 
 class TCameraWindow
@@ -732,7 +776,7 @@ class TCameraWindow
 		if ( Params.RenderVideo )
 		{
 			RenderVideoImage(RenderTarget,this.VideoTexture);
-			RenderSkeleton(RenderTarget,this.Skeleton);
+			RenderSkeleton2D(RenderTarget,this.Skeleton);
 		}
 		else if ( Params.RenderWorld || Params.RenderFromFaceCamera )
 		{
@@ -743,7 +787,8 @@ class TCameraWindow
 				RenderScene( RenderTarget, RenderCamera );
 			if ( RenderCamera != this.FaceCamera )
 				RenderCube( RenderTarget, RenderCamera, this.FaceCamera.Position, Params.CameraModelScale, Params.FaceCameraColour );
-			RenderCube( RenderTarget, RenderCamera, this.VideoCamera.Position, Params.CameraModelScale, Params.VideoCameraColour );
+			RenderCube(RenderTarget,RenderCamera,this.VideoCamera.Position,Params.CameraModelScale,Params.VideoCameraColour);
+			RenderSkeleton3D(RenderTarget,RenderCamera,this.Skeleton);
 		}
 		else
 		{
@@ -793,7 +838,7 @@ class TCameraWindow
 				{					
 					const FaceXyz = await this.GetFaceXyz(Luma);
 
-					Pop.Debug("FaceXyz",FaceXyz);
+					//Pop.Debug("FaceXyz",FaceXyz);
 					this.LastFacePosition = FaceXyz || this.LastFacePosition;
 
 					this.UpdateFaceCamera();
@@ -1049,7 +1094,7 @@ class TCameraWindow
 
 		//	todo: flatten skeleton for rendering
 		this.Skeleton = LabelsToSkeleton(Labels);
-		Pop.Debug("Skeleton",JSON.stringify(this.Skeleton));
+		//Pop.Debug("Skeleton",JSON.stringify(this.Skeleton));
 
 		if (!HeadLabels.length)
 			return null;
