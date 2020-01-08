@@ -164,6 +164,9 @@ let SendFramePng = null;
 
 function OnNewPose(Pose)
 {
+	//	generate projection matrix for sending
+	Pose.ProjectionMatrix = Pose.GetProjectionMatrix([-1,-1,1,1]);
+	Pop.Debug("OnNewPose: ",JSON.stringify(Pose));
 	if (!SendPose)
 		return;
 
