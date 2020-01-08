@@ -684,7 +684,16 @@ function RenderCube(RenderTarget,Camera,Position,Scale,Colour)
 		Shader.SetUniform('LocalToWorldTransform',LocalToWorldTransform);
 		Shader.SetUniform('WorldToCameraTransform',WorldToCameraTransform);
 		Shader.SetUniform('CameraProjectionTransform',CameraProjectionTransform);
-		Shader.SetUniform('Colour',Colour);
+		if (Colour == null)
+		{
+			Shader.SetUniform('DrawLocalPosition',true);
+			Shader.SetUniform('Colour',[1,1,1]);
+		}
+		else
+		{
+			Shader.SetUniform('DrawLocalPosition',false);
+			Shader.SetUniform('Colour',Colour);
+		}
 	}
 	RenderTarget.DrawGeometry( Geo, Shader, SetUniforms );
 }
