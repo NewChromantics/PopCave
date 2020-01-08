@@ -708,7 +708,133 @@ function RenderPortal(RenderTarget,Camera)
 	const Pos = [Params.PortalX,y,Params.PortalZ];
 	const Scale = [Params.PortalW / 2,Params.PortalH / 2,0.05];
 	const Colour = Params.PortalColour;
-	RenderCube(RenderTarget,Camera,Pos,Scale,null);
+
+
+
+	function GetPortalOrientationMatrix()
+	{
+		const DirRight = [1,0,0];
+		const DirUp = [0,-1,0];
+		const DirForward = [0,0,1];
+		const M = Math.CreateLookAtRotationMatrix([0,0,0],DirUp,DirForward);
+		return M;
+	}
+	function GetPortalCorners()
+	{
+		const l = Params.PortalX - (Params.PortalW / 2);
+		const r = Params.PortalX + (Params.PortalW / 2);
+		const t = Params.PortalY - (Params.PortalH);
+		const b = Params.PortalY;
+		const z = Params.PortalZ;
+		const tl = [l,t,z];
+		const tr = [r,t,z];
+		const br = [r,b,z];
+		const bl = [l,b,z];
+		return [tl,tr,br,bl];
+	}
+
+	function CreateFrustumMatrix(l,r,b,t,n,f)
+	{
+		//	compare this to Pop.Camera.GetProjectionMatrix()
+		//	and GetOpenglFocalLengths()
+		//	https://docs.microsoft.com/en-us/windows/win32/opengl/glfrustum?redirectedfrom=MSDN
+		const RIGHT = (2 * n) / (r - l);
+		const UP = (2 * n) / (t - b);
+		const A = (r + l) / (r - l);
+		const B = (t + b) / (t - b);
+		const C = -((f + n) / (f - n));
+		const D = -((2 * f * n) / (f - n));
+		return [
+			RIGHT,0,A,0,
+			0,UP,B,0,
+			0,0,C,D,
+			0,0,-1,0
+		];
+	}
+
+	//	https://medium.com/@michel.brisis/off-axis-projection-in-unity-1572d826541e
+	//	m from here https://github.com/aptas/off-axis-projection-unity/blob/master/Assets/Scripts/Projection/ProjectionPlane.cs
+	const M = GetPortalOrientationMatrix();
+	const eyePos = Camera.Position.slice();
+	/*
+	Vector3 pa = ProjectionScreen.BottomLeft;
+	Vector3 pb = ProjectionScreen.BottomRight;
+	Vector3 pc = ProjectionScreen.TopLeft;
+	Vector3 pd = ProjectionScreen.TopRight;
+
+	Vector3 vr = ProjectionScreen.DirRight;
+	Vector3 vu = ProjectionScreen.DirUp;
+	Vector3 vn = ProjectionScreen.DirNormal;
+	*/
+	const DirRight = [1,0,0];
+	const DirUp = [0,-1,0];
+	const DirForward = [0,0,1];
+	const vr = DirRight;
+	const vu = DirUp;
+	const vn = DirForward;
+
+
+	const PortalCorners = GetPortalCorners();
+	const pa = PortalCorners[3];	//	bottom left
+	const pb = PortalCorners[2];	//	bottom right
+	const pc = PortalCorners[0];	//	top left
+	const pd = PortalCorners[1];	//	top right
+	//From eye to projection screen corners
+	//Pop.Debug("PortalCorners",PortalCorners);
+	//Pop.Debug("eyePos",eyePos);
+	va = Math.Subtract3(pa,eyePos);
+	vb = Math.Subtract3(pb,eyePos);
+	vc = Math.Subtract3(pc,eyePos);
+	vd = Math.Subtract3(pd,eyePos);
+	//viewDir = eyePos + va + vb + vc + vd;
+	let viewDir = Math.Add3(eyePos,va);
+	viewDir = Math.Add3(viewDir,vb);
+	viewDir = Math.Add3(viewDir,vc);
+	viewDir = Math.Add3(viewDir,vd);
+
+	//distance from eye to projection screen plane
+	const d = -Math.Dot3(va,vn);
+	//if (ClampNearPlane)
+	//	cam.nearClipPlane = d;
+	const n = Camera.NearDistance;
+	const f = Camera.FarDistance;
+
+	const nearOverDist = n / d;
+	const l = Math.Dot3(vr,va) * nearOverDist;
+	const r = Math.Dot3(vr,vb) * nearOverDist;
+	const b = Math.Dot3(vu,va) * nearOverDist;
+	const t = Math.Dot3(vu,vc) * nearOverDist;
+	const P = CreateFrustumMatrix(l,r,b,t,n,f);
+
+	//Translation to eye position
+	const eyex = -eyePos[0];
+	const eyey = -eyePos[1];
+	const eyez = -eyePos[2];
+	const T = Math.CreateTranslationMatrix(eyex,eyey,eyez);
+
+	//Matrix4x4 R = Matrix4x4.Rotate(
+	//	Quaternion.Inverse(transform.rotation) * ProjectionScreen.transform.rotation);
+	const R = Math.CreateIdentityMatrix();
+
+	const WorldToCamera = Math.MatrixMultiply4x4Multiple(M,R,T);
+	const ProjectionMatrix = P;
+
+	let SkewCamera = {};
+	SkewCamera.GetWorldToCameraMatrix = function ()
+	{
+		return WorldToCamera;
+	}
+
+	SkewCamera.GetProjectionMatrix = function (ViewRect)
+	{
+		//const ViewRect = [-1,-1,1,1];
+		return ProjectionMatrix;
+	}
+
+	Pop.Debug("WorldToCamera",WorldToCamera);
+	Pop.Debug("ProjectionMatrix",ProjectionMatrix);
+
+	RenderCube(RenderTarget,SkewCamera,Pos,Scale,null);
 }
 
 function RenderCameraDebug(RenderTarget,RenderCamera,Camera,Colour)
