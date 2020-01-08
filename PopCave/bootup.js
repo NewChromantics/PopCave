@@ -853,7 +853,8 @@ class TCameraWindow
 		this.CameraFrameCounter = new Pop.FrameCounter( CameraName );
 		
 		this.FaceCamera = new Pop.Camera();
-		
+		this.FaceCamera.Up[1] = -1;
+
 		this.DebugCamera = new Pop.Camera();
 		this.DebugCamera.Position = [0,0.4,2];
 		this.DebugCamera.LookAt = [0,0,0];
