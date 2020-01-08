@@ -710,13 +710,12 @@ function RenderPortal(RenderTarget,Camera)
 	const Colour = Params.PortalColour;
 
 
-
+	const PortalDirRight = [1,0,0];
+	const PortalDirUp = [0,-1,0];
+	const PortalDirForward = [0,0,1];
 	function GetPortalOrientationMatrix()
-	{
-		const DirRight = [1,0,0];
-		const DirUp = [0,-1,0];
-		const DirForward = [0,0,1];
-		const M = Math.CreateLookAtRotationMatrix([0,0,0],DirUp,DirForward);
+	{		
+		const M = Math.CreateLookAtRotationMatrix([0,0,0],PortalDirUp,PortalDirForward);
 		return M;
 	}
 	function GetPortalCorners()
@@ -742,13 +741,18 @@ function RenderPortal(RenderTarget,Camera)
 		const UP = (2 * n) / (t - b);
 		const A = (r + l) / (r - l);
 		const B = (t + b) / (t - b);
-		const C = -((f + n) / (f - n));
-		const D = -((2 * f * n) / (f - n));
+		//const C = -((f + n) / (f - n));
+		//const E = -1;
+		//const D = -((2 * f * n) / (f - n));
+		//	Pop.Camera.GetProjectionMatrix
+		const C = (-n - f) / (n - f);
+		const E = 1;
+		const D = (2 * f * n) / (n - f);
 		return [
 			RIGHT,0,A,0,
 			0,UP,B,0,
 			0,0,C,D,
-			0,0,-1,0
+			0,0,E,0
 		];
 	}
 
@@ -766,14 +770,10 @@ function RenderPortal(RenderTarget,Camera)
 	Vector3 vu = ProjectionScreen.DirUp;
 	Vector3 vn = ProjectionScreen.DirNormal;
 	*/
-	const DirRight = [1,0,0];
-	const DirUp = [0,-1,0];
-	const DirForward = [0,0,1];
-	const vr = DirRight;
-	const vu = DirUp;
-	const vn = DirForward;
-
-
+	const vr = PortalDirRight;
+	const vu = PortalDirUp;
+	const vn = PortalDirForward;
+	
 	const PortalCorners = GetPortalCorners();
 	const pa = PortalCorners[3];	//	bottom left
 	const pb = PortalCorners[2];	//	bottom right
