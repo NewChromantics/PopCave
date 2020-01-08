@@ -1236,17 +1236,22 @@ class TCameraWindow
 		Frame.SetFormat('Greyscale');
 
 		const Labels = await Coreml.KinectAzureSkeleton(Frame);
-		const HeadLabels = Labels.filter(Object => Object.Label == "Head");
+		//const HeadLabels = Labels.filter(Object => Object.Label == "Head");
 
-		//	todo: flatten skeleton for rendering
+		if (!Labels.length)
+		{
+			Pop.Debug("No skeleton detected");
+			return null;
+		}
+
 		this.Skeleton = LabelsToSkeleton(Labels,Params.KinectSkeletonInvertX);
 		//Pop.Debug("Skeleton",JSON.stringify(this.Skeleton));
 
-		if (!HeadLabels.length)
+		const Head = this.Skeleton.Head;
+		if (!Head)
 			return null;
-
-		const Head = HeadLabels[0];
-		Pop.Debug("Head",JSON.stringify(Head));
+		//const Head = HeadLabels[0];
+		//Pop.Debug("Head",JSON.stringify(Head));
 		return [Head.x,Head.y,Head.z];
 	}
 }
