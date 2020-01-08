@@ -63,6 +63,7 @@ Params.UsePosenet = false;
 Params.UseWinSkillSkeleton = false;
 Params.UseKinectAzureSkeleton = true;
 Params.EnableStreamFramePng = false;
+Params.KinectSkeletonInvertX = true;
 
 //	world->uv scalar
 Params.SkeletonWorldMinX = -1;
@@ -72,11 +73,14 @@ Params.SkeletonWorldMaxY = 1;
 Params.SkeletonModelScale = 0.03;
 
 //	video camera origin
-Params.CaptureX = 0;
-Params.CaptureY = 0;
-Params.CaptureZ = 1;
+Params.CaptureX = 0.6;
+Params.CaptureY = -0.49;
+Params.CaptureZ = 2.5;
+Params.CaptureYaw = 180;
 Params.CaptureDebugSize = 0.05;
 Params.CaptureColour = [0,1,1];
+Params.CaptureToWorldRotateFirst = false;
+Params.CaptureToWorldInverse = false;
 
 //	portal screen
 Params.PortalX = 0;
@@ -102,6 +106,8 @@ ParamsWindow.AddParam('UseYolo');
 ParamsWindow.AddParam('UsePosenet');
 ParamsWindow.AddParam('UseWinSkillSkeleton');
 ParamsWindow.AddParam('UseKinectAzureSkeleton');
+ParamsWindow.AddParam('KinectSkeletonInvertX');
+
 
 ParamsWindow.AddParam('LineWidth',0.0001,0.01);
 ParamsWindow.AddParam('FaceZ',0,10);
@@ -128,11 +134,14 @@ ParamsWindow.AddParam('SkeletonWorldMaxX',-10,10);
 ParamsWindow.AddParam('SkeletonWorldMinY',-10,10);
 ParamsWindow.AddParam('SkeletonWorldMaxY',-10,10);
 
-ParamsWindow.AddParam('CaptureX',-5,5);
-ParamsWindow.AddParam('CaptureY',-5,5);
-ParamsWindow.AddParam('CaptureZ',-5,5);
+ParamsWindow.AddParam('CaptureX',-2,2);
+ParamsWindow.AddParam('CaptureY',-2,2);
+ParamsWindow.AddParam('CaptureZ',-4,4);
 ParamsWindow.AddParam('CaptureColour','Colour');
 ParamsWindow.AddParam('CaptureDebugSize',0,0.1);
+ParamsWindow.AddParam('CaptureYaw',-180,180);
+ParamsWindow.AddParam('CaptureToWorldInverse');
+ParamsWindow.AddParam('CaptureToWorldRotateFirst');
 
 ParamsWindow.AddParam('PortalX',-5,5);
 ParamsWindow.AddParam('PortalY',-5,5);
@@ -381,7 +390,7 @@ function GetSceneGeos(RenderTarget)
 
 
 
-function LabelsToSkeleton(Labels)
+function LabelsToSkeleton(Labels,InvertX)
 {
 	if ( !Labels || !Labels.length )
 		return null;
@@ -393,10 +402,11 @@ function LabelsToSkeleton(Labels)
 		//	world space label
 		if (Label.z !== undefined)
 		{
+			const x = (InvertX === true) ? -Label.x : Label.x;
 			const Score = Label.Score;
 			const u = Math.Range(Params.SkeletonWorldMinX,Params.SkeletonWorldMaxX,Label.x);
 			const v = Math.Range(Params.SkeletonWorldMinY,Params.SkeletonWorldMaxY,Label.y);
-			Skeleton[Label.Label] = [u,v,Score,Label.x,Label.y,Label.z];
+			Skeleton[Label.Label] = [u,v,Score,x,Label.y,Label.z];
 		}
 		else
 		{
@@ -689,11 +699,23 @@ function RenderPortal(RenderTarget,Camera)
 
 function RenderCapture(RenderTarget,Camera)
 {
-	//	render origin marker
-	const Pos = [Params.CaptureX,Params.CaptureY,Params.CaptureZ];
-	const Scale = Params.CaptureDebugSize;
-	const Colour = Params.CaptureColour;
-	RenderCube(RenderTarget,Camera,Pos,Scale,Colour);
+	//	render capture origin marker
+	{
+		//const Pos = [Params.CaptureX,Params.CaptureY,Params.CaptureZ];
+		const Pos = CapturePosToWorldPos([0,0,0]);
+		const Scale = Params.CaptureDebugSize;
+		const Colour = Params.CaptureColour;
+		RenderCube(RenderTarget,Camera,Pos,Scale,Colour);
+	}
+
+	//	draw a marker in front of camera
+	for (let z = 0.2;z < 1;z += 0.2)
+	{
+		const Pos = CapturePosToWorldPos([0,0,z]);
+		const Scale = Params.CaptureDebugSize * 0.5;
+		const Colour = Params.CaptureColour;
+		RenderCube(RenderTarget,Camera,Pos,Scale,Colour);
+	}
 }
 
 function RenderOrigin(RenderTarget,Camera)
@@ -751,7 +773,17 @@ function ScoreToColour(Score)
 function CapturePosToWorldPos(CapturePos)
 {
 	//	get a transform to put capture-space into world space
-	const WorldToCaptureTransform = Math.CreateTranslationMatrix(Params.CaptureX,Params.CaptureY,Params.CaptureZ);
+	let WorldToCaptureTransform = Math.CreateTranslationMatrix(Params.CaptureX,Params.CaptureY,Params.CaptureZ);
+	let RotationMatrix = Math.CreateAxisRotationMatrix([0,1,0],Params.CaptureYaw);
+
+
+	if (Params.CaptureToWorldRotateFirst)
+		WorldToCaptureTransform = Math.MatrixMultiply4x4(RotationMatrix,WorldToCaptureTransform);
+	else
+		WorldToCaptureTransform = Math.MatrixMultiply4x4(WorldToCaptureTransform,RotationMatrix);
+
+	if (Params.CaptureToWorldInverse )
+		WorldToCaptureTransform = Math.MatrixInverse4x4(WorldToCaptureTransform);
 
 	return Math.TransformPosition(CapturePos,WorldToCaptureTransform);
 }
@@ -1186,18 +1218,17 @@ class TCameraWindow
 		Frame.SetFormat('Greyscale');
 
 		const Labels = await Coreml.KinectAzureSkeleton(Frame);
-
 		const HeadLabels = Labels.filter(Object => Object.Label == "Head");
 
 		//	todo: flatten skeleton for rendering
-		this.Skeleton = LabelsToSkeleton(Labels);
+		this.Skeleton = LabelsToSkeleton(Labels,Params.KinectSkeletonInvertX);
 		//Pop.Debug("Skeleton",JSON.stringify(this.Skeleton));
 
 		if (!HeadLabels.length)
 			return null;
 
 		const Head = HeadLabels[0];
-		//Pop.Debug("Head",JSON.stringify(Head));
+		Pop.Debug("Head",JSON.stringify(Head));
 		return [Head.x,Head.y,Head.z];
 	}
 }
