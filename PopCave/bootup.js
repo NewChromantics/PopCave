@@ -1646,13 +1646,106 @@ async function RunServer(OnMessage)
 }
 
 
+//	keep trying to run servers
+async function ConnectToServer(HostNames,OnMessage)
+{
+	let PortIndex = 0;
+	function GetPortIndex()
+	{
+		const PortCount = Expose.ListenPorts.length;
+		PortIndex = (PortIndex + 1) % PortCount;
+		return Expose.ListenPorts[PortIndex];
+	}
 
+	let HostIndex = 0;
+	function GetHostName()
+	{
+		const HostCount = HostNames.length;
+		HostIndex = (HostIndex + 1) % HostCount;
+		return HostNames[HostIndex];
+	}
+
+	while (true)
+	{
+		try
+		{
+			const HostName = GetHostName();
+			const Port = GetPortIndex();
+			const Address = HostName + ":" + Port;
+
+			//	wrapper for websocket
+			Pop.Debug("Connecting to websocket " + Address);
+			const Socket = new Pop.Websocket.Client(Address);
+			await Socket.WaitForConnect();
+
+			while (true)
+			{
+				if (!SendPose)
+				{
+					//	gr: this was causing an error, because I THINK we send a packet before handshake is finished?
+					//		temp fix, added to WaitForMessage
+					//	gr: maybe need peer's to finish connecting?
+					SendPose = function (Object)
+					{
+						const Peers = Socket.GetPeers();
+						const Message = JSON.stringify(Object);
+						function SendToPeer(Peer)
+						{
+							try
+							{
+								//Pop.Debug("Sending to " + Peer,Message);
+								Socket.Send(Peer,Message);
+							}
+							catch (e)
+							{
+								Pop.Debug("Error sending pose to " + Peer + "; " + e);
+							}
+						}
+						Peers.forEach(SendToPeer);
+					}
+
+					SendFramePng = function (Object)
+					{
+						const Peers = Socket.GetPeers();
+						const Message = (Object);
+						function SendToPeer(Peer)
+						{
+							try
+							{
+								//Pop.Debug("Sending to " + Peer,Message);
+								Socket.Send(Peer,Message);
+							}
+							catch (e)
+							{
+								Pop.Debug("Error sending png to " + Peer + "; " + e);
+							}
+						}
+						Peers.forEach(SendToPeer);
+					}
+				}
+
+				const Message = await Socket.WaitForMessage();
+				OnMessage(Message,Socket);
+			}
+		}
+		catch (e)
+		{
+			SendPose = null;
+			Pop.Debug("Exception in server loop: " + e);
+			await Pop.Yield(2000);
+		}
+	}
+}
 
 
 //	start tracking cameras
 FindCamerasLoop().catch(Pop.Debug);
 //MemCheckLoop().catch(Pop.Debug);
 
-
 //RunBroadcast(OnBroadcastMessage).then(Pop.Debug).catch(Pop.Debug);
 RunServer(OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
+
+
+const HostNames = ['192.168.0.12','192.168.0.11'];
+ConnectToServer(HostNames,OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
+
