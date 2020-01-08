@@ -705,7 +705,25 @@ function RenderPortal(RenderTarget,Camera)
 	const Pos = [Params.PortalX,y,Params.PortalZ];
 	const Scale = [Params.PortalW / 2,Params.PortalH / 2,0.05];
 	const Colour = Params.PortalColour;
-	RenderCube(RenderTarget,Camera,Pos,Scale,Colour);
+	RenderCube(RenderTarget,Camera,Pos,Scale,null);
+}
+
+function RenderCameraDebug(RenderTarget,RenderCamera,Camera,Colour)
+{
+	const Pos = Camera.Position.slice();
+	{
+		const Scale = Params.CameraModelScale;
+		RenderCube(RenderTarget,RenderCamera,Pos,Scale,Colour);
+	}
+
+	//	draw a marker in front of camera
+	const Forward = Math.Add3(Pos,Camera.GetForward());
+	for (let z = 0.2;z < 1;z += 0.2)
+	{
+		const DeltaPos = Math.Lerp3(Pos,Forward,z);
+		const Scale = Params.CameraModelScale * 0.5;
+		RenderCube(RenderTarget,RenderCamera,DeltaPos,Scale,Colour);
+	}
 }
 
 function RenderCapture(RenderTarget,Camera)
@@ -913,7 +931,7 @@ class TCameraWindow
 			if (RenderCamera != this.FaceCamera)
 			{
 				//	render the face camera
-				RenderCube(RenderTarget,RenderCamera,this.FaceCamera.Position,Params.CameraModelScale,Params.FaceCameraColour);
+				RenderCameraDebug(RenderTarget,RenderCamera,this.FaceCamera,Params.FaceCameraColour);
 
 				//	skeleton obscures camera too
  				RenderSkeleton3D(RenderTarget,RenderCamera,this.Skeleton);
@@ -1240,19 +1258,20 @@ class TCameraWindow
 
 		if (!Labels.length)
 		{
-			Pop.Debug("No skeleton detected");
+			//Pop.Debug("No skeleton detected");
 			return null;
 		}
 
 		this.Skeleton = LabelsToSkeleton(Labels,Params.KinectSkeletonInvertX);
 		//Pop.Debug("Skeleton",JSON.stringify(this.Skeleton));
 
-		const Head = this.Skeleton.Head;
+		const Head = this.Skeleton ? this.Skeleton.Head : null;
 		if (!Head)
 			return null;
+
 		//const Head = HeadLabels[0];
-		//Pop.Debug("Head",JSON.stringify(Head));
-		return [Head.x,Head.y,Head.z];
+		Pop.Debug("Head",JSON.stringify(Head));
+		return Head.slice(3,6);
 	}
 }
 
