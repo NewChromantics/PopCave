@@ -64,6 +64,7 @@ Params.UseWinSkillSkeleton = false;
 Params.UseKinectAzureSkeleton = true;
 Params.EnableStreamFramePng = false;
 Params.KinectSkeletonInvertX = true;
+Params.KinectYieldMs = 20;
 
 //	world->uv scalar
 Params.SkeletonWorldMinX = -1;
@@ -107,6 +108,7 @@ ParamsWindow.AddParam('UsePosenet');
 ParamsWindow.AddParam('UseWinSkillSkeleton');
 ParamsWindow.AddParam('UseKinectAzureSkeleton');
 ParamsWindow.AddParam('KinectSkeletonInvertX');
+ParamsWindow.AddParam('KinectYieldMs',0,100,Math.floor);
 
 
 ParamsWindow.AddParam('LineWidth',0.0001,0.01);
@@ -919,6 +921,12 @@ class TCameraWindow
 	
 	async ProcessNextFrame(FrameBuffer)
 	{
+		if (Params.UseKinectAzureSkeleton)
+		{
+			await Pop.Yield( Params.KinectYieldMs );
+			return [FrameBuffer];
+		}
+
 		const Stream = 0;
 		const Latest = true;
 		//let NextFrame = await this.Source.GetNextFrame( Planes, Stream, Latest );
@@ -941,6 +949,7 @@ class TCameraWindow
 	async ListenForFrames()
 	{
 		const FrameBuffer = new Pop.Image();
+		FrameBuffer.WritePixels(1,1,[128],'Greyscale');
 		//const FrameBuffer = undefined;
 		while ( true )
 		{
@@ -1214,7 +1223,7 @@ class TCameraWindow
 
 	async GetFaceXyz_KinectAzureSkeleton(Frame)
 	{
-		Frame.Resize(256,256);
+		//Frame.Resize(256,256);
 		Frame.SetFormat('Greyscale');
 
 		const Labels = await Coreml.KinectAzureSkeleton(Frame);
