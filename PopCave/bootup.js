@@ -38,13 +38,12 @@ var Params = {};
 Params.MaxScore = 1.0;
 Params.LineWidth = 0.0015;
 Params.WorldVerticalFov = 45;
-Params.RenderVideo = true;
+Params.RenderVideo = false;
 Params.RenderWorld = true;
-Params.RenderFromFaceCamera = true;
+Params.RenderFromFaceCamera = false;
 Params.CameraModelScale = 0.1;
 Params.FaceZ = 1;
 Params.FaceCameraColour = [0,1,0];
-Params.VideoCameraColour = [1,1,1];
 Params.BackgroundColour = [0,0,0];
 Params.GeoColour = [0,0,1];
 Params.GeoScale = 0.01;
@@ -52,7 +51,7 @@ Params.GeoYaw = 90;
 Params.GeoX = 0;
 Params.GeoY = 0;
 Params.GeoZ = 0;
-Params.RenderGeo = true;
+Params.RenderGeo = false;
 Params.UseAppleFace = false;
 Params.UseOpenPose = false;
 Params.UseHourglass = false;
@@ -64,11 +63,32 @@ Params.UsePosenet = false;
 Params.UseWinSkillSkeleton = false;
 Params.UseKinectAzureSkeleton = true;
 Params.EnableStreamFramePng = false;
-Params.SkeletonWorldMinX = -3;
-Params.SkeletonWorldMaxX = 3;
-Params.SkeletonWorldMinY = -3;
-Params.SkeletonWorldMaxY = 3;
+
+//	world->uv scalar
+Params.SkeletonWorldMinX = -1;
+Params.SkeletonWorldMaxX = 1;
+Params.SkeletonWorldMinY = -1;
+Params.SkeletonWorldMaxY = 1;
 Params.SkeletonModelScale = 0.03;
+
+//	video camera origin
+Params.CaptureX = 0;
+Params.CaptureY = 0;
+Params.CaptureZ = 1;
+Params.CaptureDebugSize = 0.05;
+Params.CaptureColour = [0,1,1];
+
+//	portal screen
+Params.PortalX = 0;
+Params.PortalY = -0.30;
+Params.PortalZ = 0;
+Params.PortalW = 1.10;
+Params.PortalH = 1.88;
+Params.PortalColour = [1,0,1];
+
+Params.OriginDebugSize = 0.02;
+Params.OriginColour = [1,1,1];
+
 
 var ParamsWindow = CreateParamsWindow( Params, function(){}, [800,100,500,200] );
 ParamsWindow.AddParam('MaxScore',0,1);
@@ -92,7 +112,6 @@ ParamsWindow.AddParam('RenderFromFaceCamera');
 ParamsWindow.AddParam('CameraModelScale',0.001,2);
 ParamsWindow.AddParam('SkeletonModelScale',0.001,1);
 ParamsWindow.AddParam('FaceCameraColour','Colour');
-ParamsWindow.AddParam('VideoCameraColour','Colour');
 ParamsWindow.AddParam('BackgroundColour','Colour');
 
 ParamsWindow.AddParam('RenderGeo');
@@ -108,6 +127,22 @@ ParamsWindow.AddParam('SkeletonWorldMinX',-10,10);
 ParamsWindow.AddParam('SkeletonWorldMaxX',-10,10);
 ParamsWindow.AddParam('SkeletonWorldMinY',-10,10);
 ParamsWindow.AddParam('SkeletonWorldMaxY',-10,10);
+
+ParamsWindow.AddParam('CaptureX',-5,5);
+ParamsWindow.AddParam('CaptureY',-5,5);
+ParamsWindow.AddParam('CaptureZ',-5,5);
+ParamsWindow.AddParam('CaptureColour','Colour');
+ParamsWindow.AddParam('CaptureDebugSize',0,0.1);
+
+ParamsWindow.AddParam('PortalX',-5,5);
+ParamsWindow.AddParam('PortalY',-5,5);
+ParamsWindow.AddParam('PortalZ',-5,5);
+ParamsWindow.AddParam('PortalW',0,4);
+ParamsWindow.AddParam('PortalH',0,4);
+ParamsWindow.AddParam('PortalColour','Colour');
+
+ParamsWindow.AddParam('OriginColour','Colour');
+ParamsWindow.AddParam('OriginDebugSize',0,0.1);
 
 
 //	send callback
@@ -625,8 +660,9 @@ function RenderCube(RenderTarget,Camera,Position,Scale,Colour)
 {
 	const Geo = GetCube( RenderTarget );
 	const Shader = Pop.GetShader( RenderTarget, GeoColourShader, GeoVertShader );
-	
-	const LocalToWorldTransform = Math.CreateTranslationScaleMatrix( Position, [Scale,Scale,Scale] );
+
+	const Scale3 = Array.isArray(Scale) ? Scale : [Scale,Scale,Scale];
+	const LocalToWorldTransform = Math.CreateTranslationScaleMatrix(Position,Scale3);
 	const WorldToCameraTransform = Camera.GetWorldToCameraMatrix();
 	const ViewRect = [-1,-1,1,1];
 	const CameraProjectionTransform = Camera.GetProjectionMatrix(ViewRect);
@@ -639,6 +675,34 @@ function RenderCube(RenderTarget,Camera,Position,Scale,Colour)
 		Shader.SetUniform('Colour',Colour);
 	}
 	RenderTarget.DrawGeometry( Geo, Shader, SetUniforms );
+}
+
+function RenderPortal(RenderTarget,Camera)
+{
+	//	render the screen
+	const y = Params.PortalY - (Params.PortalH / 2);
+	const Pos = [Params.PortalX,y,Params.PortalZ];
+	const Scale = [Params.PortalW / 2,Params.PortalH / 2,0.05];
+	const Colour = Params.PortalColour;
+	RenderCube(RenderTarget,Camera,Pos,Scale,Colour);
+}
+
+function RenderCapture(RenderTarget,Camera)
+{
+	//	render origin marker
+	const Pos = [Params.CaptureX,Params.CaptureY,Params.CaptureZ];
+	const Scale = Params.CaptureDebugSize;
+	const Colour = Params.CaptureColour;
+	RenderCube(RenderTarget,Camera,Pos,Scale,Colour);
+}
+
+function RenderOrigin(RenderTarget,Camera)
+{
+	//	render origin marker
+	const Pos = [0,0,0];
+	const Scale = Params.OriginDebugSize;
+	const Colour = Params.OriginColour;
+	RenderCube(RenderTarget,Camera,Pos,Scale,Colour);
 }
 
 
@@ -684,6 +748,15 @@ function ScoreToColour(Score)
 	}
 }
 
+function CapturePosToWorldPos(CapturePos)
+{
+	//	get a transform to put capture-space into world space
+	const WorldToCaptureTransform = Math.CreateTranslationMatrix(Params.CaptureX,Params.CaptureY,Params.CaptureZ);
+
+	return Math.TransformPosition(CapturePos,WorldToCaptureTransform);
+}
+
+//	todo: render in capture space
 function RenderSkeleton3D(RenderTarget,Camera,Skeleton)
 {
 	//	make lines from skeleton
@@ -698,8 +771,8 @@ function RenderSkeleton3D(RenderTarget,Camera,Skeleton)
 		const BoneScores = Scores[BoneIndex];
 		const StartColour = ScoreToColour(BoneScores[0]);
 		const EndColour = ScoreToColour(BoneScores[1]);
-		const StartPos = Bone[0];
-		const EndPos = Bone[1];
+		const StartPos = CapturePosToWorldPos(Bone[0]);
+		const EndPos = CapturePosToWorldPos(Bone[1]);
 		//Pop.Debug("RenderCube at ",JSON.stringify(StartPos));
 		RenderCube(RenderTarget,Camera,StartPos,Scale,StartColour);
 		RenderCube(RenderTarget,Camera,EndPos,Scale,EndColour);
@@ -718,16 +791,12 @@ class TCameraWindow
 		this.VideoTexture = null;
 		this.CameraFrameCounter = new Pop.FrameCounter( CameraName );
 		
-		this.VideoCamera = new Pop.Camera();
-		//	calibrate camera
-		this.VideoCamera.Position = [0,0,0];
-		this.VideoCamera.LookAt = [0,0,1];
-
 		this.FaceCamera = new Pop.Camera();
 		
 		this.DebugCamera = new Pop.Camera();
 		this.DebugCamera.Position = [0,0.4,2];
 		this.DebugCamera.LookAt = [0,0,0];
+		this.DebugCamera.Up[1] = -1;
 
 		this.Window = new Pop.Opengl.Window(CameraName);
 		this.Window.OnRender = this.OnRender.bind(this);
@@ -797,10 +866,18 @@ class TCameraWindow
 			RenderTarget.ClearColour( ...Params.BackgroundColour );
 			if ( Params.RenderGeo )
 				RenderScene( RenderTarget, RenderCamera );
-			if ( RenderCamera != this.FaceCamera )
-				RenderCube( RenderTarget, RenderCamera, this.FaceCamera.Position, Params.CameraModelScale, Params.FaceCameraColour );
-			RenderCube(RenderTarget,RenderCamera,this.VideoCamera.Position,Params.CameraModelScale,Params.VideoCameraColour);
-			RenderSkeleton3D(RenderTarget,RenderCamera,this.Skeleton);
+
+			if (RenderCamera != this.FaceCamera)
+			{
+				//	render the face camera
+				RenderCube(RenderTarget,RenderCamera,this.FaceCamera.Position,Params.CameraModelScale,Params.FaceCameraColour);
+
+				//	skeleton obscures camera too
+ 				RenderSkeleton3D(RenderTarget,RenderCamera,this.Skeleton);
+			}
+			RenderPortal(RenderTarget,RenderCamera);
+			RenderCapture(RenderTarget,RenderCamera);
+			RenderOrigin(RenderTarget,RenderCamera);
 		}
 		else
 		{
@@ -883,10 +960,11 @@ class TCameraWindow
 	{
 		try
 		{
-			this.FaceCamera.Position = this.LastFacePosition.slice();
+			this.FaceCamera.Position = CapturePosToWorldPos(this.LastFacePosition);
 
-			//Pop.Debug("this.FaceCamera.Position",this.FaceCamera.Position);
-			this.FaceCamera.LookAt = this.VideoCamera.Position.slice();
+			//	just face forward for now
+			this.FaceCamera.LookAt = this.FaceCamera.Position.slice();
+			this.FaceCamera.LookAt[2] += -1;
 
 			OnNewPose(this.FaceCamera);
 		}
@@ -908,7 +986,14 @@ class TCameraWindow
 		this.LastFaceUvz = uvz;
 		const FaceUv = uvz.slice(0,2);
 		const FaceZ = uvz[2];
-		const RayToFace = GetCameraRay(this.VideoCamera,FaceUv,FaceZ);
+
+		//	for 2D cameras, we need to know the orientation
+		const VideoCamera = new Pop.Camera();
+		VideoCamera.Position = [Params.CaptureX,Params.CaptureY,Params.CaptureZ];
+		VideoCamera.LookAt = VideoCamera.Position.slice();
+		VideoCamera.LookAt[2] += 1;
+
+		const RayToFace = GetCameraRay(VideoCamera,FaceUv,FaceZ);
 		const xyz = RayToFace.GetPosition(FaceZ);
 		return xyz;
 	}
