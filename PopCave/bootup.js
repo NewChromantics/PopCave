@@ -310,18 +310,30 @@ function GetSceneGeos(RenderTarget)
 	{
 		if ( !SceneGeos )
 			SceneGeos = [];
-		
-		Pop.Debug("Geo " + Geometry.Name);
-		
-		//	convert to triangle buffer
-		const VertexAttributeName = "LocalPosition";
-		const VertexSize = 3;
-		const VertexData = new Float32Array( Geometry.Positions );
-		//const TriangleIndexes = new Int32Array( Geometry.TriangleIndexes );
-		const TriangleIndexes = undefined;
-		const TriangleBuffer = new Pop.Opengl.TriangleBuffer( RenderTarget, VertexAttributeName, VertexData, VertexSize, TriangleIndexes );
 
-		SceneGeos.push( TriangleBuffer );
+		//	gr: desktop throws if zero vertexes, web doesnt?
+		try
+		{
+			Pop.Debug("Loading Geo " + Geometry.Name);
+
+			//	skip empty geos, throwing in here seems to cause a rejit exception??
+			if (!Geometry.Positions || Geometry.Positions.length == 0)
+				return;
+
+			//	convert to triangle buffer
+			const VertexAttributeName = "LocalPosition";
+			const VertexSize = 3;
+			const VertexData = new Float32Array(Geometry.Positions);
+			//const TriangleIndexes = new Int32Array( Geometry.TriangleIndexes );
+			const TriangleIndexes = undefined;
+			const TriangleBuffer = new Pop.Opengl.TriangleBuffer(RenderTarget,VertexAttributeName,VertexData,VertexSize,TriangleIndexes);
+
+			SceneGeos.push(TriangleBuffer);
+		}
+		catch (e)
+		{
+			Pop.Debug("Error Loading Geo " + Geometry.Name + ": " + e);
+		}
 	}
 	const Contents = Pop.LoadFileAsString( SceneFilename );
 	Pop.Obj.ParseGeometry( Contents, OnGeometry );
