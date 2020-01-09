@@ -63,7 +63,9 @@ Params.UsePosenet = false;
 Params.UseWinSkillSkeleton = false;
 Params.UseKinectAzureSkeleton = true;
 Params.EnableStreamFramePng = false;
-Params.KinectSkeletonInvertX = true;
+Params.KinectSkeletonInvertX = false;
+Params.KinectSkeletonInvertY = true;
+Params.KinectSkeletonInvertZ = false;
 Params.KinectYieldMs = 20;
 
 //	world->uv scalar
@@ -75,9 +77,9 @@ Params.SkeletonModelScale = 0.03;
 
 //	video camera origin
 Params.CaptureX = 0.6;
-Params.CaptureY = -0.49;
-Params.CaptureZ = 2.5;
-Params.CaptureYaw = 180;
+Params.CaptureY = 0.49;
+Params.CaptureZ = -2.5;
+Params.CaptureYaw = 0;
 Params.CaptureDebugSize = 0.05;
 Params.CaptureColour = [0,1,1];
 Params.CaptureToWorldRotateFirst = false;
@@ -85,7 +87,7 @@ Params.CaptureToWorldInverse = false;
 
 //	portal screen
 Params.PortalX = 0;
-Params.PortalY = -0.30;
+Params.PortalY = 0.30;
 Params.PortalZ = 0;
 Params.PortalW = 1.10;
 Params.PortalH = 1.88;
@@ -130,6 +132,8 @@ ParamsWindow.AddParam('UsePosenet');
 ParamsWindow.AddParam('UseWinSkillSkeleton');
 ParamsWindow.AddParam('UseKinectAzureSkeleton');
 ParamsWindow.AddParam('KinectSkeletonInvertX');
+ParamsWindow.AddParam('KinectSkeletonInvertY');
+ParamsWindow.AddParam('KinectSkeletonInvertZ');
 ParamsWindow.AddParam('KinectYieldMs',0,100,Math.floor);
 
 
@@ -442,7 +446,7 @@ function GetSceneGeos(RenderTarget)
 
 
 
-function LabelsToSkeleton(Labels,InvertX)
+function LabelsToSkeleton(Labels,InvertX,InvertY,InvertZ)
 {
 	if ( !Labels || !Labels.length )
 		return null;
@@ -455,10 +459,12 @@ function LabelsToSkeleton(Labels,InvertX)
 		if (Label.z !== undefined)
 		{
 			const x = (InvertX === true) ? -Label.x : Label.x;
+			const y = (InvertY === true) ? -Label.y : Label.y;
+			const z = (InvertZ === true) ? -Label.z : Label.z;
 			const Score = Label.Score;
 			const u = Math.Range(Params.SkeletonWorldMinX,Params.SkeletonWorldMaxX,Label.x);
 			const v = Math.Range(Params.SkeletonWorldMinY,Params.SkeletonWorldMaxY,Label.y);
-			Skeleton[Label.Label] = [u,v,Score,x,Label.y,Label.z];
+			Skeleton[Label.Label] = [u,v,Score,x,y,z];
 		}
 		else
 		{
@@ -752,8 +758,8 @@ function RenderCube(RenderTarget,Camera,Position,Scale,Colour)
 function GetPortalSkewedCamera(Camera)
 {
 	const PortalDirRight = [1,0,0];
-	const PortalDirUp = [0,-1,0];
-	const PortalDirForward = [0,0,1];
+	const PortalDirUp = [0,1,0];
+	const PortalDirForward = [0,0,-1];
 	function GetPortalOrientationMatrix()
 	{
 		//const M = Math.CreateLookAtRotationMatrix([0,0,0],PortalDirUp,PortalDirForward);
@@ -771,7 +777,7 @@ function GetPortalSkewedCamera(Camera)
 	{
 		const l = Params.PortalX - (Params.PortalW / 2);
 		const r = Params.PortalX + (Params.PortalW / 2);
-		const t = Params.PortalY - (Params.PortalH);
+		const t = Params.PortalY + (Params.PortalH);
 		const b = Params.PortalY;
 		const z = Params.PortalZ;
 		const tl = [l,t,z];
@@ -972,8 +978,15 @@ the screen) the result is a scalar value telling us how far
 	//const ProjectionMatrix = P;
 	//const ProjectionMatrix = Math.MatrixMultiply4x4Multiple(P,M,T);
 	let ProjectionMatrix = P;
-
-
+	/*
+	ProjectionMatrix =
+		[
+			4.75416,	0.00000, -3.43179,	0.00000,
+	0.00000,	2.90532, -0.15004,	0.00000,
+	0.00000,	0.00000, -1.01415, -0.60425,
+	0.00000,	0.00000, -1.00000,	0.00000,
+		];
+	*/
 	//	unity example with our size
 	/*
 	persp
@@ -1024,7 +1037,7 @@ ProjectionMatrix,
 function RenderPortal(RenderTarget,Camera)
 {
 	//	render the screen
-	const y = Params.PortalY - (Params.PortalH / 2);
+	const y = Params.PortalY + (Params.PortalH / 2);
 	const Pos = [Params.PortalX,y,Params.PortalZ];
 	const Scale = [Params.PortalW / 2,Params.PortalH / 2,0.05];
 	const Colour = Params.PortalColour;
@@ -1075,10 +1088,10 @@ function RenderCapture(RenderTarget,Camera)
 function RenderOrigin(RenderTarget,Camera)
 {
 	//	render origin marker
-	for (let z = -0.5;z <= 0.5;	z+=0.5)
+	for (let z = -0.5;z <= 0;	z+=0.5)
 	for (let y = 0;y < 10;y+=0.5)
 	{
-		const Pos = [0,-y,z];
+		const Pos = [0,y,z];
 		const Scale = Params.OriginDebugSize;
 		const Colour = Params.OriginColour;
 		RenderCube(RenderTarget,Camera,Pos,Scale,Colour);
@@ -1182,13 +1195,13 @@ class TCameraWindow
 		this.CameraFrameCounter = new Pop.FrameCounter( CameraName );
 		
 		this.FaceCamera = new Pop.Camera();
-		this.FaceCamera.Up[1] = -1;
+		this.FaceCamera.Up[1] = 1;
 
 		this.DebugCamera = new Pop.Camera();
 		//this.DebugCamera.Position = [0,0.4,2];
-		this.DebugCamera.Position = [Params.CaptureX,Params.CaptureY-0.2,Params.CaptureZ+0.2];
+		this.DebugCamera.Position = [Params.CaptureX,Params.CaptureY+0.2,Params.CaptureZ+0.2];
 		this.DebugCamera.LookAt = [0,0,0];
-		this.DebugCamera.Up[1] = -1;
+		this.DebugCamera.Up[1] = 1;
 
 		this.Window = new Pop.Opengl.Window(CameraName);
 		this.Window.OnRender = this.OnRender.bind(this);
@@ -1598,7 +1611,7 @@ class TCameraWindow
 			return null;
 		}
 
-		this.Skeleton = LabelsToSkeleton(Labels,Params.KinectSkeletonInvertX);
+		this.Skeleton = LabelsToSkeleton(Labels,Params.KinectSkeletonInvertX,Params.KinectSkeletonInvertY,Params.KinectSkeletonInvertZ);
 		//Pop.Debug("Skeleton",JSON.stringify(this.Skeleton));
 
 		const Head = this.Skeleton ? this.Skeleton.Head : null;
