@@ -292,9 +292,6 @@
       <FileType>Document</FileType>
     </CopyFileToFolders>
     <None Include="..\..\Src_Osx\main.mm" />
-    <CopyFileToFolders Include="..\..\Src_Windows\PopEngine.dll">
-      <FileType>Document</FileType>
-    </CopyFileToFolders>
     <CopyFileToFolders Include="..\..\Src_Windows\Microsoft.AI.Skills.SkillInterfacePreview.dll">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <FileType>Document</FileType>
@@ -348,9 +345,9 @@
       <FileType>Document</FileType>
     </CopyFileToFolders>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\..\Src_Windows\PopEngine.lib" />
+    <CopyFileToFolders Include="PopEngine_x64_Debug_Chakra\Bin\PopEngine.dll">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="..\..\Src_Windows\PopCoreml.manifest" />
@@ -365,6 +362,9 @@
     <CopyFileToFolders Include="..\..\PopCave\parallax_test_02.obj">
       <FileType>Document</FileType>
     </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="PopEngine_x64_Debug_Chakra\Bin\PopEngine.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

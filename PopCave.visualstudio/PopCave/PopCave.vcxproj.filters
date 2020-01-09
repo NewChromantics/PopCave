@@ -42,28 +42,7 @@
     <None Include="packages.config">
       <Filter>Dlls</Filter>
     </None>
-    <None Include="..\..\Src_Windows\cudnn64_7.dll">
-      <Filter>Dlls</Filter>
-    </None>
-    <None Include="..\..\Src_Windows\dnn_model_2_0.onnx">
-      <Filter>Dlls</Filter>
-    </None>
-    <None Include="..\..\Src_Windows\cublas64_100.dll">
-      <Filter>Dlls</Filter>
-    </None>
-    <None Include="..\..\Src_Windows\cudart64_100.dll">
-      <Filter>Dlls</Filter>
-    </None>
-    <None Include="..\..\Src_Windows\onnxruntime.dll">
-      <Filter>Dlls</Filter>
-    </None>
-    <None Include="..\..\Src_Windows\k4abt.dll">
-      <Filter>Dlls</Filter>
-    </None>
-    <None Include="..\..\Src_Windows\k4a.dll">
-      <Filter>Dlls</Filter>
-    </None>
-    <None Include="..\..\Src_Windows\depthengine_2_0.dll">
+    <None Include="PopEngine_x64_Debug_Chakra\Bin\PopEngine.dll">
       <Filter>Dlls</Filter>
     </None>
   </ItemGroup>
@@ -73,9 +52,6 @@
     </Manifest>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="..\..\Src_Windows\PopEngine.dll">
-      <Filter>Dlls</Filter>
-    </CopyFileToFolders>
     <CopyFileToFolders Include="..\..\Src_Windows\Microsoft.AI.Skills.SkillInterfacePreview.dll">
       <Filter>Dlls</Filter>
     </CopyFileToFolders>
@@ -140,11 +116,14 @@
     <CopyFileToFolders Include="..\..\PopCave\parallax_test_02.obj">
       <Filter>PopCave</Filter>
     </CopyFileToFolders>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\..\Src_Windows\PopEngine.lib">
-      <Filter>Dlls</Filter>
-    </Library>
+    <CopyFileToFolders Include="..\..\Src_Windows\cublas64_100.dll" />
+    <CopyFileToFolders Include="..\..\Src_Windows\cudart64_100.dll" />
+    <CopyFileToFolders Include="..\..\Src_Windows\cudnn64_7.dll" />
+    <CopyFileToFolders Include="..\..\Src_Windows\dnn_model_2_0.onnx" />
+    <CopyFileToFolders Include="..\..\Src_Windows\k4a.dll" />
+    <CopyFileToFolders Include="..\..\Src_Windows\k4abt.dll" />
+    <CopyFileToFolders Include="..\..\Src_Windows\depthengine_2_0.dll" />
+    <CopyFileToFolders Include="..\..\Src_Windows\onnxruntime.dll" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src_Windows\PopCave.cpp">
@@ -155,5 +134,10 @@
     <ResourceCompile Include="..\..\Src_Windows\PopCave.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="PopEngine_x64_Debug_Chakra\Bin\PopEngine.lib">
+      <Filter>Dlls</Filter>
+    </Library>
   </ItemGroup>
 </Project>
