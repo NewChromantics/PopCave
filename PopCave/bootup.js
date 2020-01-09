@@ -157,20 +157,45 @@ ParamsWindow.AddParam('OriginDebugSize',0,0.1);
 
 
 //	send callback
-let SendPose = null;
-let SendFramePng = null;
+const PoseSockets = [];
 
+
+function SendToPeers(Socket,Object)
+{
+	const Peers = Socket.GetPeers();
+	Pop.Debug("Peers:",Peers);
+	const Message = (Object instanceof Uint8Array) ? Object : JSON.stringify(Object);
+	function SendToPeer(Peer)
+	{
+		try
+		{
+			//Pop.Debug("Sending to " + Peer,Message);
+			Socket.Send(Peer,Message);
+		}
+		catch (e)
+		{
+			Pop.Debug("Error sending pose to " + Peer + "; " + e);
+		}
+	}
+	Peers.forEach(SendToPeer);
+}
+
+function OnFramePng(Bytes)
+{
+	PoseSockets.forEach(Socket => SendToPeers(Socket,Bytes));
+}
 
 
 function OnNewPose(Pose)
 {
-	//	generate projection matrix for sending
-	Pose.ProjectionMatrix = Pose.GetProjectionMatrix([-1,-1,1,1]);
+	if (Pose.GetProjectionMatrix)
+	{
+		//	generate projection matrix for sending
+		Pose.ProjectionMatrix = Pose.GetProjectionMatrix([-1,-1,1,1]);
+	}
 	Pop.Debug("OnNewPose: ",JSON.stringify(Pose));
-	if (!SendPose)
-		return;
-
-	SendPose(Pose);
+	
+	PoseSockets.forEach(Socket => SendToPeers(Socket,Pose));
 }
 
 
@@ -1140,8 +1165,7 @@ class TCameraWindow
 				{
 					const PngData = Luma.GetPngData(0.5);
 					PngKbCounter.Add(PngData.length / 1024);
-					if (SendFramePng)
-						SendFramePng(PngData);
+					SendFramePng(PngData);
 				}
 			}
 			catch(e)
@@ -1582,63 +1606,19 @@ async function RunServer(OnMessage)
 		{
 			const Port = GetPortIndex();
 			const Socket = new Pop.Websocket.Server(Port);
-
-
+			PoseSockets.push(Socket);
 			Pop.Debug("Websocket listening on ",JSON.stringify(Socket.GetAddress()));
 
+			OnNewPose("Server says Hello");
+
 			while (true)
-			{
-				if (!SendPose)
-				{
-					//	gr: this was causing an error, because I THINK we send a packet before handshake is finished?
-					//		temp fix, added to WaitForMessage
-					//	gr: maybe need peer's to finish connecting?
-					SendPose = function (Object)
-					{
-						const Peers = Socket.GetPeers();
-						const Message = JSON.stringify(Object);
-						function SendToPeer(Peer)
-						{
-							try
-							{
-								//Pop.Debug("Sending to " + Peer,Message);
-								Socket.Send(Peer,Message);
-							}
-							catch (e)
-							{
-								Pop.Debug("Error sending pose to " + Peer + "; " + e);
-							}
-						}
-						Peers.forEach(SendToPeer);
-					}
-
-					SendFramePng = function (Object)
-					{
-						const Peers = Socket.GetPeers();
-						const Message = (Object);
-						function SendToPeer(Peer)
-						{
-							try
-							{
-								//Pop.Debug("Sending to " + Peer,Message);
-								Socket.Send(Peer,Message);
-							}
-							catch (e)
-							{
-								Pop.Debug("Error sending png to " + Peer + "; " + e);
-							}
-						}
-						Peers.forEach(SendToPeer);
-					}
-				}
-
+			{				
 				const Message = await Socket.WaitForMessage();
 				OnMessage(Message,Socket);
 			}
 		}
 		catch (e)
 		{
-			SendPose = null;
 			Pop.Debug("Exception in server loop: " + e);
 			await Pop.Yield(2000);
 		}
@@ -1646,12 +1626,14 @@ async function RunServer(OnMessage)
 }
 
 
-//	keep trying to run servers
+//	keep trying to connect to servers
 async function ConnectToServer(HostNames,OnMessage)
 {
 	let PortIndex = 0;
-	function GetPortIndex()
+	function GetPort()
 	{
+		//return 9001;
+		return 80;
 		const PortCount = Expose.ListenPorts.length;
 		PortIndex = (PortIndex + 1) % PortCount;
 		return Expose.ListenPorts[PortIndex];
@@ -1670,67 +1652,83 @@ async function ConnectToServer(HostNames,OnMessage)
 		try
 		{
 			const HostName = GetHostName();
-			const Port = GetPortIndex();
+			const Port = GetPort();
 			const Address = HostName + ":" + Port;
 
 			//	wrapper for websocket
 			Pop.Debug("Connecting to websocket " + Address);
 			const Socket = new Pop.Websocket.Client(Address);
+			Pop.Debug("Created websocket client..." + Address);
 			await Socket.WaitForConnect();
+			Pop.Debug("Connected websocket client! " + Address);
+			PoseSockets.push(Socket);
+
+			OnNewPose("Client says Hello");
 
 			while (true)
 			{
-				if (!SendPose)
-				{
-					//	gr: this was causing an error, because I THINK we send a packet before handshake is finished?
-					//		temp fix, added to WaitForMessage
-					//	gr: maybe need peer's to finish connecting?
-					SendPose = function (Object)
-					{
-						const Peers = Socket.GetPeers();
-						const Message = JSON.stringify(Object);
-						function SendToPeer(Peer)
-						{
-							try
-							{
-								//Pop.Debug("Sending to " + Peer,Message);
-								Socket.Send(Peer,Message);
-							}
-							catch (e)
-							{
-								Pop.Debug("Error sending pose to " + Peer + "; " + e);
-							}
-						}
-						Peers.forEach(SendToPeer);
-					}
-
-					SendFramePng = function (Object)
-					{
-						const Peers = Socket.GetPeers();
-						const Message = (Object);
-						function SendToPeer(Peer)
-						{
-							try
-							{
-								//Pop.Debug("Sending to " + Peer,Message);
-								Socket.Send(Peer,Message);
-							}
-							catch (e)
-							{
-								Pop.Debug("Error sending png to " + Peer + "; " + e);
-							}
-						}
-						Peers.forEach(SendToPeer);
-					}
-				}
-
 				const Message = await Socket.WaitForMessage();
 				OnMessage(Message,Socket);
 			}
 		}
 		catch (e)
 		{
-			SendPose = null;
+			Pop.Debug("Exception in server loop: " + e);
+			await Pop.Yield(2000);
+		}
+	}
+}
+
+
+
+async function ConnectToUdpServer(HostNames,Ports,OnMessage)
+{
+	let PortIndex = 0;
+	function GetPort()
+	{
+		const PortCount = Ports.length;
+		PortIndex = (PortIndex + 1) % PortCount;
+		return Ports[PortIndex];
+	}
+
+	let HostIndex = 0;
+	function GetHostName()
+	{
+		const HostCount = HostNames.length;
+		HostIndex = (HostIndex + 1) % HostCount;
+		return HostNames[HostIndex];
+	}
+
+	while (true)
+	{
+		try
+		{
+			const HostName = GetHostName();
+			const Port = GetPort();
+			const Address = HostName + ":" + Port;
+
+			//	wrapper for websocket
+			Pop.Debug("Connecting to udpserver " + Address);
+			const Socket = new Pop.Socket.UdpClient(HostName,Port);
+			Pop.Debug("Created udp client..." + Address);
+
+			//	gr: implement this that just immediately resolves
+			//await Socket.WaitForConnect();
+			Pop.Debug("Connected udp client! " + Address);
+			PoseSockets.push(Socket);
+
+			OnNewPose("Client says Hello");
+
+			while (true)
+			{
+				//OnNewPose("Beep.");
+				await Pop.Yield(100);
+				const Message = await Socket.WaitForMessage();
+				OnMessage(Message,Socket);
+			}
+		}
+		catch (e)
+		{
 			Pop.Debug("Exception in server loop: " + e);
 			await Pop.Yield(2000);
 		}
@@ -1743,9 +1741,16 @@ FindCamerasLoop().catch(Pop.Debug);
 //MemCheckLoop().catch(Pop.Debug);
 
 //RunBroadcast(OnBroadcastMessage).then(Pop.Debug).catch(Pop.Debug);
-RunServer(OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
+//RunServer(OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
 
+//ws://demos.kaazing.com/echo
 
-const HostNames = ['192.168.0.12','192.168.0.11'];
-ConnectToServer(HostNames,OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
+//const HostNames = ['192.168.0.12','192.168.0.11'];
+//const HostNames = ['echo.websocket.org'];
+const HostNames = ['192.168.0.12'];
+const Ports = [9001];
+//const HostNames = ['192.168.0.12'];
+//ConnectToServer(HostNames,OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
+
+ConnectToUdpServer(HostNames,Ports,OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
 
