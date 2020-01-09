@@ -94,8 +94,15 @@ Params.PortalColour = [1,0,1];
 Params.OriginDebugSize = 0.02;
 Params.OriginColour = [1,1,1];
 
+Params.UseSkewCamera = false;
+Params.SkewUseCameraWorldToCamera = true;
+
 
 var ParamsWindow = CreateParamsWindow( Params, function(){}, [800,100,500,200] );
+
+ParamsWindow.AddParam('UseSkewCamera');
+ParamsWindow.AddParam('SkewUseCameraWorldToCamera');
+
 ParamsWindow.AddParam('MaxScore',0,1);
 ParamsWindow.AddParam('UseAppleFace');
 ParamsWindow.AddParam('UseOpenPose');
@@ -726,23 +733,18 @@ function RenderCube(RenderTarget,Camera,Position,Scale,Colour)
 	RenderTarget.DrawGeometry( Geo, Shader, SetUniforms );
 }
 
-function RenderPortal(RenderTarget,Camera)
+
+function GetPortalSkewedCamera(Camera)
 {
-	//	render the screen
-	const y = Params.PortalY - (Params.PortalH / 2);
-	const Pos = [Params.PortalX,y,Params.PortalZ];
-	const Scale = [Params.PortalW / 2,Params.PortalH / 2,0.05];
-	const Colour = Params.PortalColour;
-
-
 	const PortalDirRight = [1,0,0];
 	const PortalDirUp = [0,-1,0];
 	const PortalDirForward = [0,0,1];
 	function GetPortalOrientationMatrix()
-	{		
+	{
 		const M = Math.CreateLookAtRotationMatrix([0,0,0],PortalDirUp,PortalDirForward);
 		return M;
 	}
+
 	function GetPortalCorners()
 	{
 		const l = Params.PortalX - (Params.PortalW / 2);
@@ -764,8 +766,9 @@ function RenderPortal(RenderTarget,Camera)
 		//	https://docs.microsoft.com/en-us/windows/win32/opengl/glfrustum?redirectedfrom=MSDN
 		const RIGHT = (2 * n) / (r - l);
 		const UP = (2 * n) / (t - b);
-		const A = (r + l) / (r - l);
-		const B = (t + b) / (t - b);
+		const CX_A = (r + l) / (r - l);
+		const CY_B = (t + b) / (t - b);
+		Pop.Debug("CX_A=" + CX_A,"r=" + r,"l=" + l);
 		//const C = -((f + n) / (f - n));
 		//const E = -1;
 		//const D = -((2 * f * n) / (f - n));
@@ -773,9 +776,32 @@ function RenderPortal(RenderTarget,Camera)
 		const C = (-n - f) / (n - f);
 		const E = 1;
 		const D = (2 * f * n) / (n - f);
+		const S = 0;
+		let Matrix = [];
+		Matrix[0] = RIGHT;
+		Matrix[1] = S;
+		Matrix[2] = CX_A;
+		Matrix[3] = 0;
+
+		Matrix[4] = 0;
+		Matrix[5] = UP;
+		Matrix[6] = CY_B;
+		Matrix[7] = 0;
+
+		Matrix[8] = 0;
+		Matrix[9] = 0;
+		Matrix[10] = C;
+		Matrix[11] = E;
+
+		Matrix[12] = 0;
+		Matrix[13] = 0;
+		Matrix[14] = D;//E;
+		Matrix[15] = 0;
+		return Matrix;
+
 		return [
-			RIGHT,0,A,0,
-			0,UP,B,0,
+			RIGHT,S,CX_A,0,
+			0,UP,CY_B,0,
 			0,0,C,D,
 			0,0,E,0
 		];
@@ -790,7 +816,7 @@ function RenderPortal(RenderTarget,Camera)
 	Vector3 pb = ProjectionScreen.BottomRight;
 	Vector3 pc = ProjectionScreen.TopLeft;
 	Vector3 pd = ProjectionScreen.TopRight;
-
+	
 	Vector3 vr = ProjectionScreen.DirRight;
 	Vector3 vu = ProjectionScreen.DirUp;
 	Vector3 vn = ProjectionScreen.DirNormal;
@@ -798,7 +824,7 @@ function RenderPortal(RenderTarget,Camera)
 	const vr = PortalDirRight;
 	const vu = PortalDirUp;
 	const vn = PortalDirForward;
-	
+
 	const PortalCorners = GetPortalCorners();
 	const pa = PortalCorners[3];	//	bottom left
 	const pb = PortalCorners[2];	//	bottom right
@@ -819,6 +845,7 @@ function RenderPortal(RenderTarget,Camera)
 
 	//distance from eye to projection screen plane
 	const d = -Math.Dot3(va,vn);
+	Pop.Debug("Distance to screen plane",d);
 	//if (ClampNearPlane)
 	//	cam.nearClipPlane = d;
 	const n = Camera.NearDistance;
@@ -832,6 +859,7 @@ function RenderPortal(RenderTarget,Camera)
 	const P = CreateFrustumMatrix(l,r,b,t,n,f);
 
 	//Translation to eye position
+	//	gr: same as in GetWorldToCameraMatrix
 	const eyex = -eyePos[0];
 	const eyey = -eyePos[1];
 	const eyez = -eyePos[2];
@@ -841,12 +869,17 @@ function RenderPortal(RenderTarget,Camera)
 	//	Quaternion.Inverse(transform.rotation) * ProjectionScreen.transform.rotation);
 	const R = Math.CreateIdentityMatrix();
 
+	//	M is portal orientation/lookat
+	//	T is camera(human/debug) positon
+	//	R is orientation of camera
 	const WorldToCamera = Math.MatrixMultiply4x4Multiple(M,R,T);
 	const ProjectionMatrix = P;
 
 	let SkewCamera = {};
 	SkewCamera.GetWorldToCameraMatrix = function ()
 	{
+		if ( Params.SkewUseCameraWorldToCamera )
+			return Camera.GetWorldToCameraMatrix();
 		return WorldToCamera;
 	}
 
@@ -856,11 +889,25 @@ function RenderPortal(RenderTarget,Camera)
 		return ProjectionMatrix;
 	}
 
-	Pop.Debug("WorldToCamera",WorldToCamera);
-	Pop.Debug("ProjectionMatrix",ProjectionMatrix);
+//	Pop.Debug("WorldToCamera",WorldToCamera);
+	//Pop.Debug("ProjectionMatrix",ProjectionMatrix);
+	//const ViewRect = [-1,-1,1,1];
+	//Pop.Debug("OrigProjectionMatrix",Camera.GetProjectionMatrix(ViewRect));
 
-	RenderCube(RenderTarget,SkewCamera,Pos,Scale,null);
+	return SkewCamera;
 }
+
+function RenderPortal(RenderTarget,Camera)
+{
+	//	render the screen
+	const y = Params.PortalY - (Params.PortalH / 2);
+	const Pos = [Params.PortalX,y,Params.PortalZ];
+	const Scale = [Params.PortalW / 2,Params.PortalH / 2,0.05];
+	const Colour = Params.PortalColour;
+
+	RenderCube(RenderTarget,Camera,Pos,Scale,null);
+}
+
 
 function RenderCameraDebug(RenderTarget,RenderCamera,Camera,Colour)
 {
@@ -1010,7 +1057,8 @@ class TCameraWindow
 		this.FaceCamera.Up[1] = -1;
 
 		this.DebugCamera = new Pop.Camera();
-		this.DebugCamera.Position = [0,0.4,2];
+		//this.DebugCamera.Position = [0,0.4,2];
+		this.DebugCamera.Position = [Params.CaptureX,Params.CaptureY-0.2,Params.CaptureZ+0.2];
 		this.DebugCamera.LookAt = [0,0,0];
 		this.DebugCamera.Up[1] = -1;
 
@@ -1077,7 +1125,7 @@ class TCameraWindow
 		}
 		else if ( Params.RenderWorld || Params.RenderFromFaceCamera )
 		{
-			const RenderCamera = Params.RenderFromFaceCamera ? this.FaceCamera : this.DebugCamera;
+			let RenderCamera = Params.RenderFromFaceCamera ? this.FaceCamera : this.DebugCamera;
 			
 			RenderTarget.ClearColour( ...Params.BackgroundColour );
 			if ( Params.RenderGeo )
@@ -1091,6 +1139,10 @@ class TCameraWindow
 				//	skeleton obscures camera too
  				RenderSkeleton3D(RenderTarget,RenderCamera,this.Skeleton);
 			}
+
+			if (Params.UseSkewCamera)
+				RenderCamera = GetPortalSkewedCamera(RenderCamera);
+
 			RenderPortal(RenderTarget,RenderCamera);
 			RenderCapture(RenderTarget,RenderCamera);
 			RenderOrigin(RenderTarget,RenderCamera);
