@@ -812,8 +812,26 @@ function GetPortalSkewedCamera(Camera)
 		return [tl,tr,br,bl];
 	}
 
-	function CreateFrustumMatrix(l,r,b,t,n,f)
+	function glFrustum(l,r,b,t,n,f)
 	{
+		const X = (2 * n) / (r - l);
+		const A = (r+l) / (r-l);
+		const Y = (2 * n) / (t - b);
+		const B = (t + b) / (t - b);
+		const C = (f + n) / (f - n);
+		const D = (2 * n * f) / (f - n);
+		const E = -1;
+
+		let Matrix =
+			[
+				X,0,A,0,
+				0,Y,B,0,
+				0,0,C,D,
+				0,0,E,0
+			];
+	}
+
+	function CreateFrustumMatrix(l,r,b,t,n,f,Headxyz)
 		//	compare this to Pop.Camera.GetProjectionMatrix()
 		//	and GetOpenglFocalLengths()
 		//	https://docs.microsoft.com/en-us/windows/win32/opengl/glfrustum?redirectedfrom=MSDN
