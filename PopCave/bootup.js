@@ -19,6 +19,7 @@ const GreyscaleFragShader = Pop.LoadFileAsString('Greyscale.frag.glsl');
 const SkeletonFragShader = Pop.LoadFileAsString('DrawLines.frag.glsl');
 const GeoVertShader = Pop.LoadFileAsString('Geo.vert.glsl');
 const GeoColourShader = Pop.LoadFileAsString('Colour.frag.glsl');
+const GeoEdgeShader = Pop.LoadFileAsString('Edge.frag.glsl');
 
 
 const RenderCounter = new Pop.FrameCounter('Render');
@@ -96,7 +97,8 @@ Params.PortalColour = [1,0,1];
 Params.OriginDebugSize = 0.02;
 Params.OriginColour = [1,1,1];
 
-Params.UseSkewCamera = true;
+Params.SkewRenderCamera = false;
+Params.SkewDebugCamera = true;
 Params.SkewUseCameraWorldToCamera = false;
 Params.SkewCamera_R = true;
 Params.SkewCamera_T = true;
@@ -109,7 +111,8 @@ Params.CXCY_Override = false;
 
 var ParamsWindow = CreateParamsWindow( Params, function(){}, [800,100,500,200] );
 
-ParamsWindow.AddParam('UseSkewCamera');
+ParamsWindow.AddParam('SkewRenderCamera');
+ParamsWindow.AddParam('SkewDebugCamera');
 ParamsWindow.AddParam('CX_Scale',-1,1);
 ParamsWindow.AddParam('CY_Scale',-1,1);
 ParamsWindow.AddParam('CXCY_Override');
@@ -724,34 +727,56 @@ function RenderScene(RenderTarget, Camera)
 	Geos.forEach( RenderGeo );
 }
 
-function RenderCube(RenderTarget,Camera,Position,Scale,Colour)
+function RenderActor(RenderTarget,Camera,Actor)
 {
-	const Geo = GetCube( RenderTarget );
-	const Shader = Pop.GetShader( RenderTarget, GeoColourShader, GeoVertShader );
+	if (Actor.Geometry == 'Cube')
+		Actor.Geometry = GetCube(RenderTarget);
 
-	const Scale3 = Array.isArray(Scale) ? Scale : [Scale,Scale,Scale];
-	const LocalToWorldTransform = Math.CreateTranslationScaleMatrix(Position,Scale3);
+	const Geo = Actor.Geometry;
+	const Shader = Pop.GetShader(RenderTarget,Actor.FragShader,Actor.VertShader);
+
 	const WorldToCameraTransform = Camera.GetWorldToCameraMatrix();
 	const ViewRect = [-1,-1,1,1];
 	const CameraProjectionTransform = Camera.GetProjectionMatrix(ViewRect);
 	//Pop.Debug(Position);
 	function SetUniforms(Shader)
 	{
-		Shader.SetUniform('LocalToWorldTransform',LocalToWorldTransform);
 		Shader.SetUniform('WorldToCameraTransform',WorldToCameraTransform);
 		Shader.SetUniform('CameraProjectionTransform',CameraProjectionTransform);
-		if (Colour == null)
+		function SetUniform(Name)
 		{
-			Shader.SetUniform('DrawLocalPosition',true);
-			Shader.SetUniform('Colour',[1,1,1]);
+			Shader.SetUniform(Name,Actor.Uniforms[Name]);
 		}
-		else
-		{
-			Shader.SetUniform('DrawLocalPosition',false);
-			Shader.SetUniform('Colour',Colour);
-		}
+		Object.keys(Actor.Uniforms).forEach(SetUniform);
 	}
-	RenderTarget.DrawGeometry( Geo, Shader, SetUniforms );
+	RenderTarget.DrawGeometry(Geo,Shader,SetUniforms);
+}
+
+function RenderCube(RenderTarget,Camera,Position,Scale,Colour)
+{
+	const Actor = {};
+
+	Actor.Uniforms = {};
+
+	Actor.Geometry = 'Cube';
+	Actor.FragShader = GeoColourShader;
+	Actor.VertShader = GeoVertShader;
+
+	if (Colour == null)
+	{
+		Actor.Uniforms.DrawLocalPosition = true;
+		Actor.Uniforms.Colour = [1,1,1];
+	}
+	else
+	{
+		Actor.Uniforms.DrawLocalPosition = false;
+		Actor.Uniforms.Colour = Colour;
+	}
+
+	const Scale3 = Array.isArray(Scale) ? Scale : [Scale,Scale,Scale];
+	Actor.Uniforms.LocalToWorldTransform = Math.CreateTranslationScaleMatrix(Position,Scale3);
+
+	RenderActor(RenderTarget,Camera,Actor);
 }
 
 
@@ -759,7 +784,7 @@ function GetPortalSkewedCamera(Camera)
 {
 	const PortalDirRight = [1,0,0];
 	const PortalDirUp = [0,1,0];
-	const PortalDirForward = [0,0,-1];
+	const PortalDirForward = [0,0,-1];	//	facing us
 	function GetPortalOrientationMatrix()
 	{
 		//const M = Math.CreateLookAtRotationMatrix([0,0,0],PortalDirUp,PortalDirForward);
@@ -986,7 +1011,7 @@ the screen) the result is a scalar value telling us how far
 	0.00000,	0.00000, -1.01415, -0.60425,
 	0.00000,	0.00000, -1.00000,	0.00000,
 		];
-	*/
+	
 	//	unity example with our size
 	/*
 	persp
@@ -1028,6 +1053,17 @@ ProjectionMatrix,
 		return ProjectionMatrix;
 	}
 
+	SkewCamera.GetLocalToWorldFrustumTransformMatrix = function ()
+	{
+		let Matrix = ProjectionMatrix.slice();
+		Matrix = Math.MatrixInverse4x4(Matrix);
+
+		let WorldToCameraMatrix = WorldToCamera;
+		let LocalToWorldMatrix = Math.MatrixInverse4x4(WorldToCameraMatrix);
+		Matrix = Math.MatrixMultiply4x4(LocalToWorldMatrix,Matrix);
+		return Matrix;
+	}
+
 	//const ViewRect = [-1,-1,1,1];
 	//Pop.Debug("OrigProjectionMatrix",Camera.GetProjectionMatrix(ViewRect));
 
@@ -1046,22 +1082,38 @@ function RenderPortal(RenderTarget,Camera)
 }
 
 
-function RenderCameraDebug(RenderTarget,RenderCamera,Camera,Colour)
+function RenderCameraDebug(RenderTarget,RenderCamera,Camera,Colour,ShowPositionMarkers=true)
 {
-	const Pos = Camera.Position.slice();
+	if (ShowPositionMarkers)
 	{
-		const Scale = Params.CameraModelScale;
-		RenderCube(RenderTarget,RenderCamera,Pos,Scale,Colour);
+		const Pos = Camera.Position.slice();
+		{
+			const Scale = Params.CameraModelScale;
+			RenderCube(RenderTarget,RenderCamera,Pos,Scale,Colour);
+		}
+
+		//	draw a marker in front of camera
+		const Forward = Math.Add3(Pos,Camera.GetForward());
+		for (let z = 0.2;z < 1;z += 0.2)
+		{
+			const DeltaPos = Math.Lerp3(Pos,Forward,z);
+			const Scale = Params.CameraModelScale * 0.5;
+			RenderCube(RenderTarget,RenderCamera,DeltaPos,Scale,Colour);
+		}
 	}
 
-	//	draw a marker in front of camera
-	const Forward = Math.Add3(Pos,Camera.GetForward());
-	for (let z = 0.2;z < 1;z += 0.2)
-	{
-		const DeltaPos = Math.Lerp3(Pos,Forward,z);
-		const Scale = Params.CameraModelScale * 0.5;
-		RenderCube(RenderTarget,RenderCamera,DeltaPos,Scale,Colour);
-	}
+	//	draw frustum
+	const Actor = {};
+	Actor.Geometry = 'Cube';
+	Actor.FragShader = GeoEdgeShader;
+	Actor.VertShader = GeoVertShader;
+	Actor.Uniforms = {};
+	Actor.Uniforms['LocalToWorldTransform'] = Camera.GetLocalToWorldFrustumTransformMatrix();
+	Actor.Uniforms['ChequerFrontAndBack'] = true;
+	Actor.Uniforms['ChequerSides'] = false;
+	Actor.Uniforms['LineWidth'] = 0.01;
+	RenderActor(RenderTarget,RenderCamera,Actor);
+
 }
 
 function RenderCapture(RenderTarget,Camera)
@@ -1202,8 +1254,10 @@ class TCameraWindow
 		this.DebugCamera.Position = [Params.CaptureX,Params.CaptureY+0.2,Params.CaptureZ+0.2];
 		this.DebugCamera.LookAt = [0,0,0];
 		this.DebugCamera.Up[1] = 1;
-
-		this.Window = new Pop.Opengl.Window(CameraName);
+		
+		const Options = null;
+		const Rect = [200,100,400,800];
+		this.Window = new Pop.Opengl.Window(CameraName,Options,Rect);
 		this.Window.OnRender = this.OnRender.bind(this);
 		
 		
@@ -1267,25 +1321,31 @@ class TCameraWindow
 		else if ( Params.RenderWorld || Params.RenderFromFaceCamera )
 		{
 			let RenderCamera = Params.RenderFromFaceCamera ? this.FaceCamera : this.DebugCamera;
-			
+			RenderCamera.FocalCenter[0] = Params.CX_Scale;
+			RenderCamera.FocalCenter[1] = Params.CY_Scale;
+
 			RenderTarget.ClearColour( ...Params.BackgroundColour );
 			if ( Params.RenderGeo )
 				RenderScene( RenderTarget, RenderCamera );
 
+			const ShowCameraFrustum = (RenderCamera != this.FaceCamera);
 			const ShowSkeleton = (RenderCamera != this.FaceCamera);
 
-			if (Params.UseSkewCamera)
+			if (Params.SkewRenderCamera)
 				RenderCamera = GetPortalSkewedCamera(RenderCamera);
 
 			if (ShowSkeleton)
-			{
-				//	render the face camera
-				RenderCameraDebug(RenderTarget,RenderCamera,this.FaceCamera,Params.FaceCameraColour);
+				RenderSkeleton3D(RenderTarget,RenderCamera,this.Skeleton);
 
-				//	skeleton obscures camera too
- 				RenderSkeleton3D(RenderTarget,RenderCamera,this.Skeleton);
+			if (ShowCameraFrustum)
+				RenderCameraDebug(RenderTarget,RenderCamera,this.FaceCamera,Params.FaceCameraColour);
+			
+			if (Params.SkewDebugCamera)
+			{
+				const Cam = GetPortalSkewedCamera(this.FaceCamera);
+				RenderCameraDebug(RenderTarget,RenderCamera,Cam,Params.FaceCameraColour,false);
 			}
-						
+			
 			RenderPortal(RenderTarget,RenderCamera);
 			RenderCapture(RenderTarget,RenderCamera);
 			RenderOrigin(RenderTarget,RenderCamera);

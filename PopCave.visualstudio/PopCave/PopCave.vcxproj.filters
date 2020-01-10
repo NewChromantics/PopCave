@@ -45,6 +45,7 @@
     <None Include="PopEngine_x64_Debug_Chakra\Bin\PopEngine.dll">
       <Filter>Dlls</Filter>
     </None>
+    <None Include="..\..\PopCave\Edge.frag.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="..\..\Src_Windows\PopCoreml.manifest">

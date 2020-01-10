@@ -291,6 +291,9 @@
     <CopyFileToFolders Include="..\..\PopCave\Quad.vert.glsl">
       <FileType>Document</FileType>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\Edge.frag.glsl">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
     <None Include="..\..\Src_Osx\main.mm" />
     <CopyFileToFolders Include="..\..\Src_Windows\Microsoft.AI.Skills.SkillInterfacePreview.dll">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
