@@ -37,10 +37,11 @@ var Params = {};
 Params.MaxScore = 1.0;
 Params.LineWidth = 0.0015;
 Params.WorldVerticalFov = 45;
-Params.CameraNearDistance = 0.1;
-Params.CameraFarDistance = 2;
+Params.CameraNearDistance = 1;
+Params.CameraFarDistance = 3;
 Params.RenderVideo = false;
 Params.RenderWorld = true;
+Params.RenderPortal = true;
 Params.RenderFromFaceCamera = false;
 Params.CameraModelScale = 0.1;
 Params.FaceZ = 1;
@@ -79,8 +80,9 @@ Params.SkeletonModelScale = 0.03;
 //	video camera origin
 Params.CaptureX = 0;
 Params.CaptureY = 0;
-Params.CaptureZ = -1;
+Params.CaptureZ = 1;	//	gr: I feel this is backwards, but matching unity one
 Params.CaptureYaw = 0;
+Params.FaceCameraUp = 1;
 Params.CaptureDebugSize = 0.05;
 Params.CaptureColour = [0,1,1];
 Params.CaptureToWorldRotateFirst = false;
@@ -149,6 +151,7 @@ ParamsWindow.AddParam('CameraNearDistance',0.001,100);
 ParamsWindow.AddParam('CameraFarDistance',0.001,100);
 ParamsWindow.AddParam('RenderVideo');
 ParamsWindow.AddParam('RenderWorld');
+ParamsWindow.AddParam('RenderPortal');
 ParamsWindow.AddParam('RenderFromFaceCamera');
 ParamsWindow.AddParam('CameraModelScale',0.001,2);
 ParamsWindow.AddParam('SkeletonModelScale',0.001,1);
@@ -172,6 +175,7 @@ ParamsWindow.AddParam('SkeletonWorldMaxY',-10,10);
 ParamsWindow.AddParam('CaptureX',-2,2);
 ParamsWindow.AddParam('CaptureY',-2,2);
 ParamsWindow.AddParam('CaptureZ',-4,4);
+ParamsWindow.AddParam('FaceCameraUp',-1,1);
 ParamsWindow.AddParam('CaptureColour','Colour');
 ParamsWindow.AddParam('CaptureDebugSize',0,0.1);
 ParamsWindow.AddParam('CaptureYaw',-180,180);
@@ -1184,7 +1188,7 @@ ProjectionMatrix,
 function RenderPortal(RenderTarget,Camera)
 {
 	//	render the screen
-	const y = Params.PortalY + (Params.PortalH / 2);
+	const y = Params.PortalY;
 	const Pos = [Params.PortalX,y,Params.PortalZ];
 	const Scale = [Params.PortalW / 2,Params.PortalH / 2,0.05];
 	const Colour = Params.PortalColour;
@@ -1262,8 +1266,41 @@ function RenderCameraDebug_OrthoProjection(RenderTarget,RenderCamera,Camera,XOff
 	RenderCameraDebug_WithProjection(RenderTarget,RenderCamera,Camera,XOffset,InvProjection);
 }
 
+
+function RenderCameraDebug_SkewedToPortalProjection(RenderTarget,RenderCamera,Camera,XOffset)
+{
+	//	far = 1, so width at far
+	const Near = Params.CameraNearDistance;
+	const Far = Params.CameraFarDistance;
+	const DrawDistance = Far - Near;
+	const NearMinFar = Near - Far;
+
+
+	const BoxWidth = Params.PortalW;
+	const BoxHeight = Params.PortalH;
+	//	https://www.cs.rit.edu/usr/local/pub/wrc/graphics/doc/opengl/books/blue/glFrustum.html
+	const ZScale = -(Far + Near) / (Far-Near);
+	const WScale = -(2 * Near * Far) / (Far-Near);
+	const ZW = -1;
+	const InvProjection =
+		[
+			1.81818,0.00000,Params.CX_Scale,0.00000,
+			0.00000,1.111,0.00000,0.00000,
+			0.00000,0.00000,ZScale,WScale,
+			0.00000,0.00000,ZW,0.00000,
+		];
+
+	Pop.Debug("InvProjection",InvProjection);
+	//Pop.Debug("Projection",Projection);
+	RenderCameraDebug_WithProjection(RenderTarget,RenderCamera,Camera,XOffset,InvProjection);
+}
+
 function RenderCameraDebug_BoxProjection(RenderTarget,RenderCamera,Camera,XOffset)
 {
+	let NormalMatrix = Camera.GetProjectionMatrix([-1,-1,1,1]);
+	Pop.Debug("NormalMatrix",NormalMatrix);
+
+
 	//	far = 1, so width at far
 	const Near = Camera.NearDistance;
 	const Far = Camera.FarDistance;
@@ -1293,18 +1330,38 @@ function RenderCameraDebug_BoxProjection(RenderTarget,RenderCamera,Camera,XOffse
 		];
 	//	z== 0...1
 
-	//	this does add then scale
-	let ProjectionScale =
+	const BoxWidth = 2;
+	const BoxHeight = 2;
+
+
+
+
+	let ProjectionScaleX =
 		[
-			1,0,0,0,		//	z=t on ray. Ray = origin
+			//	we want		X = X * Z
+			//	
+			1,0,0,0,	
 			0,1,0,0,
-			0,0,ZDist,0,	//	scale z
-			0,0,Near,1			//	offset
+			0,0,1,-1,		//	w+=1*z
+			0,0,0,10		//	w+=10*w		
+		];
+	//Projection = Math.MatrixMultiply4x4(ProjectionScaleZ,Projection);
+
+	
+
+	//
+	let ProjectionScaleZ =
+		[
+			1,0,0,0,
+			0,1,0,0,
+			0,0,ZDist,0,	//	z+=Dist*z
+			0,0,Near,1		//	z+=offset
 		];
 	//	z== Near..Near+dist
-	
+
 	let Projection = Math.MatrixMultiply4x4(ProjectionNormaliseZ,ProjectionOffset);
-	Projection = Math.MatrixMultiply4x4(ProjectionScale,Projection);
+	Projection = Math.MatrixMultiply4x4(ProjectionScaleX,Projection);
+	Projection = Math.MatrixMultiply4x4(ProjectionScaleZ,Projection);
 
 	const InvProjection = Math.MatrixInverse4x4(Projection);
 	RenderCameraDebug_WithProjection(RenderTarget,RenderCamera,Camera,XOffset,InvProjection);
@@ -1388,14 +1445,14 @@ class TCameraWindow
 	constructor(CameraName)
 	{
 		this.FaceCamera = new Pop.Camera();
-		this.FaceCamera.Up[1] = 1;
-		this.FaceCamera.Position = [0,0,0];
-		this.FaceCamera.LookAt = [0,0,1];
+		this.FaceCamera.Up[1] = Params.FaceCameraUp;
+		this.FaceCamera.Position = [0,0,-1];
+		this.FaceCamera.LookAt = [0,0,0];
 
 		this.DebugCamera = new Pop.Camera();
 		//this.DebugCamera.Position = [0,0.4,2];
-		this.DebugCamera.Position = [Params.CaptureX,Params.CaptureY,Params.CaptureZ];
-		this.DebugCamera.LookAt = [0,0,0];
+		this.DebugCamera.Position = [Params.CaptureX,Params.CaptureY,Params.CaptureZ+1];
+		this.DebugCamera.LookAt = [0,0,-1];
 		this.DebugCamera.Up[1] = 1;
 		
 		//const Options = null;
@@ -1444,21 +1501,29 @@ class TCameraWindow
 	OnRender(RenderTarget)
 	{
 		let RenderCamera = Params.RenderFromFaceCamera ? this.FaceCamera : this.DebugCamera;
-		RenderCamera.FocalCenter[0] = Params.CX_Scale;
-		RenderCamera.FocalCenter[1] = Params.CY_Scale;
+		//RenderCamera.FocalCenter[0] = Params.CX_Scale;
+		//RenderCamera.FocalCenter[1] = Params.CY_Scale;
 		this.FaceCamera.FovVertical = Params.WorldVerticalFov;
 		this.FaceCamera.NearDistance = Params.CameraNearDistance;
 		this.FaceCamera.FarDistance = Params.CameraFarDistance;
+		this.FaceCamera.Position = [Params.CaptureX,Params.CaptureY,Params.CaptureZ];
+		//this.FaceCamera.LookAt = [0,0,0];
+		this.FaceCamera.LookAt = this.FaceCamera.Position.slice();
+		this.FaceCamera.LookAt[2] += 1;
+		this.FaceCamera.Up[1] = Params.FaceCameraUp;
+
 
 		RenderTarget.ClearColour( ...Params.BackgroundColour );
 		//if ( Params.RenderGeo )
 		//	RenderScene( RenderTarget, RenderCamera );
 
-		RenderCameraDebug(RenderTarget,RenderCamera,this.FaceCamera,-2);
-		RenderCameraDebug_OrthoProjection(RenderTarget,RenderCamera,this.FaceCamera,2);
-		RenderCameraDebug_BoxProjection(RenderTarget,RenderCamera,this.FaceCamera,0);
+		//RenderCameraDebug(RenderTarget,RenderCamera,this.FaceCamera,-2);
+		RenderCameraDebug_SkewedToPortalProjection(RenderTarget,RenderCamera,this.FaceCamera,0);
+		//RenderCameraDebug_OrthoProjection(RenderTarget,RenderCamera,this.FaceCamera,4);
+		//RenderCameraDebug_BoxProjection(RenderTarget,RenderCamera,this.FaceCamera,6);
 
-		//RenderPortal(RenderTarget,RenderCamera);
+		if ( Params.RenderPortal )
+			RenderPortal(RenderTarget,RenderCamera);
 		//RenderCapture(RenderTarget,RenderCamera);
 		//RenderOrigin(RenderTarget,RenderCamera);
 	}
