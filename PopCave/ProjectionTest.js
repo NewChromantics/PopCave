@@ -80,9 +80,10 @@ Params.SkeletonModelScale = 0.03;
 //	video camera origin
 Params.CaptureX = 0;
 Params.CaptureY = 0;
-Params.CaptureZ = 1;	//	gr: I feel this is backwards, but matching unity one
+Params.CaptureZ = -1;
 Params.CaptureYaw = 0;
 Params.FaceCameraUp = 1;
+Params.FaceCameraForward = -1;
 Params.CaptureDebugSize = 0.05;
 Params.CaptureColour = [0,1,1];
 Params.CaptureToWorldRotateFirst = false;
@@ -147,8 +148,8 @@ ParamsWindow.AddParam('KinectYieldMs',0,100,Math.floor);
 ParamsWindow.AddParam('LineWidth',0.0001,0.01);
 ParamsWindow.AddParam('FaceZ',0,10);
 ParamsWindow.AddParam('WorldVerticalFov',4,90);
-ParamsWindow.AddParam('CameraNearDistance',0.001,100);
-ParamsWindow.AddParam('CameraFarDistance',0.001,100);
+ParamsWindow.AddParam('CameraNearDistance',0.001,1);
+ParamsWindow.AddParam('CameraFarDistance',0.001,10);
 ParamsWindow.AddParam('RenderVideo');
 ParamsWindow.AddParam('RenderWorld');
 ParamsWindow.AddParam('RenderPortal');
@@ -176,6 +177,7 @@ ParamsWindow.AddParam('CaptureX',-2,2);
 ParamsWindow.AddParam('CaptureY',-2,2);
 ParamsWindow.AddParam('CaptureZ',-4,4);
 ParamsWindow.AddParam('FaceCameraUp',-1,1);
+ParamsWindow.AddParam('FaceCameraForward',-1,1);
 ParamsWindow.AddParam('CaptureColour','Colour');
 ParamsWindow.AddParam('CaptureDebugSize',0,0.1);
 ParamsWindow.AddParam('CaptureYaw',-180,180);
@@ -1295,7 +1297,64 @@ function RenderCameraDebug_SkewedToPortalProjection(RenderTarget,RenderCamera,Ca
 	const BoxHeight = Params.PortalH;
 	//	https://www.cs.rit.edu/usr/local/pub/wrc/graphics/doc/opengl/books/blue/glFrustum.html
 
-	const InvProjection = glFrustum(1.81818,Params.CX_Scale,1.111,0,Near,Far);
+	function GetPortalCorners()
+	{
+		//	center for now
+		const l = Params.PortalX - (Params.PortalW / 2);
+		const r = Params.PortalX + (Params.PortalW / 2);
+		const t = Params.PortalY + (Params.PortalH / 2);
+		const b = Params.PortalY - (Params.PortalH / 2);
+		const z = Params.PortalZ;
+		const tl = [l,t,z];
+		const tr = [r,t,z];
+		const br = [r,b,z];
+		const bl = [l,b,z];
+		return [tl,tr,br,bl];
+	}
+	const PortalDirRight = [1,0,0];
+	const PortalDirUp = [0,1,0];
+	const PortalDirForward = [0,0,-1];	//	facing us
+	const PortalCorners = GetPortalCorners();
+	const pa = PortalCorners[3];	//	bottom left
+	const pb = PortalCorners[2];	//	bottom right
+	const pc = PortalCorners[0];	//	top left
+	const pd = PortalCorners[1];	//	top right
+	const vr = Math.Normalise3(Math.Subtract3(pb,pa));
+	const vu = Math.Normalise3(Math.Subtract3(pc,pa));
+	const vn = PortalDirForward;
+	const eyePos = Camera.Position.slice();
+	va = Math.Subtract3(pa,eyePos);
+	vb = Math.Subtract3(pb,eyePos);
+	vc = Math.Subtract3(pc,eyePos);
+	vd = Math.Subtract3(pd,eyePos);
+	//viewDir = eyePos + va + vb + vc + vd;
+	let viewDir = Math.Add3(eyePos,va);
+	viewDir = Math.Add3(viewDir,vb);
+	viewDir = Math.Add3(viewDir,vc);
+	viewDir = Math.Add3(viewDir,vd);
+	const d = -Math.Dot3(va,vn);	//	unity example
+	//const d = Math.Distance3(pa,eyePos);	//	gr: more correct, but doesn't skew?
+	//Pop.Debug("Distance to screen plane",d);
+	let r = Math.Dot3(vr,vb);	//	1,0,0 * right = length of x
+	let l = Math.Dot3(vr,va);	//	1,0,0 * left = -length of x
+	let t = Math.Dot3(vu,vc);	//	0,-1,0 * top = length of y
+	let b = Math.Dot3(vu,vb);	//	0,-1,0 * bottom = length of y
+
+	//Because frustum extents are specified at the near plane,
+	//	we use similar triangles to scale this distance back from
+	//its value at the screen,d units away,to its value at the
+	//near clipping plane,n units away
+	const nearOverDist = Near / d;
+	l *= nearOverDist;
+	r *= nearOverDist;
+	b *= nearOverDist;
+	t *= nearOverDist;
+	const Width = (2 * Near) / (r - l);
+	const Cx = (r + l) / (r - l);
+	const Height = (2 * Near) / (t - b);
+	const Cy = (t + b) / (t - b);
+	//const InvProjection = glFrustum(1.81818,Params.CX_Scale,1.111,0,Near,Far);
+	const InvProjection = glFrustum(Width,Cx,Height,Cy,Near,Far);
 	/*
 	const InvProjection =
 		[
@@ -1466,8 +1525,8 @@ class TCameraWindow
 
 		this.DebugCamera = new Pop.Camera();
 		//this.DebugCamera.Position = [0,0.4,2];
-		this.DebugCamera.Position = [Params.CaptureX,Params.CaptureY,Params.CaptureZ+1];
-		this.DebugCamera.LookAt = [0,0,-1];
+		this.DebugCamera.Position = [3.8,1.5,-4.5];
+		this.DebugCamera.LookAt = [0,0,0];
 		this.DebugCamera.Up[1] = 1;
 		
 		//const Options = null;
@@ -1515,6 +1574,8 @@ class TCameraWindow
 	
 	OnRender(RenderTarget)
 	{
+		//Pop.Debug("Debug pos",this.DebugCamera.Position)
+
 		let RenderCamera = Params.RenderFromFaceCamera ? this.FaceCamera : this.DebugCamera;
 		//RenderCamera.FocalCenter[0] = Params.CX_Scale;
 		//RenderCamera.FocalCenter[1] = Params.CY_Scale;
@@ -1524,7 +1585,7 @@ class TCameraWindow
 		this.FaceCamera.Position = [Params.CaptureX,Params.CaptureY,Params.CaptureZ];
 		//this.FaceCamera.LookAt = [0,0,0];
 		this.FaceCamera.LookAt = this.FaceCamera.Position.slice();
-		this.FaceCamera.LookAt[2] += 1;
+		this.FaceCamera.LookAt[2] += Params.FaceCameraForward;
 		this.FaceCamera.Up[1] = Params.FaceCameraUp;
 
 
