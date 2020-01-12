@@ -1220,16 +1220,45 @@ function RenderCameraDebug_WithProjection(RenderTarget,RenderCamera,Camera,XOffs
 
 function RenderCameraDebug_OrthoProjection(RenderTarget,RenderCamera,Camera,XOffset)
 {
-	const Projection =
+	//	far = 1, so width at far
+	const Near = Camera.NearDistance;
+	const Far = Camera.FarDistance;
+	const ZDist = Far - Near;
+
+	//	work out projection (-1..1) to camera-space
+
+	//	z== -1...1
+	let ProjectionOffset =
 		[
-			0.5,0,0,0,	//	half width in both directions, so 1m wide
+			1,0,0,0,
 			0,1,0,0,
 			0,0,1,0,
-
-			0,0,1,1		//	move forward 1
+			0,0,1,1,
 		];
-	//const InvProjection = Math.MatrixInverse4x4(Projection);
-	const InvProjection = (Projection);
+
+	//	z== 0...2
+	let ProjectionNormaliseZ =
+		[
+			1,0,0,0,
+			0,1,0,0,
+			0,0,0.5,0,	//	scale z from 0..2 to 0..1
+			0,0,0,1
+		];
+
+	//	z== 0...1
+	let ProjectionScale =
+		[
+			1,0,0,0,	
+			0,1,0,0,
+			0,0,ZDist,0,	//	scale z
+			0,0,Near,1		//	offset
+		];
+	//	z== Near..Near+dist
+
+	let Projection = Math.MatrixMultiply4x4(ProjectionNormaliseZ,ProjectionOffset);
+	Projection = Math.MatrixMultiply4x4(ProjectionScale,Projection);
+
+	const InvProjection = Math.MatrixInverse4x4(Projection);
 	RenderCameraDebug_WithProjection(RenderTarget,RenderCamera,Camera,XOffset,InvProjection);
 }
 
@@ -1255,17 +1284,27 @@ function RenderCameraDebug_BoxProjection(RenderTarget,RenderCamera,Camera,XOffse
 		];
 
 	//	z== 0...2
+	let ProjectionNormaliseZ =
+		[
+			1,0,0,0,	
+			0,1,0,0,
+			0,0,0.5,0,	//	scale z from 0..2 to 0..1
+			0,0,0,1		
+		];
+	//	z== 0...1
+
 	//	this does add then scale
 	let ProjectionScale =
 		[
-			1,0,0,0,
+			1,0,0,0,		//	z=t on ray. Ray = origin
 			0,1,0,0,
-			0,0,0.5*ZDist,0,		//	scale z
+			0,0,ZDist,0,	//	scale z
 			0,0,Near,1			//	offset
 		];
 	//	z== Near..Near+dist
 	
-	const Projection = Math.MatrixMultiply4x4(ProjectionScale,ProjectionOffset);
+	let Projection = Math.MatrixMultiply4x4(ProjectionNormaliseZ,ProjectionOffset);
+	Projection = Math.MatrixMultiply4x4(ProjectionScale,Projection);
 
 	const InvProjection = Math.MatrixInverse4x4(Projection);
 	RenderCameraDebug_WithProjection(RenderTarget,RenderCamera,Camera,XOffset,InvProjection);
