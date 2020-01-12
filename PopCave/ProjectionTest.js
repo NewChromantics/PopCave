@@ -83,7 +83,7 @@ Params.CaptureY = 0;
 Params.CaptureZ = -1;
 Params.CaptureYaw = 0;
 Params.FaceCameraUp = 1;
-Params.FaceCameraForward = -1;
+Params.FaceCameraForward = 1;
 Params.CaptureDebugSize = 0.05;
 Params.CaptureColour = [0,1,1];
 Params.CaptureToWorldRotateFirst = false;
@@ -1203,11 +1203,26 @@ function RenderCameraDebug_WithProjection(RenderTarget,RenderCamera,Camera,XOffs
 {
 	function GetLocalToWorldFrustumTransformMatrix()
 	{
+		//	proj = viewtoscreen
 		let Matrix = ProjectionMatrix;
 		Matrix = Math.MatrixInverse4x4(Matrix);
+		//Matrix = Math.CreateIdentityMatrix();
+
 		//	put into world space
-		Matrix = Math.MatrixMultiply4x4(Camera.GetLocalToWorldMatrix(),Matrix);
-		Matrix = Math.MatrixMultiply4x4(Matrix,Math.CreateTranslationMatrix(XOffset,0,0));
+		let Trans = Camera.GetLocalToWorldMatrix();
+		Trans = Math.MatrixMultiply4x4(Trans,Math.CreateTranslationMatrix(XOffset,0,0));
+		//Trans = Math.MatrixInverse4x4(Trans);
+
+		//Matrix = Math.MatrixMultiply4x4(Matrix,Trans);
+		Matrix = Math.MatrixMultiply4x4(Trans,Matrix);
+		//	invp	inv MT	X
+		//	invp	inv TM	X
+		//	invp	n MT	X
+		//	invp	n TM	X
+		//	p		n	MT
+		//	p		n	TM
+		//	p		inv	MT
+		//	p		inv	tm
 		return Matrix;
 	}
 
@@ -1272,13 +1287,40 @@ function RenderCameraDebug_OrthoProjection(RenderTarget,RenderCamera,Camera,XOff
 function RenderCameraDebug_SkewedToPortalProjection(RenderTarget,RenderCamera,Camera,XOffset)
 {
 	//	far = 1, so width at far
+	//	when near = distance, near should exactly line up with portal
 	const Near = Params.CameraNearDistance;
+	//const Near = Math.abs(Params.CaptureZ);
 	const Far = Params.CameraFarDistance;
 	const DrawDistance = Far - Near;
-	const NearMinFar = Near - Far;
-
-
+	
+	//	unreal version
+	//	https://github.com/fweidner/UE4-Plugin-OffAxis/blob/master/Source/OffAxisProjection/Private/OffAxisLocalPlayer.cpp
 	function glFrustum(Width,CX,Height,CY,Near,Far)
+	{
+		/*
+		Result.M[0][0] = (2.0f * nearVal) / (right - left);
+		Result.M[1][1] = (2.0f * nearVal) / (top - bottom);
+		Result.M[2][0] = -(right + left) / (right - left);
+		Result.M[2][1] = -(top + bottom) / (top - bottom);
+		Result.M[2][2] = (farVal) / (farVal - nearVal);
+		Result.M[2][3] = 1.0f;
+		Result.M[3][2] = -(farVal * nearVal) / (farVal - nearVal);
+		Result.M[3][3] = 0.0f;
+		*/
+		const ZScale = (Far) / (Far - Near);
+		const WScale = -(Near * Far) / (Far - Near);
+		const ZW = 1;
+		const Matrix =
+			[
+				Width,0.00000,CX,0.00000,
+				0.00000,Height,CY,0.00000,
+				0.00000,0.00000,ZScale,WScale,
+				0.00000,0.00000,ZW,0.00000,
+			];
+		return Matrix;
+	}
+
+	function glFrustum_opengl(Width,CX,Height,CY,Near,Far)
 	{
 		const ZScale = -(Far + Near) / (Far - Near);
 		const WScale = -(2 * Near * Far) / (Far - Near);
@@ -1313,28 +1355,33 @@ function RenderCameraDebug_SkewedToPortalProjection(RenderTarget,RenderCamera,Ca
 	}
 	const PortalDirRight = [1,0,0];
 	const PortalDirUp = [0,1,0];
-	const PortalDirForward = [0,0,-1];	//	facing us
+	const PortalDirForward = [0,0,1];	//	facing us
 	const PortalCorners = GetPortalCorners();
 	const pa = PortalCorners[3];	//	bottom left
 	const pb = PortalCorners[2];	//	bottom right
 	const pc = PortalCorners[0];	//	top left
 	const pd = PortalCorners[1];	//	top right
-	const vr = Math.Normalise3(Math.Subtract3(pb,pa));
-	const vu = Math.Normalise3(Math.Subtract3(pc,pa));
+	const vr = PortalDirRight;//Math.Normalise3(Math.Subtract3(pb,pa));
+	const vu = PortalDirUp;//Math.Normalise3(Math.Subtract3(pc,pa));
 	const vn = PortalDirForward;
 	const eyePos = Camera.Position.slice();
 	va = Math.Subtract3(pa,eyePos);
 	vb = Math.Subtract3(pb,eyePos);
 	vc = Math.Subtract3(pc,eyePos);
 	vd = Math.Subtract3(pd,eyePos);
+	//va = Math.Subtract3(eyePos,pa);
+	//vb = Math.Subtract3(eyePos,pb);
+	//vc = Math.Subtract3(eyePos,pc);
+	//vd = Math.Subtract3(eyePos,pd);
 	//viewDir = eyePos + va + vb + vc + vd;
+	/*
 	let viewDir = Math.Add3(eyePos,va);
 	viewDir = Math.Add3(viewDir,vb);
 	viewDir = Math.Add3(viewDir,vc);
-	viewDir = Math.Add3(viewDir,vd);
-	const d = -Math.Dot3(va,vn);	//	unity example
+	viewDir = Math.Add3(viewDir,vd);*/
+	const d = Math.Dot3(va,vn);	//	unity example
 	//const d = Math.Distance3(pa,eyePos);	//	gr: more correct, but doesn't skew?
-	//Pop.Debug("Distance to screen plane",d);
+	Pop.Debug("Distance to screen plane",d);
 	let r = Math.Dot3(vr,vb);	//	1,0,0 * right = length of x
 	let l = Math.Dot3(vr,va);	//	1,0,0 * left = -length of x
 	let t = Math.Dot3(vu,vc);	//	0,-1,0 * top = length of y
@@ -1349,9 +1396,10 @@ function RenderCameraDebug_SkewedToPortalProjection(RenderTarget,RenderCamera,Ca
 	r *= nearOverDist;
 	b *= nearOverDist;
 	t *= nearOverDist;
-	const Width = (2 * Near) / (r - l);
+	Pop.Debug("t-b",t - b);
+	const Width = (2* Near) / (r - l);
 	const Cx = (r + l) / (r - l);
-	const Height = (2 * Near) / (t - b);
+	const Height = (2* Near) / (t - b);
 	const Cy = (t + b) / (t - b);
 	//const InvProjection = glFrustum(1.81818,Params.CX_Scale,1.111,0,Near,Far);
 	const InvProjection = glFrustum(Width,Cx,Height,Cy,Near,Far);
@@ -1369,12 +1417,72 @@ function RenderCameraDebug_SkewedToPortalProjection(RenderTarget,RenderCamera,Ca
 	RenderCameraDebug_WithProjection(RenderTarget,RenderCamera,Camera,XOffset,InvProjection);
 }
 
+
+
+function RenderCameraDebug_FrustumTest(RenderTarget,RenderCamera,Camera,XOffset)
+{
+	//	far = 1, so width at far
+	//	when near = distance, near should exactly line up with portal
+	const Near = Params.CameraNearDistance;
+	const Far = Params.CameraFarDistance;
+	//const Near = 1;
+	//const Far = 10;
+
+	//	the output of this matches unity's Matrix4x4.Frustum()
+	function glFrustum(l,r,t,b,Near,Far)
+	{
+		const CX = -(r + l) / (r - l);
+		const CY = -(t + b) / (t - b);
+		const Width = (2 * Near) / (r - l);
+		const Height = (2 * Near) / (t - b);
+
+		const ZScale = -((Far + Near) / (Far - Near));
+		const ZW = -1;
+		const WScale = -((2 * Near * Far) / (Far - Near));
+		
+		const Matrix =
+			[
+				Width,0.00000,CX,0.00000,
+				0.00000,Height,CY,0.00000,
+				0.00000,0.00000,ZScale,WScale,
+				0.00000,0.00000,ZW,0.00000,
+			];
+		return Matrix;
+	}
+
+	const BoxWidth = Params.PortalW;
+	const BoxHeight = Params.PortalH;
+	const Aspect = BoxWidth / BoxHeight;
+	const FovVertical = 45;
+	let Width = Math.tan(Math.radians(FovVertical) / 2);
+	let Height = Width / Aspect;
+
+	/*
+	const l = -0.55;
+	const r = 0.55;
+	const b = -0.9;
+	const t = 0.9;
+	*/
+	/*
+	const l = -Width;
+	const r = Width;
+	const b = -Height;
+	const t = Height;	
+	*/
+	const PlaneMult = -1;
+	const l = PlaneMult * (-Params.PortalW / 2);
+	const r = PlaneMult * (Params.PortalW / 2);
+	const b = PlaneMult * (-Params.PortalH / 2);
+	const t = PlaneMult * (Params.PortalH / 2);
+	
+	const Projection = glFrustum(l,r,t,b,Near,Far);
+	
+	Pop.Debug("Projection",Projection);
+	RenderCameraDebug_WithProjection(RenderTarget,RenderCamera,Camera,XOffset,Projection);
+}
+
 function RenderCameraDebug_BoxProjection(RenderTarget,RenderCamera,Camera,XOffset)
 {
-	let NormalMatrix = Camera.GetProjectionMatrix([-1,-1,1,1]);
-	Pop.Debug("NormalMatrix",NormalMatrix);
-
-
 	//	far = 1, so width at far
 	const Near = Camera.NearDistance;
 	const Far = Camera.FarDistance;
@@ -1382,62 +1490,61 @@ function RenderCameraDebug_BoxProjection(RenderTarget,RenderCamera,Camera,XOffse
 
 	//	work out projection (-1..1) to camera-space
 
-	//	z=-1 should be near (0.1)
-	//	z=1 should be far (100)
-	//	
-	//	z== -1...1
-	let ProjectionOffset =
+	//	z = (z + 1) * 0.5	//	z=0..1
+	//	x = x * halfwidth * z
+
+	//	move viewpos to -1...1
+	const LEN = 1;
+	const ViewDistance = 1;
+	//	x = x * (halfwidth * viewdistance) * (LEN/z) / LEN
+
+	let a =
 		[
 			1,0,0,0,
 			0,1,0,0,
 			0,0,1,0,
-			0,0,1,1,
+			0,0,0,1,
 		];
 
-	//	z== 0...2
-	let ProjectionNormaliseZ =
-		[
-			1,0,0,0,	
-			0,1,0,0,
-			0,0,0.5,0,	//	scale z from 0..2 to 0..1
-			0,0,0,1		
-		];
-	//	z== 0...1
-
-	const BoxWidth = 2;
-	const BoxHeight = 2;
-
-
-
-
-	let ProjectionScaleX =
-		[
-			//	we want		X = X * Z
-			//	
-			1,0,0,0,	
-			0,1,0,0,
-			0,0,1,-1,		//	w+=1*z
-			0,0,0,10		//	w+=10*w		
-		];
-	//Projection = Math.MatrixMultiply4x4(ProjectionScaleZ,Projection);
-
-	
-
-	//
-	let ProjectionScaleZ =
+	//	z== 0..2 to 0..1
+	let b =
 		[
 			1,0,0,0,
 			0,1,0,0,
-			0,0,ZDist,0,	//	z+=Dist*z
-			0,0,Near,1		//	z+=offset
+			0,0,1,1,
+			0,0,0,1,
 		];
-	//	z== Near..Near+dist
 
-	let Projection = Math.MatrixMultiply4x4(ProjectionNormaliseZ,ProjectionOffset);
-	Projection = Math.MatrixMultiply4x4(ProjectionScaleX,Projection);
-	Projection = Math.MatrixMultiply4x4(ProjectionScaleZ,Projection);
+	//	z== 0...2
+	let c =
+		[
+			1,0,0,0,
+			0,1,0,0,
+			0,0,1,0,
+			0,0,0,1
+		];
 
-	const InvProjection = Math.MatrixInverse4x4(Projection);
+	//	z== 0...1
+	let d =
+		[
+			1,0,0,0,
+			0,1,0,0,
+			0,0,1,0,	//	scale everything by z when we /w
+			0,0,0,1		//	offset
+		];
+
+
+	//	calc screen to view
+	let Projection = Math.CreateIdentityMatrix();
+	Projection = Math.MatrixMultiply4x4(a,Projection);
+	Projection = Math.MatrixMultiply4x4(b,Projection);
+	Projection = Math.MatrixMultiply4x4(c,Projection);
+	Projection = Math.MatrixMultiply4x4(d,Projection);
+
+	//	view back to screen as projection
+	//const InvProjection = Math.MatrixInverse4x4(Projection);
+	const InvProjection = (Projection);
+	Pop.Debug("InvProjection",InvProjection);
 	RenderCameraDebug_WithProjection(RenderTarget,RenderCamera,Camera,XOffset,InvProjection);
 }
 
@@ -1593,10 +1700,14 @@ class TCameraWindow
 		//if ( Params.RenderGeo )
 		//	RenderScene( RenderTarget, RenderCamera );
 
-		//RenderCameraDebug(RenderTarget,RenderCamera,this.FaceCamera,-2);
-		RenderCameraDebug_SkewedToPortalProjection(RenderTarget,RenderCamera,this.FaceCamera,0);
-		//RenderCameraDebug_OrthoProjection(RenderTarget,RenderCamera,this.FaceCamera,4);
-		//RenderCameraDebug_BoxProjection(RenderTarget,RenderCamera,this.FaceCamera,6);
+		if (!Params.RenderFromFaceCamera)
+		{
+			//RenderCameraDebug(RenderTarget,RenderCamera,this.FaceCamera,-2);
+			RenderCameraDebug_FrustumTest(RenderTarget,RenderCamera,this.FaceCamera,0);
+			//RenderCameraDebug_SkewedToPortalProjection(RenderTarget,RenderCamera,this.FaceCamera,0);
+			RenderCameraDebug_OrthoProjection(RenderTarget,RenderCamera,this.FaceCamera,2);
+			//RenderCameraDebug_BoxProjection(RenderTarget,RenderCamera,this.FaceCamera,0);
+		}
 
 		if ( Params.RenderPortal )
 			RenderPortal(RenderTarget,RenderCamera);
