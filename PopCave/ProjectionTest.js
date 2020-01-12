@@ -37,7 +37,7 @@ var Params = {};
 Params.MaxScore = 1.0;
 Params.LineWidth = 0.0015;
 Params.WorldVerticalFov = 45;
-Params.CameraNearDistance = 1;
+Params.CameraNearDistance = 0.5;	//	1.0 should hit portal
 Params.CameraFarDistance = 3;
 Params.RenderVideo = false;
 Params.RenderWorld = true;
@@ -1276,12 +1276,27 @@ function RenderCameraDebug_SkewedToPortalProjection(RenderTarget,RenderCamera,Ca
 	const NearMinFar = Near - Far;
 
 
+	function glFrustum(Width,CX,Height,CY,Near,Far)
+	{
+		const ZScale = -(Far + Near) / (Far - Near);
+		const WScale = -(2 * Near * Far) / (Far - Near);
+		const ZW = -1;
+		const Matrix =
+			[
+				Width,0.00000,CX,0.00000,
+				0.00000,Height,CY,0.00000,
+				0.00000,0.00000,ZScale,WScale,
+				0.00000,0.00000,ZW,0.00000,
+			];
+		return Matrix;
+	}
+
 	const BoxWidth = Params.PortalW;
 	const BoxHeight = Params.PortalH;
 	//	https://www.cs.rit.edu/usr/local/pub/wrc/graphics/doc/opengl/books/blue/glFrustum.html
-	const ZScale = -(Far + Near) / (Far-Near);
-	const WScale = -(2 * Near * Far) / (Far-Near);
-	const ZW = -1;
+
+	const InvProjection = glFrustum(1.81818,Params.CX_Scale,1.111,0,Near,Far);
+	/*
 	const InvProjection =
 		[
 			1.81818,0.00000,Params.CX_Scale,0.00000,
@@ -1289,7 +1304,7 @@ function RenderCameraDebug_SkewedToPortalProjection(RenderTarget,RenderCamera,Ca
 			0.00000,0.00000,ZScale,WScale,
 			0.00000,0.00000,ZW,0.00000,
 		];
-
+		*/
 	Pop.Debug("InvProjection",InvProjection);
 	//Pop.Debug("Projection",Projection);
 	RenderCameraDebug_WithProjection(RenderTarget,RenderCamera,Camera,XOffset,InvProjection);
