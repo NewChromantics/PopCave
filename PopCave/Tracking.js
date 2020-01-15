@@ -195,7 +195,7 @@ const PoseSockets = [];
 function SendToPeers(Socket,Object)
 {
 	const Peers = Socket.GetPeers();
-	Pop.Debug("Peers:",Peers);
+	//Pop.Debug("Peers:",Peers);
 	const Message = (Object instanceof Uint8Array) ? Object : JSON.stringify(Object);
 	function SendToPeer(Peer)
 	{
@@ -255,6 +255,12 @@ function OnNewPose(Pose,Skeleton)
 	Pop.Debug("OnNewPose: ",JSON.stringify(Pose));
 
 	PoseSockets.forEach(Socket => SendToPeers(Socket,Pose));
+
+	if (OnNewPoseAdditionalFunc)
+	{
+		const Message = (Object instanceof Uint8Array) ? Object : JSON.stringify(Object);
+		OnNewPoseAdditionalFunc(Message);
+	}
 }
 
 
@@ -1951,6 +1957,7 @@ function OnBroadcastMessage(Message,Socket)
 	//	send back our address
 	Pop.Debug("Got broadcast message",JSON.stringify(Message));
 	Socket.Send(Message.Peer,"Hello");
+	Socket.Send(Message.Peer,"Hello");
 }
 
 function OnRecievedMessage(Message,Socket)
@@ -1986,14 +1993,14 @@ async function RunBroadcast(OnMessage)
 }
 
 //	keep trying to run servers
-async function RunServer(OnMessage)
+async function RunWebsocketServer(Ports,OnMessage)
 {
 	let PortIndex = 0;
 	function GetPortIndex()
 	{
-		const PortCount = Expose.ListenPorts.length;
+		const PortCount = Ports.length;
 		PortIndex = (PortIndex + 1) % PortCount;
-		return Expose.ListenPorts[PortIndex];
+		return Ports[PortIndex];
 	}
 
 	while (true)
@@ -2007,7 +2014,6 @@ async function RunServer(OnMessage)
 
 			OnNewPose("Server says Hello");
 
-			while (true)
 			{				
 				const Message = await Socket.WaitForMessage();
 				OnMessage(Message,Socket);
@@ -2067,6 +2073,7 @@ async function ConnectToServer(HostNames,OnMessage)
 				OnMessage(Message,Socket);
 			}
 		}
+		}
 		catch (e)
 		{
 			Pop.Debug("Exception in server loop: " + e);
@@ -2076,6 +2083,35 @@ async function ConnectToServer(HostNames,OnMessage)
 }
 
 
+//	create discovery udp
+async function RunBroadcastPose(Port,OnMessage)
+{
+	while (true)
+	{
+		try
+		{
+			const Socket = new Pop.Socket.UdpBroadcastServer(Port);
+			Pop.Debug("Broadcast listening on ",JSON.stringify(Socket.GetAddress()));
+
+			OnNewPoseAdditionalFunc = function(Message)
+			{
+				Socket.Send(Message);
+			}
+
+			while (true)
+			{
+				Pop.Debug("Waiting for message");
+				const Message = await Socket.WaitForMessage();
+				OnMessage(Message,Socket);
+			}
+		}
+		catch (e)
+		{
+			Pop.Debug("Exception in broadcast loop: " + e);
+			await Pop.Yield(2000);
+		}
+	}
+}
 
 async function ConnectToUdpServer(HostNames,Ports,OnMessage)
 {
@@ -2083,7 +2119,6 @@ async function ConnectToUdpServer(HostNames,Ports,OnMessage)
 	function GetPort()
 	{
 		const PortCount = Ports.length;
-		PortIndex = (PortIndex + 1) % PortCount;
 		return Ports[PortIndex];
 	}
 
@@ -2138,7 +2173,7 @@ FindCamerasLoop().catch(Pop.Debug);
 
 //RunBroadcast(OnBroadcastMessage).then(Pop.Debug).catch(Pop.Debug);
 //RunServer(OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
-
+RunWebsocketServer([9002],OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
 //ws://demos.kaazing.com/echo
 
 //const HostNames = ['192.168.0.12','192.168.0.11'];
@@ -2147,6 +2182,10 @@ const HostNames = ['192.168.0.11'];
 const Ports = [9001];
 //const HostNames = ['192.168.0.12'];
 //ConnectToServer(HostNames,OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
+
+//RunBroadcastHostname(OnBroadcastMessage).then(Pop.Debug).catch(Pop.Debug);
+
+//RunBroadcastPose(9002).then(Pop.Debug).catch(Pop.Debug);
 
 ConnectToUdpServer(HostNames,Ports,OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
 
