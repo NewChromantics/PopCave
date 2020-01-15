@@ -31,6 +31,7 @@ Expose.ListenPorts = [9001,9002,9003,9004,9005];
 
 
 var Params = {};
+Params.DebugSendingPose = false;
 Params.MaxScore = 1.0;
 Params.LineWidth = 0.0015;
 Params.WorldVerticalFov = 45;
@@ -88,7 +89,9 @@ Params.CaptureDebugSize = 0.05;
 Params.CaptureColour = [0,1,1];
 Params.CaptureToWorldRotateFirst = false;
 Params.CaptureToWorldInverse = false;
-
+Params.LockHeadY = true;
+Params.LockedHeadY = 1.6;
+Params.InvertHeadCaptureZ = true;
 
 Params.OriginDebugSize = 0.02;
 Params.OriginColour = [1,1,1];
@@ -110,6 +113,7 @@ Params.FaceCameraForward = 1;
 
 var ParamsWindow = CreateParamsWindow( Params, function(){}, [800,100,500,200] );
 
+ParamsWindow.AddParam('DebugSendingPose');
 ParamsWindow.AddParam('SkewRenderCamera');
 ParamsWindow.AddParam('SkewDebugCamera');
 ParamsWindow.AddParam('CX_Scale',-1,1);
@@ -173,6 +177,9 @@ ParamsWindow.AddParam('CaptureDebugSize',0,0.1);
 ParamsWindow.AddParam('CaptureYaw',-180,180);
 ParamsWindow.AddParam('CaptureToWorldInverse');
 ParamsWindow.AddParam('CaptureToWorldRotateFirst');
+ParamsWindow.AddParam('LockHeadY');
+ParamsWindow.AddParam('LockedHeadY',-1.6,2);
+ParamsWindow.AddParam('InvertHeadCaptureZ');
 
 ParamsWindow.AddParam('PortalX',-5,5);
 ParamsWindow.AddParam('PortalY',-5,5);
@@ -218,6 +225,8 @@ function OnFramePng(Bytes)
 }
 
 
+let OnNewPoseAdditionalFunc = function () { };
+
 function OnNewPose(Pose,Skeleton)
 {
 	if (typeof Pose !== 'string')
@@ -240,6 +249,21 @@ function OnNewPose(Pose,Skeleton)
 			Pose.HeadOffsetRight = Position[0];
 			Pose.HeadOffsetUp = Position[1];
 			Pose.HeadOffsetForward = Position[2];
+
+			if (Params.LockHeadY)
+			{
+				Pose.HeadOffsetUp = Params.LockedHeadY;
+			}
+
+			if (Params.InvertHeadCaptureZ)
+			{
+				//	reverse
+				let z = Position[2];
+				z = Math.Range(0,Params.CaptureZ,z);
+				z = Math.Lerp(Params.CaptureZ,0,z);
+				Pose.HeadOffsetForward = z;
+			}
+			
 			//Pose.Head = Skeleton.Head;
 		}
 
@@ -252,7 +276,8 @@ function OnNewPose(Pose,Skeleton)
 		Pose.PortalForward = PortalCorners.Center[2];
 	}
 
-	Pop.Debug("OnNewPose: ",JSON.stringify(Pose));
+	if ( Params.DebugSendingPose )
+		Pop.Debug("OnNewPose: ",JSON.stringify(Pose));
 
 	PoseSockets.forEach(Socket => SendToPeers(Socket,Pose));
 
@@ -1015,7 +1040,8 @@ function GetPortalSkewedCamera(Camera)
 	normalize(vr);
 	normalize(vu);
 	cross_product(vn,vr,vu);
-	normalize(vn);	*/
+	normalize(vn);
+	*/
 
 
 	//From eye to projection screen corners
@@ -1386,6 +1412,7 @@ class TCameraWindow
 	constructor(CameraName)
 	{
 		this.CameraName = CameraName;
+		this.Source = null;				//	camera source
 		this.Skeleton = null;
 		this.LastFace = null;
 		this.LastFaceUvz = null;
@@ -1441,23 +1468,30 @@ class TCameraWindow
 			Camera.OnCameraPanLocal( 0, 0, 0, true );
 			Camera.OnCameraPanLocal( 0, 0, Fly, false );
 		}
- 
-		this.Source = new Pop.Media.Source(CameraName);
+
+		//	only create a camera if it has a name, kinect has no camera and just runs ML
+		if ( CameraName !== null )
+			this.Source = new Pop.Media.Source(CameraName);
 		this.ListenForFrames().catch(Pop.Debug);
 	}
 	
 	OnRender(RenderTarget)
 	{
-		if ( !this.Source )
+		//	show errors if we're using a camera 
+		if (this.CameraName !== null)
 		{
-			RenderTarget.ClearColour(255,0,0);
-			return;
-		}
-		
-		if ( !this.VideoTexture )
-		{
-			RenderTarget.ClearColour(0,0,255);
-			return;
+			//	render red if expecting a camera
+			if (!this.Source)
+			{
+				RenderTarget.ClearColour(255,0,0);
+				return;
+			}
+
+			if (!this.VideoTexture)
+			{
+				RenderTarget.ClearColour(0,0,255);
+				return;
+			}
 		}
 		
 		if ( Params.RenderVideo )
@@ -1539,15 +1573,19 @@ class TCameraWindow
 		{
 			try
 			{
-				//await Pop.Yield(5);
-				const fb = FrameBuffer;
-				const NewTexures = await this.ProcessNextFrame(fb);
-				if ( !NewTexures )
-					continue;
-				
-				const Luma = new Pop.Image();
-				Luma.Copy( NewTexures[0] );
+				let Luma = FrameBuffer;
+				if (this.Source)
+				{
+					//await Pop.Yield(5);
+					const fb = FrameBuffer;
+					const NewTexures = await this.ProcessNextFrame(fb);
+					if (!NewTexures)
+						continue;
 
+					Luma = new Pop.Image();
+					Luma.Copy(NewTexures[0]);
+				}
+				
 				try
 				{					
 					const FaceXyz = await this.GetFaceXyz(Luma);
@@ -1582,6 +1620,12 @@ class TCameraWindow
 
 	UpdateFaceCamera()
 	{
+		if (!this.LastFacePosition)
+		{
+			Pop.Debug("Waiting for first face position");
+			return;
+		}
+
 		try
 		{
 			this.FaceCamera.Position = CapturePosToWorldPos(this.LastFacePosition);
@@ -1806,8 +1850,9 @@ class TCameraWindow
 
 	async GetFaceXyz_KinectAzureSkeleton(Frame)
 	{
+		//Pop.Debug("GetFaceXyz_KinectAzureSkeleton");
 		//Frame.Resize(256,256);
-		Frame.SetFormat('Greyscale');
+		//Frame.SetFormat('Greyscale');
 
 		const Labels = await Coreml.KinectAzureSkeleton(Frame);
 		//const HeadLabels = Labels.filter(Object => Object.Label == "Head");
@@ -1950,13 +1995,18 @@ async function FindCamerasLoop()
 }
 
 
+function StartKinectCamera()
+{
+	let Window = new TCameraWindow(null);
+	CameraWindows.push(Window);	
+}
+
 
 
 function OnBroadcastMessage(Message,Socket)
 {
 	//	send back our address
 	Pop.Debug("Got broadcast message",JSON.stringify(Message));
-	Socket.Send(Message.Peer,"Hello");
 	Socket.Send(Message.Peer,"Hello");
 }
 
@@ -2014,6 +2064,7 @@ async function RunWebsocketServer(Ports,OnMessage)
 
 			OnNewPose("Server says Hello");
 
+			while (true)
 			{				
 				const Message = await Socket.WaitForMessage();
 				OnMessage(Message,Socket);
@@ -2073,7 +2124,6 @@ async function ConnectToServer(HostNames,OnMessage)
 				OnMessage(Message,Socket);
 			}
 		}
-		}
 		catch (e)
 		{
 			Pop.Debug("Exception in server loop: " + e);
@@ -2119,6 +2169,7 @@ async function ConnectToUdpServer(HostNames,Ports,OnMessage)
 	function GetPort()
 	{
 		const PortCount = Ports.length;
+		PortIndex = (PortIndex + 1) % PortCount;
 		return Ports[PortIndex];
 	}
 
@@ -2168,12 +2219,15 @@ async function ConnectToUdpServer(HostNames,Ports,OnMessage)
 
 
 //	start tracking cameras
-FindCamerasLoop().catch(Pop.Debug);
+//FindCamerasLoop().catch(Pop.Debug);
 //MemCheckLoop().catch(Pop.Debug);
+StartKinectCamera();
+
+
 
 //RunBroadcast(OnBroadcastMessage).then(Pop.Debug).catch(Pop.Debug);
-//RunServer(OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
 RunWebsocketServer([9002],OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
+
 //ws://demos.kaazing.com/echo
 
 //const HostNames = ['192.168.0.12','192.168.0.11'];
