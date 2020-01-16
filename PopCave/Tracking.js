@@ -1596,7 +1596,10 @@ class TCameraWindow
 					this.UpdateFaceCamera();
 				}
 				catch (e)
-				{}
+				{
+					Pop.Debug("Error getting face",e);
+					await Pop.Yield(2000);
+				}
 				//Pop.Debug(JSON.stringify(this.Skeleton));
 				this.VideoTexture = Luma;
 				this.CameraFrameCounter.Add();
