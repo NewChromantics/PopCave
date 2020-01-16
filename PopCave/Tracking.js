@@ -2306,7 +2306,7 @@ RunWebsocketServer([9002],OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
 
 //const HostNames = ['192.168.0.12','192.168.0.11'];
 //const HostNames = ['echo.websocket.org'];
-const HostNames = ['192.168.0.11'];
+const HostNames = ['127.0.0.1'];
 const Ports = [9001];
 //const HostNames = ['192.168.0.12'];
 //ConnectToServer(HostNames,OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
