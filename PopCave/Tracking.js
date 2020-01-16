@@ -30,7 +30,8 @@ Expose.BroadcastPorts = [9000];
 Expose.ListenPorts = [9001,9002,9003,9004,9005];
 
 
-var Params = {};
+//	gr: this needs to be const as the object is used by params window
+const Params = {};
 Params.DebugSendingPose = false;
 Params.MaxScore = 1.0;
 Params.LineWidth = 0.0015;
@@ -111,7 +112,34 @@ Params.CXCY_Override = false;
 
 Params.FaceCameraForward = 1;
 
-var ParamsWindow = CreateParamsWindow( Params, function(){}, [800,100,500,200] );
+//	make copy of params as default
+const DefaultParams = JSON.parse( JSON.stringify( Params ) );
+const ParamsFilename = "Settings.json.txt";
+
+let HasLoaded = false;
+function SaveParams(Params)
+{
+	if (!HasLoaded)
+	{
+		Pop.Debug("Skipping save until loaded settings");
+		return;
+	}
+
+	const ParamsJson = JSON.stringify(Params,null,'\t');
+	try
+	{
+		Pop.Debug("Save settings");
+		Pop.WriteStringToFile(ParamsFilename,ParamsJson);
+		//	gr: bug here on windows!
+		//Pop.ShowFileInFinder(ParamsFilename);
+	}
+	catch (e)
+	{
+		Pop.Debug("Error writing params to file: " + e);
+	}
+}
+
+var ParamsWindow = CreateParamsWindow(Params,SaveParams, [100,100,500,200] );
 
 ParamsWindow.AddParam('DebugSendingPose');
 ParamsWindow.AddParam('SkewRenderCamera');
@@ -193,6 +221,49 @@ ParamsWindow.AddParam('OriginDebugSize',0,0.1);
 
 ParamsWindow.AddParam('FaceCameraForward',-1,1);
 
+
+function LoadNewParams(NewParams)
+{
+	//	can't change Params, so assign new key's values
+	function Set(Key)
+	{
+		if (!NewParams.hasOwnProperty(Key))
+			return;
+		const NewValue = NewParams[Key];
+		Params[Key] = NewValue;
+	}
+	Object.keys(NewParams).forEach(Set);
+
+	//	refresh window
+	ParamsWindow.OnParamsChanged();
+}
+
+//	refresh params
+function LoadParams()
+{
+	HasLoaded = true;
+
+	const SettingsJson = Pop.LoadFileAsString(ParamsFilename);
+	const Settings = JSON.parse(SettingsJson);
+	//Pop.Debug("SettingsJson",SettingsJson);
+	//Pop.Debug("Settings",Settings);
+	LoadNewParams(Settings);
+}
+
+function LoadDefaultParams()
+{
+	LoadNewParams(DefaultParams);
+}
+
+//	load settings
+try
+{
+	LoadParams();
+}
+catch (e)
+{
+	Pop.Debug("Error loading params: " + e);
+}
 
 
 //	send callback
