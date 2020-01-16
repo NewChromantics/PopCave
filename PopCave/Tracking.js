@@ -90,9 +90,9 @@ Params.CaptureDebugSize = 0.05;
 Params.CaptureColour = [0,1,1];
 Params.CaptureToWorldRotateFirst = false;
 Params.CaptureToWorldInverse = false;
-Params.LockHeadY = true;
+Params.LockHeadY = false;
 Params.LockedHeadY = 1.6;
-Params.InvertHeadCaptureZ = true;
+Params.InvertHeadCaptureZ = false;
 
 Params.OriginDebugSize = 0.02;
 Params.OriginColour = [1,1,1];
