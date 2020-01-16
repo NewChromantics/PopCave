@@ -578,7 +578,68 @@ function GetSceneGeos(RenderTarget)
 }
 
 
+function FilterSkeletonLabelsToClosest(Labels)
+{
+	//	skeletons appear as
+	//	Head, Head1, Head2
+	//	find the nearest to the camera, then filter (and rename) labels
+	function IsHeadLabel(Label)
+	{
+		return Label.Label.startsWith('Head')
+	}
+	let HeadLabels = Labels.filter(IsHeadLabel);
+	//	only 1 or no heads, nothing to filter
+	if (HeadLabels.length <= 1)
+		return Labels;
+	/*
+	Heads;,[
+		{ "Label": "Head","Score": 0.6600000262260437,"x": -0.5433149337768555,"y": -0.8685160279273987,"z": 1.1578654050827026 },
+	{ "Label": "Head1","Score": 0.6600000262260437,"x": 0.1657627522945404,"y": -0.36141061782836914,"z": 1.0542676448822021 }]
+	//Pop.Debug("Heads;",JSON.stringify(HeadLabels));
+	*/
+	
+	//	z is relative to camera, so just use that (maybe need to change in future to nearest to screen if kinect pos changes)
+	function CompareNearest(a,b)
+	{
+		if (a.z < b.z)
+			return -1;
+		if (a.z > b.z)
+			return 1;
+		return 0;
+	}
 
+	HeadLabels.sort(CompareNearest);
+	function GetLabelIndex(Label)
+	{
+		//	get last char, if it's a number, return it, if its not it's 0 (no number suffix)
+		const NumberChar = Label.Label[Label.Label.length - 1];
+		const Number = NumberChar - '0';
+		if (Number >= 0 && Number <= 9)
+			return Number;
+		return 0;
+	}
+	const KeepLabelIndex = GetLabelIndex(HeadLabels[0]);
+
+	//	filter out all labels we don't want
+	function IsKeptLabelIndex(Label)
+	{
+		const Index = GetLabelIndex(Label);
+		return Index == KeepLabelIndex;
+	}
+	Labels = Labels.filter(IsKeptLabelIndex);
+
+	function RemoveSuffix(Label)
+	{
+		//	if it's a number, remove it
+		//	gr: we should know the number, but generic function might be simpler
+		const NumberChar = Label.Label[Label.Label.length - 1];
+		if (NumberChar >= '0' && NumberChar <='9')
+			Label.Label = Label.Label.slice(0,-1); 
+		return Label;
+	}
+	Labels = Labels.map(RemoveSuffix);
+	return Labels;	
+}
 
 
 function LabelsToSkeleton(Labels,InvertX,InvertY,InvertZ)
@@ -1937,7 +1998,9 @@ class TCameraWindow
 			return null;
 		}
 
-		this.Skeleton = LabelsToSkeleton(Labels,Params.KinectSkeletonInvertX,Params.KinectSkeletonInvertY,Params.KinectSkeletonInvertZ);
+		const ClosestSkeletonLabels = FilterSkeletonLabelsToClosest(Labels);
+
+		this.Skeleton = LabelsToSkeleton(ClosestSkeletonLabels,Params.KinectSkeletonInvertX,Params.KinectSkeletonInvertY,Params.KinectSkeletonInvertZ);
 		//Pop.Debug("Skeleton",JSON.stringify(this.Skeleton));
 
 		const Head = this.Skeleton ? this.Skeleton.Head : null;
@@ -1946,6 +2009,7 @@ class TCameraWindow
 
 		//const Head = HeadLabels[0];
 		//Pop.Debug("Head",JSON.stringify(Head));
+		//	gr: label is u,v,score,x,y,z... make this better
 		return Head.slice(3,6);
 	}
 }
