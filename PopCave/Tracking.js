@@ -86,9 +86,9 @@ Params.CaptureX = UsingMac ? 0.40 : 0.36;
 Params.CaptureY = UsingMac ? 0.22 : (1.00 - 0.30);
 Params.CaptureZ = UsingMac ? 0 : -2.80;
 Params.CaptureYaw = UsingMac ? 180 : 0;
+Params.CapturePitch = 0;
 Params.CaptureDebugSize = 0.05;
 Params.CaptureColour = [0,1,1];
-Params.CaptureToWorldRotateFirst = false;
 Params.CaptureToWorldInverse = false;
 Params.LockHeadY = false;
 Params.LockedHeadY = 1.6;
@@ -203,8 +203,8 @@ ParamsWindow.AddParam('CaptureZ',-4,4);
 ParamsWindow.AddParam('CaptureColour','Colour');
 ParamsWindow.AddParam('CaptureDebugSize',0,0.1);
 ParamsWindow.AddParam('CaptureYaw',-180,180);
+ParamsWindow.AddParam('CapturePitch',-180,180);
 ParamsWindow.AddParam('CaptureToWorldInverse');
-ParamsWindow.AddParam('CaptureToWorldRotateFirst');
 ParamsWindow.AddParam('LockHeadY');
 ParamsWindow.AddParam('LockedHeadY',-1.6,2);
 ParamsWindow.AddParam('InvertHeadCaptureZ');
@@ -1501,13 +1501,11 @@ function CapturePosToWorldPos(CapturePos)
 {
 	//	get a transform to put capture-space into world space
 	let WorldToCaptureTransform = Math.CreateTranslationMatrix(Params.CaptureX,Params.CaptureY,Params.CaptureZ);
-	let RotationMatrix = Math.CreateAxisRotationMatrix([0,1,0],Params.CaptureYaw);
+	let YawMatrix = Math.CreateAxisRotationMatrix([0,1,0],Params.CaptureYaw);
+	let PitchMatrix = Math.CreateAxisRotationMatrix([1,0,0],Params.CapturePitch);
 
-
-	if (Params.CaptureToWorldRotateFirst)
-		WorldToCaptureTransform = Math.MatrixMultiply4x4(RotationMatrix,WorldToCaptureTransform);
-	else
-		WorldToCaptureTransform = Math.MatrixMultiply4x4(WorldToCaptureTransform,RotationMatrix);
+	WorldToCaptureTransform = Math.MatrixMultiply4x4(WorldToCaptureTransform,YawMatrix);
+	WorldToCaptureTransform = Math.MatrixMultiply4x4(WorldToCaptureTransform,PitchMatrix);
 
 	if (Params.CaptureToWorldInverse )
 		WorldToCaptureTransform = Math.MatrixInverse4x4(WorldToCaptureTransform);
@@ -2364,7 +2362,7 @@ StartKinectCamera();
 
 
 //RunBroadcast(OnBroadcastMessage).then(Pop.Debug).catch(Pop.Debug);
-RunWebsocketServer([9002],OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
+//RunWebsocketServer([9002],OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
 
 //ws://demos.kaazing.com/echo
 
