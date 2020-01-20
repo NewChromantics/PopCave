@@ -65,6 +65,7 @@ Params.KinectSkeletonInvertX = false;
 Params.KinectSkeletonInvertY = true;
 Params.KinectSkeletonInvertZ = false;
 Params.KinectYieldMs = 20;
+Params.KinectSmoothing = 0.5;
 
 //	world->uv scalar
 Params.SkeletonWorldMinX = -1;
@@ -170,6 +171,7 @@ ParamsWindow.AddParam('KinectSkeletonInvertX');
 ParamsWindow.AddParam('KinectSkeletonInvertY');
 ParamsWindow.AddParam('KinectSkeletonInvertZ');
 ParamsWindow.AddParam('KinectYieldMs',0,100,Math.floor);
+ParamsWindow.AddParam('KinectSmoothing',0,1);
 
 
 ParamsWindow.AddParam('LineWidth',0.0001,0.01);
@@ -1987,7 +1989,7 @@ class TCameraWindow
 		//Frame.Resize(256,256);
 		//Frame.SetFormat('Greyscale');
 
-		const Labels = await Coreml.KinectAzureSkeleton(Frame);
+		const Labels = await Coreml.KinectAzureSkeleton(Frame,Params.KinectSmoothing);
 		//const HeadLabels = Labels.filter(Object => Object.Label == "Head");
 
 		if (!Labels.length)
