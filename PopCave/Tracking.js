@@ -104,6 +104,9 @@ Params.InvertHeadCaptureZ = false;
 Params.OriginDebugSize = 0.02;
 Params.OriginColour = [1,1,1];
 
+Params.FloorDebugSize = 0.02;
+Params.FloorColour = [1,0.5,0];
+
 Params.SkewRenderCamera = false;
 Params.SkewDebugCamera = false;
 Params.SkewUseCameraWorldToCamera = false;
@@ -232,6 +235,9 @@ ParamsWindow.AddParam('PortalColour','Colour');
 
 ParamsWindow.AddParam('OriginColour','Colour');
 ParamsWindow.AddParam('OriginDebugSize',0,0.1);
+
+ParamsWindow.AddParam('FloorColour','Colour');
+ParamsWindow.AddParam('FloorDebugSize',0,0.1);
 
 ParamsWindow.AddParam('FaceCameraForward',-1,1);
 
@@ -1491,6 +1497,17 @@ function RenderCapture(RenderTarget,Camera)
 	}
 }
 
+function RenderFloorPosition(RenderTarget,Camera,FloorCenter,FloorUp)
+{
+	for (let t = 0;t <= 1;t += 0.2)
+	{
+		const Pos = CapturePosToWorldPos(Math.Lerp3(FloorCenter,FloorUp));
+		const Scale = Params.FloorDebugSize;
+		const Colour = Params.FloorColour;
+		RenderCube(RenderTarget,Camera,Pos,Scale,Colour);
+	}
+}
+
 function RenderOrigin(RenderTarget,Camera)
 {
 	//	render origin marker
@@ -1710,6 +1727,9 @@ class TCameraWindow
 			RenderPortal(RenderTarget,RenderCamera);
 			RenderCapture(RenderTarget,RenderCamera);
 			RenderOrigin(RenderTarget,RenderCamera);
+
+			if (this.FloorPosition )
+				RenderFloorMarker(RenderTarget,RenderCamera,this.FloorPosition,this.FloorPositionUp);
 		}
 		else
 		{
@@ -2051,6 +2071,12 @@ class TCameraWindow
 		this.Skeleton = LabelsToSkeleton(ClosestSkeletonLabels,Params.KinectSkeletonInvertX,Params.KinectSkeletonInvertY,Params.KinectSkeletonInvertZ);
 		//Pop.Debug("Skeleton",JSON.stringify(this.Skeleton));
 		RevertSkeletonTinyMovements(this.Skeleton,LastSkeleton);
+
+		//	grab floor points
+		if (ClosestSkeletonLabels.FloorCenter)
+			this.FloorPosition = ClosestSkeletonLabels.FloorCenter.slice(3,3 + 3);
+		if (ClosestSkeletonLabels.FloorUp)
+			this.FloorPositionUp = ClosestSkeletonLabels.FloorUp.slice(3,3 + 3);
 
 		const Head = this.Skeleton ? this.Skeleton.Head : null;
 		if (!Head)
