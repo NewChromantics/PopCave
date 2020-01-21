@@ -1580,7 +1580,7 @@ function CapturePosToWorldPos(CapturePos)
 	let YawMatrix = Math.CreateAxisRotationMatrix([0,1,0],Params.CaptureYaw);
 	let PitchMatrix = Math.CreateAxisRotationMatrix([1,0,0],Params.CapturePitch);
 
-	WorldToCaptureTransform = Math.MatrixMultiply4x4Multiple(YawMatrix,WorldToCaptureTransform,YawMatrix,PitchMatrix);
+	WorldToCaptureTransform = Math.MatrixMultiply4x4Multiple(YawMatrix,PitchMatrix,WorldToCaptureTransform);
 
 	if (Params.CaptureToWorldInverse )
 		WorldToCaptureTransform = Math.MatrixInverse4x4(WorldToCaptureTransform);
@@ -2076,7 +2076,7 @@ class TCameraWindow
 			//Pop.Debug("No skeleton detected");
 			return null;
 		}
-
+		
 		const ClosestSkeletonLabels = FilterSkeletonLabelsToClosest(Labels);
 		const LastSkeleton = this.Skeleton;
 		this.Skeleton = LabelsToSkeleton(ClosestSkeletonLabels,Params.KinectSkeletonInvertX,Params.KinectSkeletonInvertY,Params.KinectSkeletonInvertZ);
