@@ -1702,8 +1702,8 @@ class TCameraWindow
 		else if ( Params.RenderWorld || Params.RenderFromFaceCamera )
 		{
 			let RenderCamera = Params.RenderFromFaceCamera ? this.FaceCamera : this.DebugCamera;
-			RenderCamera.FocalCenter[0] = Params.CX_Scale;
-			RenderCamera.FocalCenter[1] = Params.CY_Scale;
+			//RenderCamera.FocalCenter[0] = Params.CX_Scale;
+			//RenderCamera.FocalCenter[1] = Params.CY_Scale;
 
 			RenderTarget.ClearColour( ...Params.BackgroundColour );
 			if ( Params.RenderGeo )
