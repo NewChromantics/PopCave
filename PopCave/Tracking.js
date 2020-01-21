@@ -99,6 +99,7 @@ Params.CaptureAutoRotationToleranceDegrees = 1;
 Params.CaptureDebugSize = 0.05;
 Params.CaptureColour = [0,1,1];
 Params.CaptureToWorldInverse = false;
+Params.CaptureTransformRaw = false;
 Params.LockHeadY = false;
 Params.LockedHeadY = 1.6;
 Params.InvertHeadCaptureZ = false;
@@ -217,7 +218,7 @@ ParamsWindow.AddParam('SkeletonWorldMinY',-10,10);
 ParamsWindow.AddParam('SkeletonWorldMaxY',-10,10);
 
 ParamsWindow.AddParam('CaptureX',-2,2);
-ParamsWindow.AddParam('CaptureY',-2,2);
+ParamsWindow.AddParam('CaptureY',-4,4);
 ParamsWindow.AddParam('CaptureZ',-4,4);
 ParamsWindow.AddParam('CaptureColour','Colour');
 ParamsWindow.AddParam('CaptureDebugSize',0,0.1);
@@ -226,6 +227,7 @@ ParamsWindow.AddParam('CapturePitch',-180,180);
 ParamsWindow.AddParam('CaptureAutoRotation');
 ParamsWindow.AddParam('CaptureAutoRotationToleranceDegrees',0,10);
 ParamsWindow.AddParam('CaptureToWorldInverse');
+ParamsWindow.AddParam('CaptureTransformRaw');
 ParamsWindow.AddParam('LockHeadY');
 ParamsWindow.AddParam('LockedHeadY',-1.6,2);
 ParamsWindow.AddParam('InvertHeadCaptureZ');
@@ -1570,6 +1572,9 @@ function ScoreToColour(Score)
 
 function CapturePosToWorldPos(CapturePos)
 {
+	if (Params.CaptureTransformRaw)
+		return CapturePos;
+
 	//	get a transform to put capture-space into world space
 	let WorldToCaptureTransform = Math.CreateTranslationMatrix(Params.CaptureX,Params.CaptureY,Params.CaptureZ);
 	let YawMatrix = Math.CreateAxisRotationMatrix([0,1,0],Params.CaptureYaw);
@@ -2088,9 +2093,8 @@ class TCameraWindow
 				if (Math.abs(NewPitch - Params.CapturePitch) > Params.CaptureAutoRotationToleranceDegrees)
 				{
 					Params.CapturePitch = NewPitch;
+					Pop.Debug("New accellerometer pitch=" + NewPitch);
 				}
-				//	cant get a yaw atm
-				//Params.CaptureYaw = 
 			}
 		}
 
