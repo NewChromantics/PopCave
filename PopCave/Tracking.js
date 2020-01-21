@@ -102,7 +102,6 @@ Params.CaptureToWorldInverse = false;
 Params.CaptureTransformRaw = false;
 Params.LockHeadY = false;
 Params.LockedHeadY = 1.6;
-Params.InvertHeadCaptureZ = false;
 
 Params.OriginDebugSize = 0.02;
 Params.OriginColour = [1,1,1];
@@ -351,16 +350,7 @@ function OnNewPose(Pose,Skeleton)
 			{
 				Pose.HeadOffsetUp = Params.LockedHeadY;
 			}
-
-			if (Params.InvertHeadCaptureZ)
-			{
-				//	reverse
-				let z = Position[2];
-				z = Math.Range(0,Params.CaptureZ,z);
-				z = Math.Lerp(Params.CaptureZ,0,z);
-				Pose.HeadOffsetForward = z;
-			}
-			
+						
 			//Pose.Head = Skeleton.Head;
 		}
 
