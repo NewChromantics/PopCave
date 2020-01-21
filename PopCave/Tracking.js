@@ -94,6 +94,8 @@ Params.CaptureY = UsingMac ? 0.22 : (1.00 - 0.30);
 Params.CaptureZ = UsingMac ? 0 : -2.80;
 Params.CaptureYaw = UsingMac ? 180 : 0;
 Params.CapturePitch = 0;
+Params.CaptureAutoRotation = true;
+Params.CaptureAutoRotationToleranceDegrees = 1;
 Params.CaptureDebugSize = 0.05;
 Params.CaptureColour = [0,1,1];
 Params.CaptureToWorldInverse = false;
@@ -221,6 +223,8 @@ ParamsWindow.AddParam('CaptureColour','Colour');
 ParamsWindow.AddParam('CaptureDebugSize',0,0.1);
 ParamsWindow.AddParam('CaptureYaw',-180,180);
 ParamsWindow.AddParam('CapturePitch',-180,180);
+ParamsWindow.AddParam('CaptureAutoRotation');
+ParamsWindow.AddParam('CaptureAutoRotationToleranceDegrees',0,10);
 ParamsWindow.AddParam('CaptureToWorldInverse');
 ParamsWindow.AddParam('LockHeadY');
 ParamsWindow.AddParam('LockedHeadY',-1.6,2);
@@ -2072,14 +2076,39 @@ class TCameraWindow
 		const ClosestSkeletonLabels = FilterSkeletonLabelsToClosest(Labels);
 		const LastSkeleton = this.Skeleton;
 		this.Skeleton = LabelsToSkeleton(ClosestSkeletonLabels,Params.KinectSkeletonInvertX,Params.KinectSkeletonInvertY,Params.KinectSkeletonInvertZ);
-		//Pop.Debug("Skeleton",JSON.stringify(this.Skeleton));
+		
+		//	extract rotation
+		if (Params.CaptureAutoRotation)
+		{
+			const Rot = this.Skeleton.CameraRotation;
+			if (Rot)
+			{
+				const PitchYawRoll = Rot.slice(3,3 + 3);
+				//	to avoid jitter, only change if within a tolerance
+				const NewPitch = -PitchYawRoll[0];
+				if (Math.abs(NewPitch - Params.CapturePitch) > Params.CaptureAutoRotationToleranceDegrees)
+				{
+					Params.CapturePitch = NewPitch;
+				}
+				//	cant get a yaw atm
+				//Params.CaptureYaw = 
+			}
+		}
+
 		RevertSkeletonTinyMovements(this.Skeleton,LastSkeleton);
 
+		//Pop.Debug("Skeleton",JSON.stringify(this.Skeleton));
 		//	grab floor points
-		if (ClosestSkeletonLabels.FloorCenter)
-			this.FloorPosition = ClosestSkeletonLabels.FloorCenter.slice(3,3 + 3);
-		if (ClosestSkeletonLabels.FloorUp)
-			this.FloorPositionUp = ClosestSkeletonLabels.FloorUp.slice(3,3 + 3);
+		if (this.Skeleton.FloorCenter)
+			this.FloorPosition = this.Skeleton.FloorCenter.slice(3,3 + 3);
+		if (this.Skeleton.FloorUp)
+			this.FloorPositionUp = this.Skeleton.FloorUp.slice(3,3 + 3);
+		if (this.Skeleton.CameraForward)
+		{
+			this.CameraForward = this.Skeleton.CameraForward.slice(3,3 + 3);
+			Pop.Debug("this.CameraForward",this.CameraForward);
+		}
+
 
 		const Head = this.Skeleton ? this.Skeleton.Head : null;
 		if (!Head)
