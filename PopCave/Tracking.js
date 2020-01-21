@@ -1497,11 +1497,11 @@ function RenderCapture(RenderTarget,Camera)
 	}
 }
 
-function RenderFloorPosition(RenderTarget,Camera,FloorCenter,FloorUp)
+function RenderCaptureLine(RenderTarget,Camera,FloorCenter,FloorUp)
 {
 	for (let t = 0;t <= 1;t += 0.2)
 	{
-		const Pos = CapturePosToWorldPos(Math.Lerp3(FloorCenter,FloorUp));
+		const Pos = CapturePosToWorldPos(Math.Lerp3(FloorCenter,FloorUp,t));
 		const Scale = Params.FloorDebugSize;
 		const Colour = Params.FloorColour;
 		RenderCube(RenderTarget,Camera,Pos,Scale,Colour);
@@ -1726,10 +1726,13 @@ class TCameraWindow
 			
 			RenderPortal(RenderTarget,RenderCamera);
 			RenderCapture(RenderTarget,RenderCamera);
-			RenderOrigin(RenderTarget,RenderCamera);
+			//RenderOrigin(RenderTarget,RenderCamera);
+
+			if ( this.CameraForward )
+				RenderCaptureLine(RenderTarget,RenderCamera,[0,0,0],this.CameraForward);
 
 			if (this.FloorPosition )
-				RenderFloorMarker(RenderTarget,RenderCamera,this.FloorPosition,this.FloorPositionUp);
+				RenderCaptureLine(RenderTarget,RenderCamera,this.FloorPosition,this.FloorPositionUp);
 		}
 		else
 		{
