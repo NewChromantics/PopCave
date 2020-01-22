@@ -2457,9 +2457,15 @@ async function ConnectToUdpServer(HostNames,Ports,OnMessage)
 
 
 //	start tracking cameras
-//FindCamerasLoop().catch(Pop.Debug);
+if (Params.UseKinectAzureSkeleton)
+{
+	StartKinectCamera();
+}
+else
+{
+	FindCamerasLoop().catch(Pop.Debug);
+}
 //MemCheckLoop().catch(Pop.Debug);
-StartKinectCamera();
 
 
 
