@@ -20,14 +20,14 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Src_Windows\PopEngine.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Src_Windows\Resource.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Src_Windows\TargetVer.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src_Windows\PopEngine.h">
+      <Filter>Dlls</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -42,11 +42,9 @@
     <None Include="packages.config">
       <Filter>Dlls</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Manifest Include="..\..\Src_Windows\PopCoreml.manifest">
-      <Filter>Source Files</Filter>
-    </Manifest>
+    <None Include="..\..\Src_Windows\PopCoreml.manifest">
+      <Filter>Dlls</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="..\..\Src_Windows\Microsoft.AI.Skills.SkillInterfacePreview.dll">
@@ -85,15 +83,6 @@
     <CopyFileToFolders Include="..\..\PopCave\parallax_test_02.obj">
       <Filter>PopCave</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\..\Src_Windows\cublas64_100.dll" />
-    <CopyFileToFolders Include="..\..\Src_Windows\cudart64_100.dll" />
-    <CopyFileToFolders Include="..\..\Src_Windows\cudnn64_7.dll" />
-    <CopyFileToFolders Include="..\..\Src_Windows\dnn_model_2_0.onnx" />
-    <CopyFileToFolders Include="..\..\Src_Windows\k4a.dll" />
-    <CopyFileToFolders Include="..\..\Src_Windows\k4abt.dll" />
-    <CopyFileToFolders Include="..\..\Src_Windows\depthengine_2_0.dll" />
-    <CopyFileToFolders Include="..\..\Src_Windows\onnxruntime.dll" />
-    <CopyFileToFolders Include="PopEngine_x64_Debug_Chakra\Bin\PopEngine.dll" />
     <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopWebXrApi.js">
       <Filter>PopCave\PopEngineCommon</Filter>
     </CopyFileToFolders>
@@ -181,8 +170,39 @@
     <CopyFileToFolders Include="..\..\PopCave\Colour.frag.glsl">
       <Filter>PopCave</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\..\PopCave\ProjectionTest.js" />
-    <CopyFileToFolders Include="..\..\PopCave\Tracking.js" />
+    <CopyFileToFolders Include="..\..\Src_Windows\cublas64_100.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\cudart64_100.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\cudnn64_7.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\depthengine_2_0.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\dnn_model_2_0.onnx">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\k4a.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\k4abt.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\onnxruntime.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="PopEngine_x64_Debug_Chakra\Bin\PopEngine.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\Tracking.js">
+      <Filter>PopCave</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\ProjectionTest.js">
+      <Filter>PopCave</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Src_Windows\PopCave.cpp">
