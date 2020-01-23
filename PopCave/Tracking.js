@@ -122,6 +122,8 @@ Params.CX_Scale = 0;
 Params.CY_Scale = 0;
 Params.CXCY_Override = false;
 
+Params.FaceCameraCenterXZ = true;
+Params.FaceCameraCenterY = false;
 Params.FaceCameraForward = 1;
 
 //	make copy of params as default
@@ -225,7 +227,6 @@ ParamsWindow.AddParam('CaptureToWorldInverse');
 ParamsWindow.AddParam('CaptureTransformRaw');
 ParamsWindow.AddParam('LockHeadY');
 ParamsWindow.AddParam('LockedHeadY',-1.6,2);
-ParamsWindow.AddParam('InvertHeadCaptureZ');
 
 ParamsWindow.AddParam('PortalX',-5,5);
 ParamsWindow.AddParam('PortalY',-5,5);
@@ -240,6 +241,8 @@ ParamsWindow.AddParam('OriginDebugSize',0,0.1);
 ParamsWindow.AddParam('FloorColour','Colour');
 ParamsWindow.AddParam('FloorDebugSize',0,0.1);
 
+ParamsWindow.AddParam('FaceCameraCenterXZ');
+ParamsWindow.AddParam('FaceCameraCenterY');
 ParamsWindow.AddParam('FaceCameraForward',-1,1);
 
 
@@ -1820,9 +1823,28 @@ class TCameraWindow
 		{
 			this.FaceCamera.Position = CapturePosToWorldPos(this.LastFacePosition);
 
-			//	just face forward for now
-			this.FaceCamera.LookAt = this.FaceCamera.Position.slice();
-			this.FaceCamera.LookAt[2] += Params.FaceCameraForward;
+			//	new options
+			const PortalCenter = GetPortalCorners().Center;
+			if (Params.FaceCameraCenterXZ && Params.FaceCameraCenterY)
+			{
+				this.FaceCamera.LookAt = PortalCenter;
+			}
+			else if (Params.FaceCameraCenterXZ)
+			{
+				this.FaceCamera.LookAt = PortalCenter;
+				this.FaceCamera.LookAt[1] = this.FaceCamera.Position[1];
+			}
+			else if (Params.FaceCameraCenterY)
+			{
+				this.FaceCamera.LookAt = this.FaceCamera.Position.slice();
+				this.FaceCamera.LookAt[2] += Params.FaceCameraForward;
+				this.FaceCamera.LookAt[1] = PortalCenter[1];
+			}
+			else
+			{
+				this.FaceCamera.LookAt = this.FaceCamera.Position.slice();
+				this.FaceCamera.LookAt[2] += Params.FaceCameraForward;
+			}
 
 			OnNewPose(this.FaceCamera,this.Skeleton);
 		}
