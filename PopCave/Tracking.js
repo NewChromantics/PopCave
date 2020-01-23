@@ -137,13 +137,13 @@ function SaveParams(Params,ChangedParam,Value,IsFinalValue)
 		const ParamsJson = JSON.stringify(Params,null,'\t');
 		try
 		{
-		Pop.Debug("Save settings");
-		Pop.WriteStringToFile(ParamsFilename,ParamsJson);
-		//	gr: bug here on windows!
-		//Pop.ShowFileInFinder(ParamsFilename);
-	}
-	catch (e)
-	{
+			Pop.Debug("Save settings");
+			Pop.WriteStringToFile(ParamsFilename,ParamsJson);
+			//	gr: bug here on windows!
+			//Pop.ShowFileInFinder(ParamsFilename);
+		}
+		catch (e)
+		{
 			Pop.Debug("Error writing params to file: " + e);
 		}
 	}
@@ -326,6 +326,7 @@ function OnNewPose(Pose,Skeleton)
 		//Pose = {};
 
 		//if (Skeleton && Skeleton.Head)
+		if ( Pose.Position )
 		{
 			//	gr: this should be relative to the portal pos, not world space
 
@@ -2282,7 +2283,7 @@ async function RunBroadcast(OnMessage)
 		}
 		catch (e)
 		{
-			Pop.Debug("Exception in broadcast loop: " + e);
+			Pop.Debug("Exception in RunBroadcast loop: " + e);
 			await Pop.Yield(2000);
 		}
 	}
@@ -2318,7 +2319,7 @@ async function RunWebsocketServer(Ports,OnMessage)
 		}
 		catch (e)
 		{
-			Pop.Debug("Exception in server loop: " + e);
+			Pop.Debug("Exception in RunWebsocketServer loop: " + e);
 			await Pop.Yield(2000);
 		}
 	}
@@ -2362,7 +2363,9 @@ async function ConnectToServer(HostNames,OnMessage)
 			Pop.Debug("Connected websocket client! " + Address);
 			PoseSockets.push(Socket);
 
-			OnNewPose("Client says Hello");
+			const Debug = {};
+			Debug.Debug = "Websocket Server says Hello";
+			OnNewPose(Debug);
 
 			while (true)
 			{
@@ -2372,7 +2375,7 @@ async function ConnectToServer(HostNames,OnMessage)
 		}
 		catch (e)
 		{
-			Pop.Debug("Exception in server loop: " + e);
+			Pop.Debug("Exception in ConnectToServer loop: " + e);
 			await Pop.Yield(2000);
 		}
 	}
@@ -2403,7 +2406,7 @@ async function RunBroadcastPose(Port,OnMessage)
 		}
 		catch (e)
 		{
-			Pop.Debug("Exception in broadcast loop: " + e);
+			Pop.Debug("Exception in RunBroadcastPose loop: " + e);
 			await Pop.Yield(2000);
 		}
 	}
@@ -2445,7 +2448,9 @@ async function ConnectToUdpServer(HostNames,Ports,OnMessage)
 			Pop.Debug("Connected udp client! " + Address);
 			PoseSockets.push(Socket);
 
-			OnNewPose("Client says Hello");
+			const Debug = {};
+			Debug.Debug = "UDP client connected to server";
+			OnNewPose(Debug);
 
 			while (true)
 			{
@@ -2457,7 +2462,7 @@ async function ConnectToUdpServer(HostNames,Ports,OnMessage)
 		}
 		catch (e)
 		{
-			Pop.Debug("Exception in server loop: " + e);
+			Pop.Debug("Exception in ConnectToUdpServer loop: " + e);
 			await Pop.Yield(2000);
 		}
 	}
@@ -2478,7 +2483,7 @@ else
 
 
 //RunBroadcast(OnBroadcastMessage).then(Pop.Debug).catch(Pop.Debug);
-//RunWebsocketServer([9002],OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
+RunWebsocketServer([9003],OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
 
 //ws://demos.kaazing.com/echo
 
