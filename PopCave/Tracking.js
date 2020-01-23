@@ -128,18 +128,13 @@ Params.FaceCameraForward = 1;
 const DefaultParams = JSON.parse( JSON.stringify( Params ) );
 const ParamsFilename = "Settings.json.txt";
 
-let HasLoaded = false;
-function SaveParams(Params)
+function SaveParams(Params,ChangedParam,Value,IsFinalValue)
 {
-	if (!HasLoaded)
+	if (IsFinalValue)
 	{
-		Pop.Debug("Skipping save until loaded settings");
-		return;
-	}
-
-	const ParamsJson = JSON.stringify(Params,null,'\t');
-	try
-	{
+		const ParamsJson = JSON.stringify(Params,null,'\t');
+		try
+		{
 		Pop.Debug("Save settings");
 		Pop.WriteStringToFile(ParamsFilename,ParamsJson);
 		//	gr: bug here on windows!
@@ -147,11 +142,12 @@ function SaveParams(Params)
 	}
 	catch (e)
 	{
-		Pop.Debug("Error writing params to file: " + e);
+			Pop.Debug("Error writing params to file: " + e);
+		}
 	}
 }
 
-var ParamsWindow = CreateParamsWindow(Params,SaveParams, [100,100,500,200] );
+var ParamsWindow = new Pop.ParamsWindow(Params,SaveParams, [100,100,500,200] );
 
 ParamsWindow.AddParam('DebugSendingPose');
 ParamsWindow.AddParam('SkewRenderCamera');
@@ -249,15 +245,7 @@ ParamsWindow.AddParam('FaceCameraForward',-1,1);
 
 function LoadNewParams(NewParams)
 {
-	//	can't change Params, so assign new key's values
-	function Set(Key)
-	{
-		if (!NewParams.hasOwnProperty(Key))
-			return;
-		const NewValue = NewParams[Key];
-		Params[Key] = NewValue;
-	}
-	Object.keys(NewParams).forEach(Set);
+	Object.assign(Params,NewParams);
 
 	//	refresh window
 	ParamsWindow.OnParamsChanged();
@@ -266,8 +254,6 @@ function LoadNewParams(NewParams)
 //	refresh params
 function LoadParams()
 {
-	HasLoaded = true;
-
 	const SettingsJson = Pop.LoadFileAsString(ParamsFilename);
 	const Settings = JSON.parse(SettingsJson);
 	//Pop.Debug("SettingsJson",SettingsJson);
