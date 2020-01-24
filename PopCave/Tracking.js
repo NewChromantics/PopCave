@@ -125,6 +125,7 @@ Params.CXCY_Override = false;
 Params.FaceCameraCenterXZ = true;
 Params.FaceCameraCenterY = false;
 Params.FaceCameraForward = 1;
+Params.SkeletonTrackJoint = 'Head';
 
 //	make copy of params as default
 const DefaultParams = JSON.parse( JSON.stringify( Params ) );
@@ -244,6 +245,7 @@ ParamsWindow.AddParam('FloorDebugSize',0,0.1);
 ParamsWindow.AddParam('FaceCameraCenterXZ');
 ParamsWindow.AddParam('FaceCameraCenterY');
 ParamsWindow.AddParam('FaceCameraForward',-1,1);
+ParamsWindow.AddParam('SkeletonTrackJoint');
 
 
 function LoadNewParams(NewParams)
@@ -1919,7 +1921,7 @@ class TCameraWindow
 		const LabelMap = await Coreml.OpenPoseLabelMap( Frame );
 		
 		this.Skeleton = LabelMapToSkeleton(LabelMap);
-		const HeadUvScore = this.Skeleton.Head;
+		const HeadUvScore = this.Skeleton[Params.SkeletonTrackJoint];
 		const Distance = Params.FaceZ;
 		const FaceUvDistance = [ HeadUvScore[0], HeadUvScore[1], Distance ];
 		
@@ -1934,7 +1936,7 @@ class TCameraWindow
 		const LabelMap = await Coreml.HourglassLabelMap( Frame );
 		
 		this.Skeleton = LabelMapToSkeleton(LabelMap);
-		const HeadUvScore = this.Skeleton.Head;
+		const HeadUvScore = this.Skeleton[Params.SkeletonTrackJoint];
 		const Distance = Params.FaceZ;
 		const FaceUvDistance = [ HeadUvScore[0], HeadUvScore[1], Distance ];
 		
@@ -1949,7 +1951,7 @@ class TCameraWindow
 		const LabelMap = await Coreml.CpmLabelMap( Frame );
 		
 		this.Skeleton = LabelMapToSkeleton(LabelMap);
-		const HeadUvScore = this.Skeleton.Head;
+		const HeadUvScore = this.Skeleton[Params.SkeletonTrackJoint];
 		const Distance = Params.FaceZ;
 		const FaceUvDistance = [ HeadUvScore[0], HeadUvScore[1], Distance ];
 		
@@ -1964,7 +1966,7 @@ class TCameraWindow
 		const LabelMap = await Coreml.Resnet50LabelMap( Frame );
 		
 		this.Skeleton = LabelMapToSkeleton(LabelMap);
-		const HeadUvScore = this.Skeleton.Head;
+		const HeadUvScore = this.Skeleton[Params.SkeletonTrackJoint];
 		const Distance = Params.FaceZ;
 		const FaceUvDistance = [ HeadUvScore[0], HeadUvScore[1], Distance ];
 		
@@ -1986,7 +1988,7 @@ class TCameraWindow
 		
 		//	get the person rect[s] and fake a skeleton
 		this.Skeleton = LabelRectsToSkeleton(Rects);
-		const HeadUvScore = this.Skeleton.Head;
+		const HeadUvScore = this.Skeleton[Params.SkeletonTrackJoint];
 		const Distance = Params.FaceZ;
 		const FaceUvDistance = [ HeadUvScore[0], HeadUvScore[1], Distance ];
 		
@@ -2008,7 +2010,7 @@ class TCameraWindow
 		
 		//	get the person rect[s] and fake a skeleton
 		this.Skeleton = LabelRectsToSkeleton(Rects);
-		const HeadUvScore = this.Skeleton.Head;
+		const HeadUvScore = this.Skeleton[Params.SkeletonTrackJoint];
 		const Distance = Params.FaceZ;
 		const FaceUvDistance = [ HeadUvScore[0], HeadUvScore[1], Distance ];
 		
@@ -2023,7 +2025,7 @@ class TCameraWindow
 		const LabelMap = await Coreml.PosenetLabelMap( Frame );
 		
 		this.Skeleton = LabelMapToSkeleton(LabelMap);
-		const HeadUvScore = this.Skeleton.Head;
+		const HeadUvScore = this.Skeleton[Params.SkeletonTrackJoint];
 		const Distance = Params.FaceZ;
 		const FaceUvDistance = [ HeadUvScore[0], HeadUvScore[1], Distance ];
 		
@@ -2053,7 +2055,7 @@ class TCameraWindow
 		const Labels = await Coreml.WinSkillSkeleton(Frame);
 		
 		this.Skeleton = LabelsToSkeleton(Labels);
-		const HeadUvScore = this.Skeleton.Head;
+		const HeadUvScore = this.Skeleton[Params.SkeletonTrackJoint];
 		const Distance = Params.FaceZ;
 		const FaceUvDistance = [HeadUvScore[0],HeadUvScore[1],Distance];
 
@@ -2080,7 +2082,7 @@ class TCameraWindow
 		const Now = Pop.GetTimeNowMs();
 		const ResolveTime = Labels[0].ResolveTimeMs;
 		const CaptureTime = Labels[0].TimeMs;
-		Pop.Debug("Latency from capture to skeleton:",Now - CaptureTime,"Resolve latency",Now - ResolveTime);
+		//Pop.Debug("Latency from capture to skeleton:",Now - CaptureTime,"Resolve latency",Now - ResolveTime);
 
 		const ClosestSkeletonLabels = FilterSkeletonLabelsToClosest(Labels);
 		const LastSkeleton = this.Skeleton;
@@ -2118,7 +2120,7 @@ class TCameraWindow
 		}
 
 
-		const Head = this.Skeleton ? this.Skeleton.Head : null;
+		const Head = this.Skeleton ? this.Skeleton[Params.SkeletonTrackJoint] : null;
 		if (!Head)
 			return null;
 
