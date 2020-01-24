@@ -130,8 +130,12 @@ Params.SkeletonTrackJoint = 'Head';
 
 Params.ShowCameraHistory = true;
 Params.ApplyCameraHistoryFilter = true;
-Params.CameraHistoryLength = 10;
-Params.CameraHistoyDebugSize = 0.1;
+Params.CameraHistoryLength = 5;
+Params.CameraHistoyDebugSize = 0.07;
+Params.HistoryDeltaMin = 0.015;
+Params.HistoryDeltaMax = 0.05;
+Params.HistoryDeltaLerpSlow = 0.05;
+Params.HistoryDeltaLerpFast = 0.9;
 
 //	make copy of params as default
 const DefaultParams = JSON.parse( JSON.stringify( Params ) );
@@ -257,7 +261,10 @@ ParamsWindow.AddParam('ShowCameraHistory');
 ParamsWindow.AddParam('ApplyCameraHistoryFilter');
 ParamsWindow.AddParam('CameraHistoryLength',1,20,Math.floor);
 ParamsWindow.AddParam('CameraHistoyDebugSize',0,1);
-
+ParamsWindow.AddParam('HistoryDeltaMin',0,0.5);
+ParamsWindow.AddParam('HistoryDeltaMax',0,0.5);
+ParamsWindow.AddParam('HistoryDeltaLerpSlow',0,1);
+ParamsWindow.AddParam('HistoryDeltaLerpFast',0,1);
 
 function LoadNewParams(NewParams)
 {
@@ -1443,7 +1450,7 @@ function RenderPortal(RenderTarget,Camera)
 
 function RenderCameraDebug(RenderTarget,RenderCamera,Camera,Colour,ShowPositionMarkers=true)
 {
-	if (ShowPositionMarkers)
+	if (ShowPositionMarkers && false)
 	{
 		const Pos = Camera.Position.slice();
 		{
@@ -1458,6 +1465,7 @@ function RenderCameraDebug(RenderTarget,RenderCamera,Camera,Colour,ShowPositionM
 			const DeltaPos = Math.Lerp3(Pos,Forward,z);
 			const Scale = Params.CameraModelScale * 0.5;
 			RenderCube(RenderTarget,RenderCamera,DeltaPos,Scale,Colour);
+			//Pop.Debug("Draw camera cube ",DeltaPos);
 		}
 	}
 
@@ -1472,6 +1480,7 @@ function RenderCameraDebug(RenderTarget,RenderCamera,Camera,Colour,ShowPositionM
 	Actor.Uniforms['ChequerSides'] = false;
 	Actor.Uniforms['LineWidth'] = 0.01;
 	RenderActor(RenderTarget,RenderCamera,Actor);
+	//Pop.Debug("Draw camera frustum ",Actor.Uniforms['LocalToWorldTransform']);
 
 }
 
@@ -1832,11 +1841,41 @@ class TCameraWindow
 		}
 	}
 
-	CalculateNewPositionFromHistory()
+	CalculateNewPositionFromHistory(CurrentCameraPosition)
 	{
 		const LatestPositon = this.CameraHistory.slice(-1)[0];
-		//this.CameraHistory
-		return LatestPositon;
+		const Positions = this.CameraHistory.slice();
+
+		//	from last X, get magnitude to determine lerp along curve
+		//	maybe should actually implement a curve?
+		let Length = 0;
+		for (let i = 1;i < Positions.length;i++)
+		{
+			const Prev = Positions[i-1];
+			const Next = Positions[i];
+			const Distance = Math.Distance3(Prev,Next);
+			Length += Distance;
+		}
+		//	get an average movement
+		const AverageDelta = Length / Positions.length;
+
+		//	get normalised average in our tolerance
+		const HistoryToleranceRange = Math.RangeClamped(Params.HistoryDeltaMin,Params.HistoryDeltaMax,AverageDelta);
+
+		//	turn that normal into a lerp value
+		const HistoryLerp = Math.Lerp(Params.HistoryDeltaLerpSlow,Params.HistoryDeltaLerpFast,HistoryToleranceRange);
+
+		//	now where do we lerp from?
+		//	gr: is this going to cause jitter?
+		//	gr: should we lerp from the last filtered camera pos?
+		const PrevPosition = CurrentCameraPosition;
+
+		//	do lerp
+		Pop.Debug("Lerp",PrevPosition,"to",LatestPositon,"x",HistoryLerp);
+
+		const NewPosition = Math.Lerp3(PrevPosition,LatestPositon,HistoryLerp);
+		
+		return NewPosition;
 	}
 
 	UpdateFaceCamera()
@@ -1855,7 +1894,8 @@ class TCameraWindow
 
 			if (Params.ApplyCameraHistoryFilter)
 			{
-				this.FaceCamera.Position = this.CalculateNewPositionFromHistory();
+				const PrevPosition = this.FaceCamera.Position;
+				this.FaceCamera.Position = this.CalculateNewPositionFromHistory(PrevPosition);
 			}
 			else
 			{
