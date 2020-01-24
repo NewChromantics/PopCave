@@ -72,6 +72,7 @@ Params.TinyMovementMaxZ = 0.0;
 Params.TinyMovementLerpX = 0.5;
 Params.TinyMovementLerpY = 0.5;
 Params.TinyMovementLerpZ = 0.5;
+Params.ApplyTinyMovementFilter = false;
 
 //	world->uv scalar
 Params.SkeletonWorldMinX = -1;
@@ -126,6 +127,11 @@ Params.FaceCameraCenterXZ = true;
 Params.FaceCameraCenterY = false;
 Params.FaceCameraForward = 1;
 Params.SkeletonTrackJoint = 'Head';
+
+Params.ShowCameraHistory = true;
+Params.ApplyCameraHistoryFilter = true;
+Params.CameraHistoryLength = 10;
+Params.CameraHistoyDebugSize = 0.1;
 
 //	make copy of params as default
 const DefaultParams = JSON.parse( JSON.stringify( Params ) );
@@ -188,7 +194,7 @@ ParamsWindow.AddParam('TinyMovementMaxZ',0,0.1);
 ParamsWindow.AddParam('TinyMovementLerpX',0,1);
 ParamsWindow.AddParam('TinyMovementLerpY',0,1);
 ParamsWindow.AddParam('TinyMovementLerpZ',0,1);
-
+ParamsWindow.AddParam('ApplyTinyMovementFilter');
 
 ParamsWindow.AddParam('LineWidth',0.0001,0.01);
 ParamsWindow.AddParam('FaceZ',0,10);
@@ -246,6 +252,11 @@ ParamsWindow.AddParam('FaceCameraCenterXZ');
 ParamsWindow.AddParam('FaceCameraCenterY');
 ParamsWindow.AddParam('FaceCameraForward',-1,1);
 ParamsWindow.AddParam('SkeletonTrackJoint');
+
+ParamsWindow.AddParam('ShowCameraHistory');
+ParamsWindow.AddParam('ApplyCameraHistoryFilter');
+ParamsWindow.AddParam('CameraHistoryLength',1,20,Math.floor);
+ParamsWindow.AddParam('CameraHistoyDebugSize',0,1);
 
 
 function LoadNewParams(NewParams)
@@ -1601,6 +1612,7 @@ class TCameraWindow
 		this.CameraName = CameraName;
 		this.Source = null;				//	camera source
 		this.Skeleton = null;
+		this.CameraHistory = [];
 		this.LastFace = null;
 		this.LastFaceUvz = null;
 		this.VideoTexture = null;
@@ -1704,6 +1716,12 @@ class TCameraWindow
 
 			if (ShowSkeleton)
 				RenderSkeleton3D(RenderTarget,RenderCamera,this.Skeleton);
+
+			if (ShowCameraFrustum && Params.ShowCameraHistory)
+			{
+				for (const LastCameraPosition of this.CameraHistory)
+					RenderCube(RenderTarget,RenderCamera,LastCameraPosition,Params.CameraHistoyDebugSize,Params.FaceCameraColour);
+			}
 			
 			if (ShowCameraFrustum)
 				RenderCameraDebug(RenderTarget,RenderCamera,this.FaceCamera,Params.FaceCameraColour,true);
@@ -1814,6 +1832,13 @@ class TCameraWindow
 		}
 	}
 
+	CalculateNewPositionFromHistory()
+	{
+		const LatestPositon = this.CameraHistory.slice(-1)[0];
+		//this.CameraHistory
+		return LatestPositon;
+	}
+
 	UpdateFaceCamera()
 	{
 		if (!this.LastFacePosition)
@@ -1824,7 +1849,18 @@ class TCameraWindow
 
 		try
 		{
-			this.FaceCamera.Position = CapturePosToWorldPos(this.LastFacePosition);
+			const NewPosition = CapturePosToWorldPos(this.LastFacePosition);
+			this.CameraHistory.push(NewPosition);
+			this.CameraHistory = this.CameraHistory.slice(-Params.CameraHistoryLength);
+
+			if (Params.ApplyCameraHistoryFilter)
+			{
+				this.FaceCamera.Position = this.CalculateNewPositionFromHistory();
+			}
+			else
+			{
+				this.FaceCamera.Position = NewPosition;
+			}
 
 			//	new options
 			const PortalCenter = GetPortalCorners().Center;
@@ -2086,8 +2122,12 @@ class TCameraWindow
 
 		const ClosestSkeletonLabels = FilterSkeletonLabelsToClosest(Labels);
 		const LastSkeleton = this.Skeleton;
-		this.Skeleton = LabelsToSkeleton(ClosestSkeletonLabels,Params.KinectSkeletonInvertX,Params.KinectSkeletonInvertY,Params.KinectSkeletonInvertZ);
-		
+		const NewSkeleton = LabelsToSkeleton(ClosestSkeletonLabels,Params.KinectSkeletonInvertX,Params.KinectSkeletonInvertY,Params.KinectSkeletonInvertZ);
+
+		if (!NewSkeleton)
+			return;
+		this.Skeleton = NewSkeleton;
+
 		//	extract rotation
 		if (Params.CaptureAutoRotation)
 		{
@@ -2105,8 +2145,10 @@ class TCameraWindow
 			}
 		}
 
-		RevertSkeletonTinyMovements(this.Skeleton,LastSkeleton);
-
+		
+		if (Params.ApplyTinyMovementFilter)
+			RevertSkeletonTinyMovements(this.Skeleton,LastSkeleton);
+		
 		//Pop.Debug("Skeleton",JSON.stringify(this.Skeleton));
 		//	grab floor points
 		if (this.Skeleton.FloorCenter)
@@ -2119,8 +2161,7 @@ class TCameraWindow
 			Pop.Debug("this.CameraForward",this.CameraForward);
 		}
 
-
-		const Head = this.Skeleton ? this.Skeleton[Params.SkeletonTrackJoint] : null;
+		const Head = this.Skeleton[Params.SkeletonTrackJoint];
 		if (!Head)
 			return null;
 
