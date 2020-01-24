@@ -2075,7 +2075,13 @@ class TCameraWindow
 			//Pop.Debug("No skeleton detected");
 			return null;
 		}
-		
+
+		//	get timestamp to identify latency
+		const Now = Pop.GetTimeNowMs();
+		const ResolveTime = Labels[0].ResolveTimeMs;
+		const CaptureTime = Labels[0].TimeMs;
+		Pop.Debug("Latency from capture to skeleton:",Now - CaptureTime,"Resolve latency",Now - ResolveTime);
+
 		const ClosestSkeletonLabels = FilterSkeletonLabelsToClosest(Labels);
 		const LastSkeleton = this.Skeleton;
 		this.Skeleton = LabelsToSkeleton(ClosestSkeletonLabels,Params.KinectSkeletonInvertX,Params.KinectSkeletonInvertY,Params.KinectSkeletonInvertZ);
