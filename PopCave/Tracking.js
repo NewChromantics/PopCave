@@ -156,7 +156,7 @@ function SaveParams(Params,ChangedParam,Value,IsFinalValue)
 	}
 }
 
-var ParamsWindow = new Pop.ParamsWindow(Params,SaveParams, [100,100,500,200] );
+var ParamsWindow = new Pop.ParamsWindow(Params,SaveParams, [100,100,500,500] );
 
 ParamsWindow.AddParam('DebugSendingPose');
 ParamsWindow.AddParam('SkewRenderCamera');
