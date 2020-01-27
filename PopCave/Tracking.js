@@ -22,8 +22,6 @@ const PoseCounter = new Pop.FrameCounter('Poses');
 const FrameImageCounter = new Pop.FrameCounter('FrameImage');
 const PngKbCounter = new Pop.FrameCounter('Png kb');
 
-const UsingMac = false;
-
 //	namespace for Expose network API
 const Expose = {};
 Expose.BroadcastPorts = [9000];
@@ -78,15 +76,15 @@ Params.SkeletonModelScale = 0.03;
 Params.PortalX = 0;
 Params.PortalY = 0;
 Params.PortalZ = 0;
-Params.PortalW = UsingMac ? 0.58 : 1.10;
-Params.PortalH = UsingMac ? 0.32 : 1.88;
+Params.PortalW = 1.10;
+Params.PortalH = 1.88;
 Params.PortalColour = [1,0,1];
 
 //	video camera origin
-Params.CaptureX = UsingMac ? 0.40 : 0.36;
-Params.CaptureY = UsingMac ? 0.22 : (1.00 - 0.30);
-Params.CaptureZ = UsingMac ? 0 : -2.80;
-Params.CaptureYaw = UsingMac ? 180 : 0;
+Params.CaptureX = 0.36;
+Params.CaptureY = (1.00 - 0.30);
+Params.CaptureZ = -2.80;
+Params.CaptureYaw = 0;
 Params.CapturePitch = 0;
 Params.CaptureAutoRotation = true;
 Params.CaptureAutoRotationToleranceDegrees = 1;
