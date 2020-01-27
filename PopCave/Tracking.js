@@ -66,13 +66,6 @@ Params.KinectSkeletonInvertY = true;
 Params.KinectSkeletonInvertZ = false;
 Params.KinectYieldMs = 20;
 Params.KinectSmoothing = 0.5;
-Params.TinyMovementMaxX = 0.0;
-Params.TinyMovementMaxY = 0.0;
-Params.TinyMovementMaxZ = 0.0;
-Params.TinyMovementLerpX = 0.5;
-Params.TinyMovementLerpY = 0.5;
-Params.TinyMovementLerpZ = 0.5;
-Params.ApplyTinyMovementFilter = false;
 
 //	world->uv scalar
 Params.SkeletonWorldMinX = -1;
@@ -160,6 +153,7 @@ function SaveParams(Params,ChangedParam,Value,IsFinalValue)
 	}
 }
 
+
 var ParamsWindow = new Pop.ParamsWindow(Params,SaveParams, [100,100,500,500] );
 
 ParamsWindow.AddParam('DebugSendingPose');
@@ -192,13 +186,6 @@ ParamsWindow.AddParam('KinectSkeletonInvertY');
 ParamsWindow.AddParam('KinectSkeletonInvertZ');
 ParamsWindow.AddParam('KinectYieldMs',0,100,Math.floor);
 ParamsWindow.AddParam('KinectSmoothing',0,1);
-ParamsWindow.AddParam('TinyMovementMaxX',0,0.1);
-ParamsWindow.AddParam('TinyMovementMaxY',0,0.1);
-ParamsWindow.AddParam('TinyMovementMaxZ',0,0.1);
-ParamsWindow.AddParam('TinyMovementLerpX',0,1);
-ParamsWindow.AddParam('TinyMovementLerpY',0,1);
-ParamsWindow.AddParam('TinyMovementLerpZ',0,1);
-ParamsWindow.AddParam('ApplyTinyMovementFilter');
 
 ParamsWindow.AddParam('LineWidth',0.0001,0.01);
 ParamsWindow.AddParam('FaceZ',0,10);
@@ -700,42 +687,6 @@ function LabelsToSkeleton(Labels,InvertX,InvertY,InvertZ)
 	Labels.forEach( LabelToPoint );
 
 	return Skeleton;
-}
-
-function RevertSkeletonTinyMovements(NewSkeleton,OldSkeleton)
-{
-	const Threshold = [Params.TinyMovementMaxX,Params.TinyMovementMaxY,Params.TinyMovementMaxZ];
-	const Lerp = [Params.TinyMovementLerpX,Params.TinyMovementLerpY,Params.TinyMovementLerpZ];
-
-	if (!NewSkeleton || !OldSkeleton)
-		return;
-
-	function RevertJoint(JointName)
-	{
-		const NewJoint = NewSkeleton[JointName];
-		const OldJoint = OldSkeleton[JointName];
-		if (!NewJoint || !OldJoint)
-			return;
-
-		//	todo: 2D version
-		const NewXyz = NewJoint.slice(3,3 + 3);
-		const OldXyz = OldJoint.slice(3,3 + 3);
-
-		//	threshold per component
-		for (let i = 0;i < 3;i++)
-		{
-			const OldV = OldXyz[i];
-			const NewV = NewXyz[i];
-			const Distance = Math.abs(OldV - NewV);
-			if (Distance >= Threshold[i])
-				continue;
-
-			//	lerp
-			const v = Math.Lerp(OldV,NewV,Lerp[i]);
-			NewSkeleton[JointName][3 + i] = v;
-		}
-	}
-	Object.keys(NewSkeleton).forEach(RevertJoint);
 }
 
 function GetFaceCenterDistance(FaceLabels)
@@ -2185,10 +2136,6 @@ class TCameraWindow
 			}
 		}
 
-		
-		if (Params.ApplyTinyMovementFilter)
-			RevertSkeletonTinyMovements(this.Skeleton,LastSkeleton);
-		
 		//Pop.Debug("Skeleton",JSON.stringify(this.Skeleton));
 		//	grab floor points
 		if (this.Skeleton.FloorCenter)
