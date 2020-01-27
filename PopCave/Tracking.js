@@ -35,7 +35,6 @@ Params.MaxScore = 1.0;
 Params.LineWidth = 0.0015;
 Params.WorldVerticalFov = 45;
 Params.RenderVideo = false;
-Params.RenderWorld = true;
 Params.RenderFromFaceCamera = false;
 Params.CameraModelScale = 0.1;
 Params.FaceZ = 1;
@@ -189,7 +188,6 @@ ParamsWindow.AddParam('LineWidth',0.0001,0.01);
 ParamsWindow.AddParam('FaceZ',0,10);
 ParamsWindow.AddParam('WorldVerticalFov',4,90);
 ParamsWindow.AddParam('RenderVideo');
-ParamsWindow.AddParam('RenderWorld');
 ParamsWindow.AddParam('RenderFromFaceCamera');
 ParamsWindow.AddParam('CameraModelScale',0.001,2);
 ParamsWindow.AddParam('SkeletonModelScale',0.001,1);
@@ -1656,7 +1654,7 @@ class TCameraWindow
 			RenderVideoImage(RenderTarget,this.VideoTexture);
 			RenderSkeleton2D(RenderTarget,this.Skeleton);
 		}
-		else if ( Params.RenderWorld || Params.RenderFromFaceCamera )
+		else
 		{
 			let RenderCamera = Params.RenderFromFaceCamera ? this.FaceCamera : this.DebugCamera;
 			//RenderCamera.FocalCenter[0] = Params.CX_Scale;
@@ -1699,10 +1697,6 @@ class TCameraWindow
 
 			if (this.FloorPosition )
 				RenderCaptureLine(RenderTarget,RenderCamera,this.FloorPosition,this.FloorPositionUp);
-		}
-		else
-		{
-			RenderTarget.ClearColour(0,0,255);
 		}
 	}
 	
@@ -2129,6 +2123,7 @@ class TCameraWindow
 				if (Math.abs(NewPitch - Params.CapturePitch) > Params.CaptureAutoRotationToleranceDegrees)
 				{
 					Params.CapturePitch = NewPitch;
+					ParamsWindow.OnParamChanged('CapturePitch');
 					Pop.Debug("New accellerometer pitch=" + NewPitch);
 				}
 			}
