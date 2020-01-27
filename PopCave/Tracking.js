@@ -1871,7 +1871,7 @@ class TCameraWindow
 		const PrevPosition = CurrentCameraPosition;
 
 		//	do lerp
-		Pop.Debug("Lerp",PrevPosition,"to",LatestPositon,"x",HistoryLerp);
+		//Pop.Debug("Lerp",PrevPosition,"to",LatestPositon,"x",HistoryLerp);
 
 		const NewPosition = Math.Lerp3(PrevPosition,LatestPositon,HistoryLerp);
 		
