@@ -127,6 +127,11 @@ Params.HistoryDeltaMax = 0.05;
 Params.HistoryDeltaLerpSlow = 0.05;
 Params.HistoryDeltaLerpFast = 0.9;
 
+Params.UdpServerAddress = '127.0.0.1';
+Params.UdpServerPort = 9001;
+Params.WebsocketServerPort = 9003;
+
+
 //	make copy of params as default
 const DefaultParams = JSON.parse( JSON.stringify( Params ) );
 const ParamsFilename = "Settings.json.txt";
@@ -248,6 +253,12 @@ ParamsWindow.AddParam('HistoryDeltaMin',0,0.5);
 ParamsWindow.AddParam('HistoryDeltaMax',0,0.5);
 ParamsWindow.AddParam('HistoryDeltaLerpSlow',0,1);
 ParamsWindow.AddParam('HistoryDeltaLerpFast',0,1);
+
+ParamsWindow.AddParam('UdpServerAddress');
+ParamsWindow.AddParam('UdpServerPort',1,10000,Math.floor,'String');
+ParamsWindow.AddParam('WebsocketServerPort',1,10000,Math.floor,'String');
+
+
 
 function LoadNewParams(NewParams)
 {
@@ -2510,16 +2521,17 @@ else
 //MemCheckLoop().catch(Pop.Debug);
 
 
+const WebsocketPorts = [Params.WebsocketServerPort];
 
 //RunBroadcast(OnBroadcastMessage).then(Pop.Debug).catch(Pop.Debug);
-RunWebsocketServer([9003],OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
+RunWebsocketServer(WebsocketPorts,OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
 
 //ws://demos.kaazing.com/echo
 
-//const HostNames = ['192.168.0.12','192.168.0.11'];
-//const HostNames = ['echo.websocket.org'];
-const HostNames = ['127.0.0.1'];
-const Ports = [9001];
+
+
+const UdpHostNames = [Params.UdpServerAddress];
+const UdpPorts = [Params.UdpServerPort];
 //const HostNames = ['192.168.0.12'];
 //ConnectToServer(HostNames,OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
 
@@ -2527,5 +2539,5 @@ const Ports = [9001];
 
 //RunBroadcastPose(9002).then(Pop.Debug).catch(Pop.Debug);
 
-ConnectToUdpServer(HostNames,Ports,OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
+ConnectToUdpServer(UdpHostNames,UdpPorts,OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
 
