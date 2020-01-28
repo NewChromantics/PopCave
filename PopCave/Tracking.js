@@ -159,6 +159,14 @@ function SaveParams(Params,ChangedParam,Value,IsFinalValue)
 
 var ParamsWindow = new Pop.ParamsWindow(Params,SaveParams, [100,100,500,500] );
 
+ParamsWindow.AddParam('CaptureX',-2,2);
+ParamsWindow.AddParam('CaptureY',-4,4);
+ParamsWindow.AddParam('CaptureZ',-4,4);
+ParamsWindow.AddParam('CaptureYaw',-180,180);
+ParamsWindow.AddParam('CapturePitch',-180,180);
+ParamsWindow.AddParam('CaptureAutoRotation');
+ParamsWindow.AddParam('CaptureAutoRotationToleranceDegrees',0,10);
+
 ParamsWindow.AddParam('DebugSendingPose');
 ParamsWindow.AddParam('SkewRenderCamera');
 ParamsWindow.AddParam('SkewDebugCamera');
@@ -215,15 +223,8 @@ ParamsWindow.AddParam('SkeletonWorldMaxX',-10,10);
 ParamsWindow.AddParam('SkeletonWorldMinY',-10,10);
 ParamsWindow.AddParam('SkeletonWorldMaxY',-10,10);
 
-ParamsWindow.AddParam('CaptureX',-2,2);
-ParamsWindow.AddParam('CaptureY',-4,4);
-ParamsWindow.AddParam('CaptureZ',-4,4);
 ParamsWindow.AddParam('CaptureColour','Colour');
 ParamsWindow.AddParam('CaptureDebugSize',0,0.1);
-ParamsWindow.AddParam('CaptureYaw',-180,180);
-ParamsWindow.AddParam('CapturePitch',-180,180);
-ParamsWindow.AddParam('CaptureAutoRotation');
-ParamsWindow.AddParam('CaptureAutoRotationToleranceDegrees',0,10);
 ParamsWindow.AddParam('CaptureToWorldInverse');
 ParamsWindow.AddParam('CaptureTransformRaw');
 ParamsWindow.AddParam('LockHeadY');
