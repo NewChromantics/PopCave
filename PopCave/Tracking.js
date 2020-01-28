@@ -64,6 +64,7 @@ Params.KinectSkeletonInvertZ = false;
 Params.KinectYieldMs = 20;
 Params.KinectSmoothing = 0.5;
 Params.KinectGpuId = 0;
+Params.KinectTrackMode = 2;	//	wideA,B, NarrowA,B, NarrowSmallA,B
 
 //	world->uv scalar
 Params.SkeletonWorldMinX = -1;
@@ -198,6 +199,7 @@ ParamsWindow.AddParam('KinectSkeletonInvertZ');
 ParamsWindow.AddParam('KinectYieldMs',0,100,Math.floor);
 ParamsWindow.AddParam('KinectSmoothing',0,1);
 ParamsWindow.AddParam('KinectGpuId',-1,5,Math.floor);
+ParamsWindow.AddParam('KinectTrackMode',0,5,Math.floor);
 
 ParamsWindow.AddParam('LineWidth',0.0001,0.01);
 ParamsWindow.AddParam('FaceZ',0,10);
@@ -1764,7 +1766,7 @@ class TCameraWindow
 				}
 				
 				try
-				{					
+				{
 					const FaceXyz = await this.GetFaceXyz(Luma);
 
 					//Pop.Debug("FaceXyz",FaceXyz);
@@ -2102,7 +2104,11 @@ class TCameraWindow
 		//Frame.Resize(256,256);
 		//Frame.SetFormat('Greyscale');
 
-		const Labels = await Coreml.KinectAzureSkeleton(Frame,Params.KinectSmoothing,Params.KinectGpuId);
+		const Options = {};
+		Options.Smoothing = Params.KinectSmoothing;
+		Options.Gpu = Params.KinectGpuId;
+		Options.TrackMode = Params.KinectTrackMode;
+		const Labels = await Coreml.KinectAzureSkeleton(Frame,Options);
 		//const HeadLabels = Labels.filter(Object => Object.Label == "Head");
 
 		if (!Labels.length)
@@ -2544,3 +2550,18 @@ const UdpPorts = [Params.UdpServerPort];
 
 ConnectToUdpServer(UdpHostNames,UdpPorts,OnRecievedMessage).then(Pop.Debug).catch(Pop.Debug);
 
+
+
+async function SendFakePoseLoop()
+{
+	while (true)
+	{
+		await Pop.Yield(1000 / 31);
+		const Debug = {};
+		Debug.Debug = "Test pose data";
+		OnNewPose(Debug);
+	}
+}
+
+//	test flooding network
+//SendFakePoseLoop().then(Pop.Debug).catch(Pop.Debug);
