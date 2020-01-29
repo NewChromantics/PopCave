@@ -2248,7 +2248,7 @@ class TCameraWindow
 			{
 				const PitchYawRoll = Rot.slice(3,3 + 3);
 				//	to avoid jitter, only change if within a tolerance
-				const NewPitch = -PitchYawRoll[0];
+				const NewPitch = PitchYawRoll[0];
 				if (Math.abs(NewPitch - Params.CapturePitch) > Params.CaptureAutoRotationToleranceDegrees)
 				{
 					Params.CapturePitch = NewPitch;
