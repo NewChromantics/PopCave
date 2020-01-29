@@ -130,6 +130,10 @@ Params.HistoryDeltaMin = 0.015;
 Params.HistoryDeltaMax = 0.05;
 Params.HistoryDeltaLerpSlow = 0.05;
 Params.HistoryDeltaLerpFast = 0.9;
+Params.HistoryVerticalDeltaMin = 0.015;
+Params.HistoryVerticalDeltaMax = 0.05;
+Params.HistoryVerticalDeltaLerpSlow = 0.05;
+Params.HistoryVerticalDeltaLerpFast = 0.9;
 
 Params.UdpServerAddress = '127.0.0.1';
 Params.UdpServerPort = 9001;
@@ -260,6 +264,10 @@ ParamsWindow.AddParam('HistoryDeltaMin',0,0.5);
 ParamsWindow.AddParam('HistoryDeltaMax',0,0.5);
 ParamsWindow.AddParam('HistoryDeltaLerpSlow',0,1);
 ParamsWindow.AddParam('HistoryDeltaLerpFast',0,1);
+ParamsWindow.AddParam('HistoryVerticalDeltaMin',0,0.5);
+ParamsWindow.AddParam('HistoryVerticalDeltaMax',0,0.5);
+ParamsWindow.AddParam('HistoryVerticalDeltaLerpSlow',0,1);
+ParamsWindow.AddParam('HistoryVerticalDeltaLerpFast',0,1);
 
 ParamsWindow.AddParam('UdpServerAddress');
 ParamsWindow.AddParam('UdpServerPort',1,10000,Math.floor,'String');
@@ -1839,6 +1847,44 @@ class TCameraWindow
 		return NewPosition;
 	}
 
+	CalculateNewPositionFromHistoryVertical(CurrentCameraPosition)
+	{
+		const Y = 1;
+		const LatestPositon = this.CameraHistory.slice(-1)[0][Y];
+		const Positions = this.CameraHistory.slice();
+
+		//	from last X, get magnitude to determine lerp along curve
+		//	maybe should actually implement a curve?
+		let Length = 0;
+		for (let i = 1;i < Positions.length;i++)
+		{
+			const Prev = Positions[i - 1][Y];
+			const Next = Positions[i][Y];
+			const Distance = Math.Distance(Prev,Next);
+			Length += Distance;
+		}
+		//	get an average movement
+		const AverageDelta = Length / Positions.length;
+
+		//	get normalised average in our tolerance
+		const HistoryToleranceRange = Math.RangeClamped(Params.HistoryVerticalDeltaMin,Params.HistoryVerticalDeltaMax,AverageDelta);
+
+		//	turn that normal into a lerp value
+		const HistoryLerp = Math.Lerp(Params.HistoryVerticalDeltaLerpSlow,Params.HistoryVerticalDeltaLerpFast,HistoryToleranceRange);
+
+		//	now where do we lerp from?
+		//	gr: is this going to cause jitter?
+		//	gr: should we lerp from the last filtered camera pos?
+		const PrevPosition = CurrentCameraPosition;
+
+		//	do lerp
+		//Pop.Debug("Lerp",PrevPosition,"to",LatestPositon,"x",HistoryLerp);
+
+		const NewPosition = Math.Lerp(PrevPosition,LatestPositon,HistoryLerp);
+
+		return NewPosition;
+	}
+
 	UpdateFaceCamera()
 	{
 		if (!this.LastFacePosition)
@@ -1857,6 +1903,9 @@ class TCameraWindow
 			{
 				const PrevPosition = this.FaceCamera.Position;
 				this.FaceCamera.Position = this.CalculateNewPositionFromHistory(PrevPosition);
+
+				//	process Y seperately
+				this.FaceCamera.Position[1] = this.CalculateNewPositionFromHistoryVertical(PrevPosition);
 			}
 			else
 			{
