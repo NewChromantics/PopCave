@@ -147,6 +147,12 @@ Params.WebsocketServerPort = 9003;
 Params.RenderWhenMinimised = false;
 Params.RenderWhenBackground = false;
 
+Params.ShowExtendedParams = false;
+
+
+
+
+
 //	make copy of params as default
 const DefaultParams = JSON.parse( JSON.stringify( Params ) );
 const ParamsFilename = "Settings.json.txt";
@@ -166,8 +172,19 @@ function RefreshWindowSettings()
 
 function SaveParams(Params,ChangedParam,Value,IsFinalValue)
 {
-	if (ChangedParam == 'RenderWhenMinimised' || ChangedParam == 'RenderWhenBackground')
-		RefreshWindowSettings();
+	//	don't stop saving if something throws
+	try
+	{
+		if (ChangedParam == 'RenderWhenMinimised' || ChangedParam == 'RenderWhenBackground')
+			RefreshWindowSettings();
+
+		if (ChangedParam == 'ShowExtendedParams')
+			ShowExtendedParams();
+	}
+	catch (e)
+	{
+		Pop.Debug("Exception pre-saving params",e);
+	}
 
 	if (IsFinalValue)
 	{
@@ -189,6 +206,9 @@ function SaveParams(Params,ChangedParam,Value,IsFinalValue)
 
 var ParamsWindow = new Pop.ParamsWindow(Params,SaveParams, [100,100,500,500] );
 
+ParamsWindow.AddParam('RenderWhenMinimised');
+ParamsWindow.AddParam('RenderWhenBackground');
+
 ParamsWindow.AddParam('CaptureX',-2,2);
 ParamsWindow.AddParam('CaptureY',-4,4);
 ParamsWindow.AddParam('CaptureZ',-4,4);
@@ -196,93 +216,7 @@ ParamsWindow.AddParam('CaptureYaw',-180,180);
 ParamsWindow.AddParam('CapturePitch',-180,180);
 ParamsWindow.AddParam('CaptureAutoRotation');
 ParamsWindow.AddParam('CaptureAutoRotationToleranceDegrees',0,10);
-
-ParamsWindow.AddParam('DebugSendingPose');
-ParamsWindow.AddParam('SkewRenderCamera');
-ParamsWindow.AddParam('SkewDebugCamera');
-ParamsWindow.AddParam('CX_Scale',-1,1);
-ParamsWindow.AddParam('CY_Scale',-1,1);
-ParamsWindow.AddParam('CXCY_Override');
-ParamsWindow.AddParam('SkewTestFov',1,80);
-ParamsWindow.AddParam('SkewUseCameraWorldToCamera');
-ParamsWindow.AddParam('SkewCamera_R');
-ParamsWindow.AddParam('SkewCamera_T');
-ParamsWindow.AddParam('SkewCamera_M');
-ParamsWindow.AddParam('SkewCamera_InvT');
-ParamsWindow.AddParam('SkewCamera_InvM');
-
-ParamsWindow.AddParam('MaxScore',0,1);
-ParamsWindow.AddParam('UseAppleFace');
-ParamsWindow.AddParam('UseOpenPose');
-ParamsWindow.AddParam('UseCpm');
-ParamsWindow.AddParam('UseHourglass');
-ParamsWindow.AddParam('UseResnet50');
-ParamsWindow.AddParam('UseSsdMobileNet');
-ParamsWindow.AddParam('UseYolo');
-ParamsWindow.AddParam('UsePosenet');
-ParamsWindow.AddParam('UseWinSkillSkeleton');
-ParamsWindow.AddParam('UseKinectAzureSkeleton');
-ParamsWindow.AddParam('KinectSkeletonInvertX');
-ParamsWindow.AddParam('KinectSkeletonInvertY');
-ParamsWindow.AddParam('KinectSkeletonInvertZ');
-ParamsWindow.AddParam('KinectYieldMs',0,100,Math.floor);
-ParamsWindow.AddParam('KinectSmoothing',0,1);
 ParamsWindow.AddParam('KinectGpuId',-1,5,Math.floor);
-ParamsWindow.AddParam('KinectTrackMode',TrackModeLabels);
-
-ParamsWindow.AddParam('LineWidth',0.0001,0.01);
-ParamsWindow.AddParam('FaceZ',0,10);
-ParamsWindow.AddParam('WorldVerticalFov',4,90);
-ParamsWindow.AddParam('RenderVideo');
-ParamsWindow.AddParam('RenderFromFaceCamera');
-ParamsWindow.AddParam('CameraModelScale',0.001,2);
-ParamsWindow.AddParam('SkeletonModelScale',0.001,1);
-ParamsWindow.AddParam('FaceCameraColour','Colour');
-ParamsWindow.AddParam('BackgroundColour','Colour');
-
-ParamsWindow.AddParam('RenderGeo');
-ParamsWindow.AddParam('GeoColour','Colour');
-ParamsWindow.AddParam('GeoScale',0.001,10);
-ParamsWindow.AddParam('GeoX',-10,10);
-ParamsWindow.AddParam('GeoY',-10,10);
-ParamsWindow.AddParam('GeoZ',-10,10);
-ParamsWindow.AddParam('GeoYaw',-180,180);
-
-ParamsWindow.AddParam('EnableStreamFramePng');
-ParamsWindow.AddParam('SkeletonWorldMinX',-10,10);
-ParamsWindow.AddParam('SkeletonWorldMaxX',-10,10);
-ParamsWindow.AddParam('SkeletonWorldMinY',-10,10);
-ParamsWindow.AddParam('SkeletonWorldMaxY',-10,10);
-
-ParamsWindow.AddParam('CaptureColour','Colour');
-ParamsWindow.AddParam('CaptureDebugSize',0,0.1);
-ParamsWindow.AddParam('CaptureToWorldInverse');
-ParamsWindow.AddParam('CaptureTransformRaw');
-ParamsWindow.AddParam('LockHeadY');
-ParamsWindow.AddParam('LockedHeadY',-1.6,2);
-
-ParamsWindow.AddParam('PortalX',-5,5);
-ParamsWindow.AddParam('PortalY',-5,5);
-ParamsWindow.AddParam('PortalZ',-5,5);
-ParamsWindow.AddParam('PortalW',0,4);
-ParamsWindow.AddParam('PortalH',0,4);
-ParamsWindow.AddParam('PortalColour','Colour');
-
-ParamsWindow.AddParam('OriginColour','Colour');
-ParamsWindow.AddParam('OriginDebugSize',0,0.1);
-
-ParamsWindow.AddParam('FloorColour','Colour');
-ParamsWindow.AddParam('FloorDebugSize',0,0.1);
-
-ParamsWindow.AddParam('FaceCameraCenterXZ');
-ParamsWindow.AddParam('FaceCameraCenterY');
-ParamsWindow.AddParam('FaceCameraForward',-1,1);
-ParamsWindow.AddParam('SkeletonTrackJoint');
-
-ParamsWindow.AddParam('ShowCameraHistory');
-ParamsWindow.AddParam('ApplyCameraHistoryFilter');
-ParamsWindow.AddParam('CameraHistoryLength',1,20,Math.floor);
-ParamsWindow.AddParam('CameraHistoyDebugSize',0,1);
 ParamsWindow.AddParam('HistoryDeltaMin',0,0.5);
 ParamsWindow.AddParam('HistoryDeltaMax',0,0.5);
 ParamsWindow.AddParam('HistoryDeltaLerpSlow',0,1);
@@ -291,13 +225,109 @@ ParamsWindow.AddParam('HistoryVerticalDeltaMin',0,0.5);
 ParamsWindow.AddParam('HistoryVerticalDeltaMax',0,0.5);
 ParamsWindow.AddParam('HistoryVerticalDeltaLerpSlow',0,1);
 ParamsWindow.AddParam('HistoryVerticalDeltaLerpFast',0,1);
+ParamsWindow.AddParam('LockHeadY');
+ParamsWindow.AddParam('LockedHeadY',-1.6,2);
+ParamsWindow.AddParam('ShowExtendedParams');
 
-ParamsWindow.AddParam('UdpServerAddress');
-ParamsWindow.AddParam('UdpServerPort',1,10000,Math.floor,'String');
-ParamsWindow.AddParam('WebsocketServerPort',1,10000,Math.floor,'String');
+let ExtendedParamsShown = false;
+function ShowExtendedParams()
+{
+	if (!Params.ShowExtendedParams)
+		return;
+	//	already added
+	if (ExtendedParamsShown)
+		return;
 
-ParamsWindow.AddParam('RenderWhenMinimised');
-ParamsWindow.AddParam('RenderWhenBackground');
+	ParamsWindow.AddParam('DebugSendingPose');
+	ParamsWindow.AddParam('SkewRenderCamera');
+	ParamsWindow.AddParam('SkewDebugCamera');
+	ParamsWindow.AddParam('CX_Scale',-1,1);
+	ParamsWindow.AddParam('CY_Scale',-1,1);
+	ParamsWindow.AddParam('CXCY_Override');
+	ParamsWindow.AddParam('SkewTestFov',1,80);
+	ParamsWindow.AddParam('SkewUseCameraWorldToCamera');
+	ParamsWindow.AddParam('SkewCamera_R');
+	ParamsWindow.AddParam('SkewCamera_T');
+	ParamsWindow.AddParam('SkewCamera_M');
+	ParamsWindow.AddParam('SkewCamera_InvT');
+	ParamsWindow.AddParam('SkewCamera_InvM');
+
+	ParamsWindow.AddParam('MaxScore',0,1);
+	ParamsWindow.AddParam('UseAppleFace');
+	ParamsWindow.AddParam('UseOpenPose');
+	ParamsWindow.AddParam('UseCpm');
+	ParamsWindow.AddParam('UseHourglass');
+	ParamsWindow.AddParam('UseResnet50');
+	ParamsWindow.AddParam('UseSsdMobileNet');
+	ParamsWindow.AddParam('UseYolo');
+	ParamsWindow.AddParam('UsePosenet');
+	ParamsWindow.AddParam('UseWinSkillSkeleton');
+	ParamsWindow.AddParam('UseKinectAzureSkeleton');
+	ParamsWindow.AddParam('KinectSkeletonInvertX');
+	ParamsWindow.AddParam('KinectSkeletonInvertY');
+	ParamsWindow.AddParam('KinectSkeletonInvertZ');
+	ParamsWindow.AddParam('KinectYieldMs',0,100,Math.floor);
+	ParamsWindow.AddParam('KinectSmoothing',0,1);
+	ParamsWindow.AddParam('KinectTrackMode',TrackModeLabels);
+
+	ParamsWindow.AddParam('LineWidth',0.0001,0.01);
+	ParamsWindow.AddParam('FaceZ',0,10);
+	ParamsWindow.AddParam('WorldVerticalFov',4,90);
+	ParamsWindow.AddParam('RenderVideo');
+	ParamsWindow.AddParam('RenderFromFaceCamera');
+	ParamsWindow.AddParam('CameraModelScale',0.001,2);
+	ParamsWindow.AddParam('SkeletonModelScale',0.001,1);
+	ParamsWindow.AddParam('FaceCameraColour','Colour');
+	ParamsWindow.AddParam('BackgroundColour','Colour');
+
+	ParamsWindow.AddParam('RenderGeo');
+	ParamsWindow.AddParam('GeoColour','Colour');
+	ParamsWindow.AddParam('GeoScale',0.001,10);
+	ParamsWindow.AddParam('GeoX',-10,10);
+	ParamsWindow.AddParam('GeoY',-10,10);
+	ParamsWindow.AddParam('GeoZ',-10,10);
+	ParamsWindow.AddParam('GeoYaw',-180,180);
+
+	ParamsWindow.AddParam('EnableStreamFramePng');
+	ParamsWindow.AddParam('SkeletonWorldMinX',-10,10);
+	ParamsWindow.AddParam('SkeletonWorldMaxX',-10,10);
+	ParamsWindow.AddParam('SkeletonWorldMinY',-10,10);
+	ParamsWindow.AddParam('SkeletonWorldMaxY',-10,10);
+
+	ParamsWindow.AddParam('CaptureColour','Colour');
+	ParamsWindow.AddParam('CaptureDebugSize',0,0.1);
+	ParamsWindow.AddParam('CaptureToWorldInverse');
+	ParamsWindow.AddParam('CaptureTransformRaw');
+
+	ParamsWindow.AddParam('PortalX',-5,5);
+	ParamsWindow.AddParam('PortalY',-5,5);
+	ParamsWindow.AddParam('PortalZ',-5,5);
+	ParamsWindow.AddParam('PortalW',0,4);
+	ParamsWindow.AddParam('PortalH',0,4);
+	ParamsWindow.AddParam('PortalColour','Colour');
+
+	ParamsWindow.AddParam('OriginColour','Colour');
+	ParamsWindow.AddParam('OriginDebugSize',0,0.1);
+
+	ParamsWindow.AddParam('FloorColour','Colour');
+	ParamsWindow.AddParam('FloorDebugSize',0,0.1);
+
+	ParamsWindow.AddParam('FaceCameraCenterXZ');
+	ParamsWindow.AddParam('FaceCameraCenterY');
+	ParamsWindow.AddParam('FaceCameraForward',-1,1);
+	ParamsWindow.AddParam('SkeletonTrackJoint');
+
+	ParamsWindow.AddParam('ShowCameraHistory');
+	ParamsWindow.AddParam('ApplyCameraHistoryFilter');
+	ParamsWindow.AddParam('CameraHistoryLength',1,20,Math.floor);
+	ParamsWindow.AddParam('CameraHistoyDebugSize',0,1);
+
+	ParamsWindow.AddParam('UdpServerAddress');
+	ParamsWindow.AddParam('UdpServerPort',1,10000,Math.floor,'String');
+	ParamsWindow.AddParam('WebsocketServerPort',1,10000,Math.floor,'String');
+
+	ExtendedParamsShown = true;
+}
 
 
 
@@ -308,6 +338,7 @@ function LoadNewParams(NewParams)
 	//	refresh window
 	ParamsWindow.OnParamsChanged();
 	RefreshWindowSettings();
+	ShowExtendedParams();
 }
 
 //	refresh params
