@@ -139,13 +139,28 @@ Params.UdpServerAddress = '127.0.0.1';
 Params.UdpServerPort = 9001;
 Params.WebsocketServerPort = 9003;
 
+Params.RenderWhenMinimised = false;
+Params.RenderWhenBackground = false;
 
 //	make copy of params as default
 const DefaultParams = JSON.parse( JSON.stringify( Params ) );
 const ParamsFilename = "Settings.json.txt";
 
+function RefreshWindowSettings()
+{
+	function UpdateWindow(Window)
+	{
+		Window.EnableRenderMinimised(Params.RenderWhenMinimised);
+		Window.EnableRenderBackground(Params.RenderWhenBackground);
+	}
+	CameraWindows.forEach(UpdateWindow);
+}
+
 function SaveParams(Params,ChangedParam,Value,IsFinalValue)
 {
+	if (ChangedParam == 'RenderWhenMinimised' || ChangedParam == 'RenderWhenBackground')
+		RefreshWindowSettings();
+
 	if (IsFinalValue)
 	{
 		const ParamsJson = JSON.stringify(Params,null,'\t');
@@ -273,6 +288,9 @@ ParamsWindow.AddParam('UdpServerAddress');
 ParamsWindow.AddParam('UdpServerPort',1,10000,Math.floor,'String');
 ParamsWindow.AddParam('WebsocketServerPort',1,10000,Math.floor,'String');
 
+ParamsWindow.AddParam('RenderWhenMinimised');
+ParamsWindow.AddParam('RenderWhenBackground');
+
 
 
 function LoadNewParams(NewParams)
@@ -281,6 +299,7 @@ function LoadNewParams(NewParams)
 
 	//	refresh window
 	ParamsWindow.OnParamsChanged();
+	RefreshWindowSettings();
 }
 
 //	refresh params
@@ -2291,6 +2310,7 @@ async function FindCamerasLoop()
 		{
 			let Window = new TCameraWindow(CameraName);
 			CameraWindows.push(Window);
+			RefreshWindowSettings();
 		}
 		catch(e)
 		{
