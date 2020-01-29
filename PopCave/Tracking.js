@@ -28,6 +28,8 @@ Expose.BroadcastPorts = [9000];
 Expose.ListenPorts = [9001,9002,9003,9004,9005];
 
 
+const TrackModeLabels = ['Wide_Depth','Wide_Camera','Narrow_Depth','Narrow_Camera','NSmall_Depth','NSmall_Camera'];
+
 //	gr: this needs to be const as the object is used by params window
 const Params = {};
 Params.DebugSendingPose = false;
@@ -199,7 +201,7 @@ ParamsWindow.AddParam('KinectSkeletonInvertZ');
 ParamsWindow.AddParam('KinectYieldMs',0,100,Math.floor);
 ParamsWindow.AddParam('KinectSmoothing',0,1);
 ParamsWindow.AddParam('KinectGpuId',-1,5,Math.floor);
-ParamsWindow.AddParam('KinectTrackMode',0,5,Math.floor);
+ParamsWindow.AddParam('KinectTrackMode',TrackModeLabels);
 
 ParamsWindow.AddParam('LineWidth',0.0001,0.01);
 ParamsWindow.AddParam('FaceZ',0,10);
