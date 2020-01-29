@@ -1894,7 +1894,7 @@ class TCameraWindow
 		//	now where do we lerp from?
 		//	gr: is this going to cause jitter?
 		//	gr: should we lerp from the last filtered camera pos?
-		const PrevPosition = CurrentCameraPosition;
+		const PrevPosition = CurrentCameraPosition[Y];
 
 		//	do lerp
 		//Pop.Debug("Lerp",PrevPosition,"to",LatestPositon,"x",HistoryLerp);
