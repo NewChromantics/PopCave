@@ -27,6 +27,11 @@ const Expose = {};
 Expose.BroadcastPorts = [9000];
 Expose.ListenPorts = [9001,9002,9003,9004,9005];
 
+let Coreml = new Pop.CoreMl();
+
+let CameraWindows = [];
+
+
 
 const TrackModeLabels = ['Wide_Depth','Wide_Camera','Narrow_Depth','Narrow_Camera','NSmall_Depth','NSmall_Camera'];
 
@@ -148,8 +153,11 @@ const ParamsFilename = "Settings.json.txt";
 
 function RefreshWindowSettings()
 {
-	function UpdateWindow(Window)
+	function UpdateWindow(CameraWindow)
 	{
+		const Window = CameraWindow.Window;
+		if (!Window)
+			return;
 		Window.EnableRenderMinimised(Params.RenderWhenMinimised);
 		Window.EnableRenderBackground(Params.RenderWhenBackground);
 	}
@@ -2284,10 +2292,6 @@ function GetCameraRay(Camera,uv)
 }
 
 
-let Coreml = new Pop.CoreMl();
-
-let CameraWindows = [];
-
 async function FindCamerasLoop()
 {
 	let CreateCamera = function(CameraName)
@@ -2366,6 +2370,7 @@ function StartKinectCamera()
 {
 	let Window = new TCameraWindow(null);
 	CameraWindows.push(Window);	
+	RefreshWindowSettings();
 }
 
 
