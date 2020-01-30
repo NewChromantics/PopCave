@@ -72,6 +72,7 @@ Params.KinectYieldMs = 20;
 Params.KinectSmoothing = 0.5;
 Params.KinectGpuId = 0;
 Params.KinectTrackMode = 2;	//	wideA,B, NarrowA,B, NarrowSmallA,B
+Params.SkeletonIgnoreDistance = 2;
 
 //	world->uv scalar
 Params.SkeletonWorldMinX = -1;
@@ -227,6 +228,7 @@ ParamsWindow.AddParam('HistoryVerticalDeltaLerpSlow',0,1);
 ParamsWindow.AddParam('HistoryVerticalDeltaLerpFast',0,1);
 ParamsWindow.AddParam('LockHeadY');
 ParamsWindow.AddParam('LockedHeadY',-1.6,2);
+ParamsWindow.AddParam('SkeletonIgnoreDistance',1,10);
 ParamsWindow.AddParam('ShowExtendedParams');
 
 let ExtendedParamsShown = false;
@@ -671,7 +673,7 @@ function GetSceneGeos(RenderTarget)
 }
 
 
-function FilterSkeletonLabelsToClosest(Labels)
+function FilterSkeletonLabelsToClosest(Labels,MaxDistance)
 {
 	//	skeletons appear as
 	//	Head, Head1, Head2
@@ -680,9 +682,26 @@ function FilterSkeletonLabelsToClosest(Labels)
 	{
 		return Label.Label.startsWith('Head')
 	}
-	let HeadLabels = Labels.filter(IsHeadLabel);
-	//	only 1 or no heads, nothing to filter
-	if (HeadLabels.length <= 1)
+	function IsValidHeadLabel(Label)
+	{
+		if (!IsHeadLabel)
+			return false;
+
+		//	filter out heads that are too far away
+		const Distance = Math.abs(Label.z);
+		if (Distance > MaxDistance)
+			return false;
+
+		return true;
+	}
+	let HeadLabels = Labels.filter(IsValidHeadLabel);
+
+	//	heads filtered out (dont return the originals!)
+	if (HeadLabels.length == 0)
+		return null;
+
+	//	only 1 head, nothing to filter
+	if (HeadLabels.length == 1)
 		return Labels;
 	/*
 	Heads;,[
@@ -2232,7 +2251,7 @@ class TCameraWindow
 		const CaptureTime = Labels[0].TimeMs;
 		//Pop.Debug("Latency from capture to skeleton:",Now - CaptureTime,"Resolve latency",Now - ResolveTime);
 
-		const ClosestSkeletonLabels = FilterSkeletonLabelsToClosest(Labels);
+		const ClosestSkeletonLabels = FilterSkeletonLabelsToClosest(Labels,Params.SkeletonIgnoreDistance);
 		const LastSkeleton = this.Skeleton;
 		const NewSkeleton = LabelsToSkeleton(ClosestSkeletonLabels,Params.KinectSkeletonInvertX,Params.KinectSkeletonInvertY,Params.KinectSkeletonInvertZ);
 
