@@ -149,7 +149,7 @@ Params.RenderWhenMinimised = false;
 Params.RenderWhenBackground = false;
 
 Params.ShowExtendedParams = false;
-
+Params.ShowDebugWindow = false;
 
 
 
@@ -181,6 +181,9 @@ function SaveParams(Params,ChangedParam,Value,IsFinalValue)
 
 		if (ChangedParam == 'ShowExtendedParams')
 			ShowExtendedParams();
+
+		if (ChangedParam == 'ShowDebugWindow')
+			ShowDebugWindow();
 	}
 	catch (e)
 	{
@@ -230,6 +233,7 @@ ParamsWindow.AddParam('LockHeadY');
 ParamsWindow.AddParam('LockedHeadY',-1.6,2);
 ParamsWindow.AddParam('SkeletonIgnoreDistance',1,10);
 ParamsWindow.AddParam('ShowExtendedParams');
+ParamsWindow.AddParam('ShowDebugWindow');
 
 let ExtendedParamsShown = false;
 function ShowExtendedParams()
@@ -332,6 +336,18 @@ function ShowExtendedParams()
 }
 
 
+let DebugWindow = null;
+function ShowDebugWindow()
+{
+	if (!Params.ShowDebugWindow)
+		return;
+
+	if (DebugWindow)
+		return;
+
+	DebugWindow = new Pop.Engine.StatsWindow();
+}
+
 
 function LoadNewParams(NewParams)
 {
@@ -341,6 +357,7 @@ function LoadNewParams(NewParams)
 	ParamsWindow.OnParamsChanged();
 	RefreshWindowSettings();
 	ShowExtendedParams();
+	ShowDebugWindow();
 }
 
 //	refresh params
@@ -2682,7 +2699,7 @@ async function SendFakePoseLoop()
 {
 	while (true)
 	{
-		await Pop.Yield(1000 / 31);
+		await Pop.Yield(1000 / 10);
 		const Debug = {};
 		Debug.Debug = "Test pose data";
 		OnNewPose(Debug);
