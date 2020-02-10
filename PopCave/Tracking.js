@@ -2636,7 +2636,7 @@ async function ConnectToUdpServer(HostNames,Ports,OnMessage)
 			Pop.Debug("Created udp client..." + Address);
 
 			//	gr: implement this that just immediately resolves
-			//await Socket.WaitForConnect();
+			await Socket.WaitForConnect();
 			Pop.Debug("Connected udp client! " + Address);
 			PoseSockets.push(Socket);
 
