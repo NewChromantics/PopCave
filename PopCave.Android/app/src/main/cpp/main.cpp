@@ -34,6 +34,9 @@
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", __VA_ARGS__))
 
+extern"C" int32_t			PopH264_CreateInstance();
+
+
 /**
  * Our saved state data.
  */
@@ -308,6 +311,7 @@ ASensorManager* AcquireASensorManagerInstance(android_app* app) {
 void android_main(struct android_app* state) {
     struct engine engine;
 
+    PopH264_CreateInstance();
     memset(&engine, 0, sizeof(engine));
     state->userData = &engine;
     state->onAppCmd = engine_handle_cmd;

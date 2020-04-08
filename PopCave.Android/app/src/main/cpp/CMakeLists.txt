@@ -22,17 +22,32 @@ add_library(native_app_glue STATIC
     ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
 
 # now build app's shared lib
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -Wall -Werror")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17 -Wall -Werror")
 
 # Export ANativeActivity_onCreate(),
 # Refer to: https://github.com/android-ndk/ndk/issues/381.
 set(CMAKE_SHARED_LINKER_FLAGS
     "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
 
+
+add_library(PopH264 SHARED IMPORTED)
+set_target_properties(PopH264 PROPERTIES IMPORTED_LOCATION /Volumes/Code/PopCave/PopCave.Android/app/src/main/cpp/${CMAKE_ANDROID_ARCH_ABI}/libPopH264.so)
+#find_library(PopH264 "/Volumes/Code/PopCave/PopCave.Android/app/src/main/cpp/${CMAKE_ANDROID_ARCH_ABI}/libPopH264.so")
+
 add_library(native-activity SHARED main.cpp)
 
-target_include_directories(native-activity PRIVATE
-    ${ANDROID_NDK}/sources/android/native_app_glue)
+# https://groups.google.com/forum/?fromgroups#!topic/adt-dev/nQobKd2Gl_8
+# need to put so's into a jar
+link_directories("Libs")
+link_directories("")
+link_directories("./")
+#add_library(testlib SHARED IMPORTED)
+#set_property(TARGET testlib PROPERTY IMPORTEDPopH264_LOCATION "libPopH264.so")
+#TARGET_LINK_LIBRARIES(TARGET "-L./" testlib)
+#target_link_directories(TARGET SHARED Libs)
+
+target_include_directories(native-activity PRIVATE ${ANDROID_NDK}/sources/android/native_app_glue)
+
 
 # add lib dependencies
 target_link_libraries(native-activity
@@ -40,4 +55,7 @@ target_link_libraries(native-activity
     native_app_glue
     EGL
     GLESv1_CM
-    log)
+    log
+        PopH264
+  #"/Volumes/Code/PopCave/PopCave.Android/app/src/main/cpp/${CMAKE_ANDROID_ARCH_ABI}/libPopH264.so"
+    )

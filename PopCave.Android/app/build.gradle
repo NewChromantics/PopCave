@@ -9,6 +9,8 @@ android {
         targetSdkVersion 28
         externalNativeBuild {
             cmake {
+                abiFilters "armeabi-v7a","x86_64"
+
                 arguments '-DANDROID_STL=c++_static'
             }
         }
