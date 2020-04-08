@@ -8,6 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		BF151F2623842ABF00A70EBF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BF5EAFA8237F09F50077BCF5 /* Assets.xcassets */; };
+		BF15205E2385602D00A70EBF /* PopCameraDeviceFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF1520562385602C00A70EBF /* PopCameraDeviceFramework.framework */; };
+		BF15205F2385602D00A70EBF /* PopCoreml.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF1520572385602C00A70EBF /* PopCoreml.framework */; };
+		BF1520602385602D00A70EBF /* PopH264Framework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF1520582385602C00A70EBF /* PopH264Framework.framework */; };
+		BF1520612385602D00A70EBF /* PopH264_Ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF1520592385602C00A70EBF /* PopH264_Ios.framework */; };
+		BF1520622385602D00A70EBF /* PopCameraDevice_Ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF15205A2385602C00A70EBF /* PopCameraDevice_Ios.framework */; };
+		BF1520632385602D00A70EBF /* PopEngine_Ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF15205B2385602C00A70EBF /* PopEngine_Ios.framework */; };
+		BF1520642385602D00A70EBF /* PopCoreml_Ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF15205C2385602C00A70EBF /* PopCoreml_Ios.framework */; };
+		BF1520652385602D00A70EBF /* PopEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF15205D2385602D00A70EBF /* PopEngine.framework */; };
 		BF5EAFA4237F09E70077BCF5 /* PopCave in Resources */ = {isa = PBXBuildFile; fileRef = BF5EAFA3237F09E70077BCF5 /* PopCave */; };
 		BF5EB03D237F17BD0077BCF5 /* PopEngine.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BF5EB039237F176D0077BCF5 /* PopEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BF5EB03E237F181E0077BCF5 /* PopEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF5EB039237F176D0077BCF5 /* PopEngine.framework */; };
@@ -35,6 +43,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		BF1520562385602C00A70EBF /* PopCameraDeviceFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopCameraDeviceFramework.framework; path = Src_Osx/PopCameraDeviceFramework.framework; sourceTree = "<group>"; };
+		BF1520572385602C00A70EBF /* PopCoreml.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopCoreml.framework; path = Src_Osx/PopCoreml.framework; sourceTree = "<group>"; };
+		BF1520582385602C00A70EBF /* PopH264Framework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopH264Framework.framework; path = Src_Osx/PopH264Framework.framework; sourceTree = "<group>"; };
+		BF1520592385602C00A70EBF /* PopH264_Ios.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopH264_Ios.framework; path = Src_Osx/PopH264_Ios.framework; sourceTree = "<group>"; };
+		BF15205A2385602C00A70EBF /* PopCameraDevice_Ios.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopCameraDevice_Ios.framework; path = Src_Osx/PopCameraDevice_Ios.framework; sourceTree = "<group>"; };
+		BF15205B2385602C00A70EBF /* PopEngine_Ios.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopEngine_Ios.framework; path = Src_Osx/PopEngine_Ios.framework; sourceTree = "<group>"; };
+		BF15205C2385602C00A70EBF /* PopCoreml_Ios.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopCoreml_Ios.framework; path = Src_Osx/PopCoreml_Ios.framework; sourceTree = "<group>"; };
+		BF15205D2385602D00A70EBF /* PopEngine.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopEngine.framework; path = Src_Osx/PopEngine.framework; sourceTree = "<group>"; };
 		BF5EAF8F237F08CB0077BCF5 /* PopCave.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PopCave.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF5EAFA3237F09E70077BCF5 /* PopCave */ = {isa = PBXFileReference; lastKnownFileType = folder; path = PopCave; sourceTree = "<group>"; };
 		BF5EAFA8237F09F50077BCF5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -52,7 +68,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF1520642385602D00A70EBF /* PopCoreml_Ios.framework in Frameworks */,
+				BF1520632385602D00A70EBF /* PopEngine_Ios.framework in Frameworks */,
+				BF15205E2385602D00A70EBF /* PopCameraDeviceFramework.framework in Frameworks */,
+				BF1520612385602D00A70EBF /* PopH264_Ios.framework in Frameworks */,
+				BF15205F2385602D00A70EBF /* PopCoreml.framework in Frameworks */,
+				BF1520622385602D00A70EBF /* PopCameraDevice_Ios.framework in Frameworks */,
+				BF1520652385602D00A70EBF /* PopEngine.framework in Frameworks */,
 				BF5EB07523803E2F0077BCF5 /* PopCameraDeviceFramework.framework in Frameworks */,
+				BF1520602385602D00A70EBF /* PopH264Framework.framework in Frameworks */,
 				BF5EB03E237F181E0077BCF5 /* PopEngine.framework in Frameworks */,
 				BF5EB07623803E2F0077BCF5 /* PopCoreml.framework in Frameworks */,
 			);
@@ -94,6 +118,14 @@
 		BF5EB031237F151C0077BCF5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BF15205A2385602C00A70EBF /* PopCameraDevice_Ios.framework */,
+				BF1520562385602C00A70EBF /* PopCameraDeviceFramework.framework */,
+				BF15205C2385602C00A70EBF /* PopCoreml_Ios.framework */,
+				BF1520572385602C00A70EBF /* PopCoreml.framework */,
+				BF15205B2385602C00A70EBF /* PopEngine_Ios.framework */,
+				BF15205D2385602D00A70EBF /* PopEngine.framework */,
+				BF1520592385602C00A70EBF /* PopH264_Ios.framework */,
+				BF1520582385602C00A70EBF /* PopH264Framework.framework */,
 				BF5EB07323803E2F0077BCF5 /* PopCameraDeviceFramework.framework */,
 				BF5EB07423803E2F0077BCF5 /* PopCoreml.framework */,
 				BF5EB039237F176D0077BCF5 /* PopEngine.framework */,
