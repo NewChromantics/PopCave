@@ -3,3 +3,18 @@
 
 # user data
 xcuserdata/
+
+# temp build files
+PopCave.visualstudio/PopCave/x64/
+PopCave.visualstudio/PopCave/packages/
+PopCave.visualstudio/PopCave/PopCave_x64_Debug/
+PopCave.visualstudio/PopCave/PopEngine_x64_Debug_Chakra/
+Build/
+
+*.user
+
+PopCave.visualstudio/PopCave/.vs/
+
+*.aps
+
+

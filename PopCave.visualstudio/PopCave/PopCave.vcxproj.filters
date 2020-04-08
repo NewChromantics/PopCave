@@ -1,0 +1,222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="PopCave">
+      <UniqueIdentifier>{18bd5f61-4e3e-42c8-a983-5a60ef84b02a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PopCave\PopEngineCommon">
+      <UniqueIdentifier>{7a356c43-2ca5-4cd0-a555-d5564bed0ed7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dlls">
+      <UniqueIdentifier>{00d28bea-7c65-45f8-9136-3e217528d32f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Src_Windows\Resource.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src_Windows\TargetVer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src_Windows\PopEngine.h">
+      <Filter>Dlls</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\Src_Windows\PopCave.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Src_Osx\main.mm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="packages.config">
+      <Filter>Dlls</Filter>
+    </None>
+    <None Include="..\..\Src_Windows\PopCoreml.manifest">
+      <Filter>Dlls</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\..\Src_Windows\Microsoft.AI.Skills.SkillInterfacePreview.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\Microsoft.AI.Skills.Vision.SkeletalDetectorPreview.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\msvcp140_app.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\msvcp140d_app.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\PopCameraDevice.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\PopCoreml.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\vcruntime140_app.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\vcruntime140d_app.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\Greyscale.frag.glsl">
+      <Filter>PopCave</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\Quad.vert.glsl">
+      <Filter>PopCave</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\Readme.md">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\parallax_test_02.obj">
+      <Filter>PopCave</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopWebXrApi.js">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\ParamsWindow.js">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopApi.js">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopAruco.js">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopCamera.js">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopCinema4d.js">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopCollada.js">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopDll.js">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopFrameCounter.js">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopMath.js">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopMedia.js">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopMp4.js">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopObj.js">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopPly.js">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopShaderCache.js">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopSvg.js">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopTexture.js">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopWebApi.js">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopWebGuiApi.js">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopWebImageApi.js">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopWebOpenglApi.js">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\PopWebSocketApi.js">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\MemCheckLoop.js">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\PopEngineCommon\LICENSE.md">
+      <Filter>PopCave\PopEngineCommon</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\DrawLines.frag.glsl">
+      <Filter>PopCave</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\Edge.frag.glsl">
+      <Filter>PopCave</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\Geo.vert.glsl">
+      <Filter>PopCave</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\bootup.js">
+      <Filter>PopCave</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\Colour.frag.glsl">
+      <Filter>PopCave</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\cublas64_100.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\cudart64_100.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\cudnn64_7.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\depthengine_2_0.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\dnn_model_2_0.onnx">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\k4a.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\k4abt.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Src_Windows\onnxruntime.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="PopEngine_x64_Debug_Chakra\Bin\PopEngine.dll">
+      <Filter>Dlls</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\Tracking.js">
+      <Filter>PopCave</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\PopCave\ProjectionTest.js">
+      <Filter>PopCave</Filter>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Src_Windows\PopCave.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\Src_Windows\PopCave.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="PopEngine_x64_Debug_Chakra\Bin\PopEngine.lib">
+      <Filter>Dlls</Filter>
+    </Library>
+  </ItemGroup>
+</Project>

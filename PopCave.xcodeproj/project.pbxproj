@@ -22,9 +22,9 @@
 		BF5EB04023802F380077BCF5 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF5EAFAC237F09F50077BCF5 /* main.mm */; };
 		BF5EB06E23803BC50077BCF5 /* PopEngine.nib in Resources */ = {isa = PBXBuildFile; fileRef = BF5EB06D23803BC50077BCF5 /* PopEngine.nib */; };
 		BF5EB07523803E2F0077BCF5 /* PopCameraDeviceFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF5EB07323803E2F0077BCF5 /* PopCameraDeviceFramework.framework */; };
-		BF5EB07623803E2F0077BCF5 /* PopCoreml.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF5EB07423803E2F0077BCF5 /* PopCoreml.framework */; };
+		BF5EB07623803E2F0077BCF5 /* PopCoreml_Osx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF5EB07423803E2F0077BCF5 /* PopCoreml_Osx.framework */; };
 		BF5EB07A23803E9A0077BCF5 /* PopCameraDeviceFramework.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BF5EB07323803E2F0077BCF5 /* PopCameraDeviceFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		BF5EB07B23803E9B0077BCF5 /* PopCoreml.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BF5EB07423803E2F0077BCF5 /* PopCoreml.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		BF5EB07B23803E9B0077BCF5 /* PopCoreml_Osx.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BF5EB07423803E2F0077BCF5 /* PopCoreml_Osx.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -36,7 +36,7 @@
 			files = (
 				BF5EB03D237F17BD0077BCF5 /* PopEngine.framework in CopyFiles */,
 				BF5EB07A23803E9A0077BCF5 /* PopCameraDeviceFramework.framework in CopyFiles */,
-				BF5EB07B23803E9B0077BCF5 /* PopCoreml.framework in CopyFiles */,
+				BF5EB07B23803E9B0077BCF5 /* PopCoreml_Osx.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -60,7 +60,7 @@
 		BF5EB039237F176D0077BCF5 /* PopEngine.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopEngine.framework; path = Src_Osx/PopEngine.framework; sourceTree = "<group>"; };
 		BF5EB06D23803BC50077BCF5 /* PopEngine.nib */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = PopEngine.nib; path = PopEngine.framework/Versions/A/Resources/PopEngine.nib; sourceTree = "<group>"; };
 		BF5EB07323803E2F0077BCF5 /* PopCameraDeviceFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopCameraDeviceFramework.framework; path = Src_Osx/PopCameraDeviceFramework.framework; sourceTree = "<group>"; };
-		BF5EB07423803E2F0077BCF5 /* PopCoreml.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopCoreml.framework; path = Src_Osx/PopCoreml.framework; sourceTree = "<group>"; };
+		BF5EB07423803E2F0077BCF5 /* PopCoreml_Osx.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopCoreml_Osx.framework; path = Src_Osx/PopCoreml_Osx.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,7 +78,7 @@
 				BF5EB07523803E2F0077BCF5 /* PopCameraDeviceFramework.framework in Frameworks */,
 				BF1520602385602D00A70EBF /* PopH264Framework.framework in Frameworks */,
 				BF5EB03E237F181E0077BCF5 /* PopEngine.framework in Frameworks */,
-				BF5EB07623803E2F0077BCF5 /* PopCoreml.framework in Frameworks */,
+				BF5EB07623803E2F0077BCF5 /* PopCoreml_Osx.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -127,7 +127,7 @@
 				BF1520592385602C00A70EBF /* PopH264_Ios.framework */,
 				BF1520582385602C00A70EBF /* PopH264Framework.framework */,
 				BF5EB07323803E2F0077BCF5 /* PopCameraDeviceFramework.framework */,
-				BF5EB07423803E2F0077BCF5 /* PopCoreml.framework */,
+				BF5EB07423803E2F0077BCF5 /* PopCoreml_Osx.framework */,
 				BF5EB039237F176D0077BCF5 /* PopEngine.framework */,
 			);
 			name = Frameworks;
