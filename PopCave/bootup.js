@@ -5,4 +5,7 @@ Pop.Include = function(Filename)
 }
 
 //Pop.Include('ProjectionTest.js');
-Pop.Include('Tracking.js');
+//Pop.Include('Tracking.js');
+Pop.Debug("Hello");
+
+Pop.Include('CameraTest.js');

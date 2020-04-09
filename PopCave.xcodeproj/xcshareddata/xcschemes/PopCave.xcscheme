@@ -14,7 +14,21 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BF5EAF8E237F08CB0077BCF5"
+               BlueprintIdentifier = "BF5EAFB4237F0C100077BCF5"
+               BuildableName = "PopEngine_Osx.framework"
+               BlueprintName = "PopEngine_Osx"
+               ReferencedContainer = "container:../../PopEngine/PopEngine.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "BF1826672422502B006FEB93"
                BuildableName = "PopCave.app"
                BlueprintName = "PopCave"
                ReferencedContainer = "container:PopCave.xcodeproj">
@@ -32,7 +46,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "BF5EAF8E237F08CB0077BCF5"
+            BlueprintIdentifier = "BF1826672422502B006FEB93"
             BuildableName = "PopCave.app"
             BlueprintName = "PopCave"
             ReferencedContainer = "container:PopCave.xcodeproj">
@@ -45,32 +59,23 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      enableAddressSanitizer = "YES"
-      enableASanStackUseAfterReturn = "YES"
-      enableUBSanitizer = "YES"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
-      stopOnEveryUBSanitizerIssue = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
       <BuildableProductRunnable
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "BF5EAF8E237F08CB0077BCF5"
+            BlueprintIdentifier = "BF1826672422502B006FEB93"
             BuildableName = "PopCave.app"
             BlueprintName = "PopCave"
             ReferencedContainer = "container:PopCave.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
-         <AdditionalOption
-            key = "MallocScribble"
-            value = ""
-            isEnabled = "YES">
-         </AdditionalOption>
       </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
@@ -83,7 +88,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "BF5EAF8E237F08CB0077BCF5"
+            BlueprintIdentifier = "BF1826672422502B006FEB93"
             BuildableName = "PopCave.app"
             BlueprintName = "PopCave"
             ReferencedContainer = "container:PopCave.xcodeproj">

@@ -7,173 +7,315 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		BF151F2623842ABF00A70EBF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BF5EAFA8237F09F50077BCF5 /* Assets.xcassets */; };
-		BF15205E2385602D00A70EBF /* PopCameraDeviceFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF1520562385602C00A70EBF /* PopCameraDeviceFramework.framework */; };
-		BF15205F2385602D00A70EBF /* PopCoreml.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF1520572385602C00A70EBF /* PopCoreml.framework */; };
-		BF1520602385602D00A70EBF /* PopH264Framework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF1520582385602C00A70EBF /* PopH264Framework.framework */; };
-		BF1520612385602D00A70EBF /* PopH264_Ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF1520592385602C00A70EBF /* PopH264_Ios.framework */; };
-		BF1520622385602D00A70EBF /* PopCameraDevice_Ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF15205A2385602C00A70EBF /* PopCameraDevice_Ios.framework */; };
-		BF1520632385602D00A70EBF /* PopEngine_Ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF15205B2385602C00A70EBF /* PopEngine_Ios.framework */; };
-		BF1520642385602D00A70EBF /* PopCoreml_Ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF15205C2385602C00A70EBF /* PopCoreml_Ios.framework */; };
-		BF1520652385602D00A70EBF /* PopEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF15205D2385602D00A70EBF /* PopEngine.framework */; };
-		BF5EAFA4237F09E70077BCF5 /* PopCave in Resources */ = {isa = PBXBuildFile; fileRef = BF5EAFA3237F09E70077BCF5 /* PopCave */; };
-		BF5EB03D237F17BD0077BCF5 /* PopEngine.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BF5EB039237F176D0077BCF5 /* PopEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		BF5EB03E237F181E0077BCF5 /* PopEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF5EB039237F176D0077BCF5 /* PopEngine.framework */; };
-		BF5EB04023802F380077BCF5 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF5EAFAC237F09F50077BCF5 /* main.mm */; };
-		BF5EB06E23803BC50077BCF5 /* PopEngine.nib in Resources */ = {isa = PBXBuildFile; fileRef = BF5EB06D23803BC50077BCF5 /* PopEngine.nib */; };
-		BF5EB07523803E2F0077BCF5 /* PopCameraDeviceFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF5EB07323803E2F0077BCF5 /* PopCameraDeviceFramework.framework */; };
-		BF5EB07623803E2F0077BCF5 /* PopCoreml_Osx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF5EB07423803E2F0077BCF5 /* PopCoreml_Osx.framework */; };
-		BF5EB07A23803E9A0077BCF5 /* PopCameraDeviceFramework.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BF5EB07323803E2F0077BCF5 /* PopCameraDeviceFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		BF5EB07B23803E9B0077BCF5 /* PopCoreml_Osx.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BF5EB07423803E2F0077BCF5 /* PopCoreml_Osx.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		BF18266F2422502D006FEB93 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BF18266E2422502D006FEB93 /* Assets.xcassets */; };
+		BF1826752422502D006FEB93 /* Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF1826742422502D006FEB93 /* Main.cpp */; };
+		BF71CA94243E4EE200AEF50F /* PopCave in Resources */ = {isa = PBXBuildFile; fileRef = BF71CA93243E4EE200AEF50F /* PopCave */; };
+		BF71CAAB243E504500AEF50F /* PopEngine_Osx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF71CA9E243E4F8F00AEF50F /* PopEngine_Osx.framework */; };
+		BF71CAAF243E51A700AEF50F /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = BF71CAAE243E51A700AEF50F /* MainMenu.xib */; };
+		BF71CAB0243E521F00AEF50F /* PopEngine_Osx.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BF71CA9E243E4F8F00AEF50F /* PopEngine_Osx.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		BF71CAC5243E575A00AEF50F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BF71CAC3243E575A00AEF50F /* Main.storyboard */; settings = {ASSET_TAGS = (TextBox1, ); }; };
+		BF71CAC7243E575E00AEF50F /* PrebuiltAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BF71CAC6243E575E00AEF50F /* PrebuiltAssets.xcassets */; };
+		BF71CACA243E575F00AEF50F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BF71CAC8243E575F00AEF50F /* LaunchScreen.storyboard */; };
+		BF71CADF243E57DD00AEF50F /* Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF1826742422502D006FEB93 /* Main.cpp */; };
+		BFB4D711243E71F30011CD78 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF71CAC1243E575900AEF50F /* ViewController.m */; };
+		BFB4D713243E736A0011CD78 /* PopCave in Resources */ = {isa = PBXBuildFile; fileRef = BF71CA93243E4EE200AEF50F /* PopCave */; };
+		BFB4D71A243F25630011CD78 /* PopH264_Osx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFB4D714243F25620011CD78 /* PopH264_Osx.framework */; };
+		BFB4D71E243F25630011CD78 /* PopCameraDevice_Osx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFB4D716243F25630011CD78 /* PopCameraDevice_Osx.framework */; };
+		BFB4D722243F25630011CD78 /* PopH264_Ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFB4D718243F25630011CD78 /* PopH264_Ios.framework */; };
+		BFB4D724243F25630011CD78 /* PopCoreml_Osx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFB4D719243F25630011CD78 /* PopCoreml_Osx.framework */; };
+		BFB4D72A243F28330011CD78 /* PopCameraDevice_Ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFB4D715243F25620011CD78 /* PopCameraDevice_Ios.framework */; };
+		BFB4D72B243F28330011CD78 /* PopCameraDevice_Ios.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BFB4D715243F25620011CD78 /* PopCameraDevice_Ios.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		BFB4D72C243F28330011CD78 /* PopCoreml_Ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFB4D717243F25630011CD78 /* PopCoreml_Ios.framework */; };
+		BFB4D72D243F28330011CD78 /* PopCoreml_Ios.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BFB4D717243F25630011CD78 /* PopCoreml_Ios.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		BFB4D72E243F28330011CD78 /* PopH264_Ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFB4D718243F25630011CD78 /* PopH264_Ios.framework */; };
+		BFB4D72F243F28330011CD78 /* PopH264_Ios.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BFB4D718243F25630011CD78 /* PopH264_Ios.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		BFB4D730243F28330011CD78 /* PopEngine_Ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF71CAA2243E4F8F00AEF50F /* PopEngine_Ios.framework */; };
+		BFB4D731243F28330011CD78 /* PopEngine_Ios.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BF71CAA2243E4F8F00AEF50F /* PopEngine_Ios.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		BF71CA9D243E4F8F00AEF50F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BF18267C2422505D006FEB93 /* PopEngine.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BF5EAFB5237F0C100077BCF5;
+			remoteInfo = PopEngine_Osx;
+		};
+		BF71CA9F243E4F8F00AEF50F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BF18267C2422505D006FEB93 /* PopEngine.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BF5EB0542380335D0077BCF5;
+			remoteInfo = PopEngine;
+		};
+		BF71CAA1243E4F8F00AEF50F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BF18267C2422505D006FEB93 /* PopEngine.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BF151F7623845F2E00A70EBF;
+			remoteInfo = PopEngine_Ios;
+		};
+		BF71CAA5243E503700AEF50F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BF18267C2422505D006FEB93 /* PopEngine.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = BF5EAFB4237F0C100077BCF5;
+			remoteInfo = PopEngine_Osx;
+		};
+		BF71CADC243E57B500AEF50F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BF18267C2422505D006FEB93 /* PopEngine.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = BF151F7523845F2E00A70EBF;
+			remoteInfo = PopEngine_Ios;
+		};
+		BFB4D732243F28330011CD78 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BF18267C2422505D006FEB93 /* PopEngine.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = BF151F7523845F2E00A70EBF;
+			remoteInfo = PopEngine_Ios;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
-		BF5EB03C237F17B40077BCF5 /* CopyFiles */ = {
+		BF40CE1D2423DB8800F636EF /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				BF5EB03D237F17BD0077BCF5 /* PopEngine.framework in CopyFiles */,
-				BF5EB07A23803E9A0077BCF5 /* PopCameraDeviceFramework.framework in CopyFiles */,
-				BF5EB07B23803E9B0077BCF5 /* PopCoreml_Osx.framework in CopyFiles */,
+				BF71CAB0243E521F00AEF50F /* PopEngine_Osx.framework in CopyFiles */,
 			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BF71CADE243E57B500AEF50F /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				BFB4D72D243F28330011CD78 /* PopCoreml_Ios.framework in Embed Frameworks */,
+				BFB4D72B243F28330011CD78 /* PopCameraDevice_Ios.framework in Embed Frameworks */,
+				BFB4D731243F28330011CD78 /* PopEngine_Ios.framework in Embed Frameworks */,
+				BFB4D72F243F28330011CD78 /* PopH264_Ios.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		BF1520562385602C00A70EBF /* PopCameraDeviceFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopCameraDeviceFramework.framework; path = Src_Osx/PopCameraDeviceFramework.framework; sourceTree = "<group>"; };
-		BF1520572385602C00A70EBF /* PopCoreml.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopCoreml.framework; path = Src_Osx/PopCoreml.framework; sourceTree = "<group>"; };
-		BF1520582385602C00A70EBF /* PopH264Framework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopH264Framework.framework; path = Src_Osx/PopH264Framework.framework; sourceTree = "<group>"; };
-		BF1520592385602C00A70EBF /* PopH264_Ios.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopH264_Ios.framework; path = Src_Osx/PopH264_Ios.framework; sourceTree = "<group>"; };
-		BF15205A2385602C00A70EBF /* PopCameraDevice_Ios.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopCameraDevice_Ios.framework; path = Src_Osx/PopCameraDevice_Ios.framework; sourceTree = "<group>"; };
-		BF15205B2385602C00A70EBF /* PopEngine_Ios.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopEngine_Ios.framework; path = Src_Osx/PopEngine_Ios.framework; sourceTree = "<group>"; };
-		BF15205C2385602C00A70EBF /* PopCoreml_Ios.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopCoreml_Ios.framework; path = Src_Osx/PopCoreml_Ios.framework; sourceTree = "<group>"; };
-		BF15205D2385602D00A70EBF /* PopEngine.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopEngine.framework; path = Src_Osx/PopEngine.framework; sourceTree = "<group>"; };
-		BF5EAF8F237F08CB0077BCF5 /* PopCave.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PopCave.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		BF5EAFA3237F09E70077BCF5 /* PopCave */ = {isa = PBXFileReference; lastKnownFileType = folder; path = PopCave; sourceTree = "<group>"; };
-		BF5EAFA8237F09F50077BCF5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		BF5EAFAB237F09F50077BCF5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		BF5EAFAC237F09F50077BCF5 /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
-		BF5EAFAD237F09F50077BCF5 /* PopCave.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PopCave.entitlements; sourceTree = "<group>"; };
-		BF5EB039237F176D0077BCF5 /* PopEngine.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopEngine.framework; path = Src_Osx/PopEngine.framework; sourceTree = "<group>"; };
-		BF5EB06D23803BC50077BCF5 /* PopEngine.nib */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = PopEngine.nib; path = PopEngine.framework/Versions/A/Resources/PopEngine.nib; sourceTree = "<group>"; };
-		BF5EB07323803E2F0077BCF5 /* PopCameraDeviceFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopCameraDeviceFramework.framework; path = Src_Osx/PopCameraDeviceFramework.framework; sourceTree = "<group>"; };
-		BF5EB07423803E2F0077BCF5 /* PopCoreml_Osx.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopCoreml_Osx.framework; path = Src_Osx/PopCoreml_Osx.framework; sourceTree = "<group>"; };
+		BF1826682422502B006FEB93 /* PopCave.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PopCave.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BF18266E2422502D006FEB93 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		BF1826732422502D006FEB93 /* Info_Osx.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info_Osx.plist; sourceTree = "<group>"; };
+		BF1826742422502D006FEB93 /* Main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Main.cpp; sourceTree = "<group>"; };
+		BF1826762422502D006FEB93 /* PopCave.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PopCave.entitlements; sourceTree = "<group>"; };
+		BF18267C2422505D006FEB93 /* PopEngine.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = PopEngine.xcodeproj; sourceTree = "<group>"; };
+		BF71CA93243E4EE200AEF50F /* PopCave */ = {isa = PBXFileReference; lastKnownFileType = folder; path = PopCave; sourceTree = "<group>"; };
+		BF71CAAE243E51A700AEF50F /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
+		BF71CABB243E575900AEF50F /* PopCave_Ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PopCave_Ios.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BF71CAC0243E575900AEF50F /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		BF71CAC1243E575900AEF50F /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		BF71CAC4243E575A00AEF50F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		BF71CAC6243E575E00AEF50F /* PrebuiltAssets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = PrebuiltAssets.xcassets; sourceTree = "<group>"; };
+		BF71CAC9243E575F00AEF50F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		BF71CACB243E575F00AEF50F /* Info_Ios.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info_Ios.plist; sourceTree = "<group>"; };
+		BFB4D714243F25620011CD78 /* PopH264_Osx.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopH264_Osx.framework; path = src/Libs/PopH264_Osx.framework; sourceTree = "<group>"; };
+		BFB4D715243F25620011CD78 /* PopCameraDevice_Ios.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopCameraDevice_Ios.framework; path = src/Libs/PopCameraDevice_Ios.framework; sourceTree = "<group>"; };
+		BFB4D716243F25630011CD78 /* PopCameraDevice_Osx.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopCameraDevice_Osx.framework; path = src/Libs/PopCameraDevice_Osx.framework; sourceTree = "<group>"; };
+		BFB4D717243F25630011CD78 /* PopCoreml_Ios.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopCoreml_Ios.framework; path = src/Libs/PopCoreml_Ios.framework; sourceTree = "<group>"; };
+		BFB4D718243F25630011CD78 /* PopH264_Ios.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopH264_Ios.framework; path = src/Libs/PopH264_Ios.framework; sourceTree = "<group>"; };
+		BFB4D719243F25630011CD78 /* PopCoreml_Osx.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PopCoreml_Osx.framework; path = src/Libs/PopCoreml_Osx.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		BF5EAF8C237F08CB0077BCF5 /* Frameworks */ = {
+		BF1826652422502B006FEB93 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BF1520642385602D00A70EBF /* PopCoreml_Ios.framework in Frameworks */,
-				BF1520632385602D00A70EBF /* PopEngine_Ios.framework in Frameworks */,
-				BF15205E2385602D00A70EBF /* PopCameraDeviceFramework.framework in Frameworks */,
-				BF1520612385602D00A70EBF /* PopH264_Ios.framework in Frameworks */,
-				BF15205F2385602D00A70EBF /* PopCoreml.framework in Frameworks */,
-				BF1520622385602D00A70EBF /* PopCameraDevice_Ios.framework in Frameworks */,
-				BF1520652385602D00A70EBF /* PopEngine.framework in Frameworks */,
-				BF5EB07523803E2F0077BCF5 /* PopCameraDeviceFramework.framework in Frameworks */,
-				BF1520602385602D00A70EBF /* PopH264Framework.framework in Frameworks */,
-				BF5EB03E237F181E0077BCF5 /* PopEngine.framework in Frameworks */,
-				BF5EB07623803E2F0077BCF5 /* PopCoreml_Osx.framework in Frameworks */,
+				BFB4D722243F25630011CD78 /* PopH264_Ios.framework in Frameworks */,
+				BFB4D724243F25630011CD78 /* PopCoreml_Osx.framework in Frameworks */,
+				BF71CAAB243E504500AEF50F /* PopEngine_Osx.framework in Frameworks */,
+				BFB4D71E243F25630011CD78 /* PopCameraDevice_Osx.framework in Frameworks */,
+				BFB4D71A243F25630011CD78 /* PopH264_Osx.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BF71CAB8243E575900AEF50F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BFB4D72C243F28330011CD78 /* PopCoreml_Ios.framework in Frameworks */,
+				BFB4D72A243F28330011CD78 /* PopCameraDevice_Ios.framework in Frameworks */,
+				BFB4D730243F28330011CD78 /* PopEngine_Ios.framework in Frameworks */,
+				BFB4D72E243F28330011CD78 /* PopH264_Ios.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		BF5EAF86237F08CB0077BCF5 = {
+		BF18265F2422502B006FEB93 = {
 			isa = PBXGroup;
 			children = (
-				BF5EAFA5237F09F50077BCF5 /* Src_Osx */,
-				BF5EAFA3237F09E70077BCF5 /* PopCave */,
-				BF5EAF90237F08CB0077BCF5 /* Products */,
-				BF5EB031237F151C0077BCF5 /* Frameworks */,
+				BF71CA95243E4F6400AEF50F /* PopEngine */,
+				BF71CABC243E575900AEF50F /* PopCave_Ios */,
+				BF18268C24225109006FEB93 /* Frameworks */,
+				BF71CA93243E4EE200AEF50F /* PopCave */,
+				BF40CE172423D7F200F636EF /* Source */,
+				BF18266A2422502B006FEB93 /* Source_Osx */,
+				BF1826692422502B006FEB93 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		BF5EAF90237F08CB0077BCF5 /* Products */ = {
+		BF1826692422502B006FEB93 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				BF5EAF8F237F08CB0077BCF5 /* PopCave.app */,
+				BF1826682422502B006FEB93 /* PopCave.app */,
+				BF71CABB243E575900AEF50F /* PopCave_Ios.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		BF5EAFA5237F09F50077BCF5 /* Src_Osx */ = {
+		BF18266A2422502B006FEB93 /* Source_Osx */ = {
 			isa = PBXGroup;
 			children = (
-				BF5EB06D23803BC50077BCF5 /* PopEngine.nib */,
-				BF5EAFA8237F09F50077BCF5 /* Assets.xcassets */,
-				BF5EAFAB237F09F50077BCF5 /* Info.plist */,
-				BF5EAFAC237F09F50077BCF5 /* main.mm */,
-				BF5EAFAD237F09F50077BCF5 /* PopCave.entitlements */,
+				BF18266E2422502D006FEB93 /* Assets.xcassets */,
+				BF1826732422502D006FEB93 /* Info_Osx.plist */,
+				BF71CAAE243E51A700AEF50F /* MainMenu.xib */,
+				BF1826762422502D006FEB93 /* PopCave.entitlements */,
 			);
-			path = Src_Osx;
+			path = Source_Osx;
 			sourceTree = "<group>";
 		};
-		BF5EB031237F151C0077BCF5 /* Frameworks */ = {
+		BF18268C24225109006FEB93 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				BF15205A2385602C00A70EBF /* PopCameraDevice_Ios.framework */,
-				BF1520562385602C00A70EBF /* PopCameraDeviceFramework.framework */,
-				BF15205C2385602C00A70EBF /* PopCoreml_Ios.framework */,
-				BF1520572385602C00A70EBF /* PopCoreml.framework */,
-				BF15205B2385602C00A70EBF /* PopEngine_Ios.framework */,
-				BF15205D2385602D00A70EBF /* PopEngine.framework */,
-				BF1520592385602C00A70EBF /* PopH264_Ios.framework */,
-				BF1520582385602C00A70EBF /* PopH264Framework.framework */,
-				BF5EB07323803E2F0077BCF5 /* PopCameraDeviceFramework.framework */,
-				BF5EB07423803E2F0077BCF5 /* PopCoreml_Osx.framework */,
-				BF5EB039237F176D0077BCF5 /* PopEngine.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		BF40CE172423D7F200F636EF /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				BF1826742422502D006FEB93 /* Main.cpp */,
+			);
+			path = Source;
+			sourceTree = "<group>";
+		};
+		BF71CA95243E4F6400AEF50F /* PopEngine */ = {
+			isa = PBXGroup;
+			children = (
+				BFB4D715243F25620011CD78 /* PopCameraDevice_Ios.framework */,
+				BFB4D716243F25630011CD78 /* PopCameraDevice_Osx.framework */,
+				BFB4D717243F25630011CD78 /* PopCoreml_Ios.framework */,
+				BFB4D719243F25630011CD78 /* PopCoreml_Osx.framework */,
+				BFB4D718243F25630011CD78 /* PopH264_Ios.framework */,
+				BFB4D714243F25620011CD78 /* PopH264_Osx.framework */,
+				BF18267C2422505D006FEB93 /* PopEngine.xcodeproj */,
+			);
+			name = PopEngine;
+			path = ../PopEngine;
+			sourceTree = SOURCE_ROOT;
+		};
+		BF71CA97243E4F8F00AEF50F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BF71CA9E243E4F8F00AEF50F /* PopEngine_Osx.framework */,
+				BF71CAA0243E4F8F00AEF50F /* PopEngine.app */,
+				BF71CAA2243E4F8F00AEF50F /* PopEngine_Ios.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BF71CABC243E575900AEF50F /* PopCave_Ios */ = {
+			isa = PBXGroup;
+			children = (
+				BF71CAC0243E575900AEF50F /* ViewController.h */,
+				BF71CAC1243E575900AEF50F /* ViewController.m */,
+				BF71CAC3243E575A00AEF50F /* Main.storyboard */,
+				BF71CAC6243E575E00AEF50F /* PrebuiltAssets.xcassets */,
+				BF71CAC8243E575F00AEF50F /* LaunchScreen.storyboard */,
+				BF71CACB243E575F00AEF50F /* Info_Ios.plist */,
+			);
+			path = PopCave_Ios;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		BF1826C42423CF77006FEB93 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
-		BF5EAF8E237F08CB0077BCF5 /* PopCave */ = {
+		BF1826672422502B006FEB93 /* PopCave */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BF5EAFA0237F08CC0077BCF5 /* Build configuration list for PBXNativeTarget "PopCave" */;
+			buildConfigurationList = BF1826792422502D006FEB93 /* Build configuration list for PBXNativeTarget "PopCave" */;
 			buildPhases = (
-				BF5EAF8B237F08CB0077BCF5 /* Sources */,
-				BF5EAF8C237F08CB0077BCF5 /* Frameworks */,
-				BF5EAF8D237F08CB0077BCF5 /* Resources */,
-				BF5EB03C237F17B40077BCF5 /* CopyFiles */,
+				BF1826C42423CF77006FEB93 /* Headers */,
+				BF1826642422502B006FEB93 /* Sources */,
+				BF1826652422502B006FEB93 /* Frameworks */,
+				BF1826662422502B006FEB93 /* Resources */,
+				BF40CE1D2423DB8800F636EF /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				BF71CAA6243E503700AEF50F /* PBXTargetDependency */,
 			);
 			name = PopCave;
-			productName = PopCave;
-			productReference = BF5EAF8F237F08CB0077BCF5 /* PopCave.app */;
+			productName = PopKandinsky;
+			productReference = BF1826682422502B006FEB93 /* PopCave.app */;
+			productType = "com.apple.product-type.application";
+		};
+		BF71CABA243E575900AEF50F /* PopCave_Ios */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BF71CAD3243E575F00AEF50F /* Build configuration list for PBXNativeTarget "PopCave_Ios" */;
+			buildPhases = (
+				BF71CAB7243E575900AEF50F /* Sources */,
+				BF71CAB8243E575900AEF50F /* Frameworks */,
+				BF71CAB9243E575900AEF50F /* Resources */,
+				BF71CADE243E57B500AEF50F /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BF71CADD243E57B500AEF50F /* PBXTargetDependency */,
+				BFB4D733243F28330011CD78 /* PBXTargetDependency */,
+			);
+			name = PopCave_Ios;
+			productName = PopCave_Ios;
+			productReference = BF71CABB243E575900AEF50F /* PopCave_Ios.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		BF5EAF87237F08CB0077BCF5 /* Project object */ = {
+		BF1826602422502B006FEB93 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				KnownAssetTags = (
+					TextBox1,
+				);
 				LastUpgradeCheck = 1010;
 				ORGANIZATIONNAME = NewChromantics;
 				TargetAttributes = {
-					BF5EAF8E237F08CB0077BCF5 = {
+					BF1826672422502B006FEB93 = {
 						CreatedOnToolsVersion = 10.1;
-						SystemCapabilities = {
-							com.apple.Sandbox = {
-								enabled = 0;
-							};
-						};
+					};
+					BF71CABA243E575900AEF50F = {
+						CreatedOnToolsVersion = 10.1;
 					};
 				};
 			};
-			buildConfigurationList = BF5EAF8A237F08CB0077BCF5 /* Build configuration list for PBXProject "PopCave" */;
+			buildConfigurationList = BF1826632422502B006FEB93 /* Build configuration list for PBXProject "PopCave" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -181,42 +323,130 @@
 				en,
 				Base,
 			);
-			mainGroup = BF5EAF86237F08CB0077BCF5;
-			productRefGroup = BF5EAF90237F08CB0077BCF5 /* Products */;
+			mainGroup = BF18265F2422502B006FEB93;
+			productRefGroup = BF1826692422502B006FEB93 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = BF71CA97243E4F8F00AEF50F /* Products */;
+					ProjectRef = BF18267C2422505D006FEB93 /* PopEngine.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
-				BF5EAF8E237F08CB0077BCF5 /* PopCave */,
+				BF1826672422502B006FEB93 /* PopCave */,
+				BF71CABA243E575900AEF50F /* PopCave_Ios */,
 			);
 		};
 /* End PBXProject section */
 
+/* Begin PBXReferenceProxy section */
+		BF71CA9E243E4F8F00AEF50F /* PopEngine_Osx.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = PopEngine_Osx.framework;
+			remoteRef = BF71CA9D243E4F8F00AEF50F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		BF71CAA0243E4F8F00AEF50F /* PopEngine.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = PopEngine.app;
+			remoteRef = BF71CA9F243E4F8F00AEF50F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		BF71CAA2243E4F8F00AEF50F /* PopEngine_Ios.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = PopEngine_Ios.framework;
+			remoteRef = BF71CAA1243E4F8F00AEF50F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
 /* Begin PBXResourcesBuildPhase section */
-		BF5EAF8D237F08CB0077BCF5 /* Resources */ = {
+		BF1826662422502B006FEB93 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BF5EAFA4237F09E70077BCF5 /* PopCave in Resources */,
-				BF151F2623842ABF00A70EBF /* Assets.xcassets in Resources */,
-				BF5EB06E23803BC50077BCF5 /* PopEngine.nib in Resources */,
+				BF71CA94243E4EE200AEF50F /* PopCave in Resources */,
+				BF18266F2422502D006FEB93 /* Assets.xcassets in Resources */,
+				BF71CAAF243E51A700AEF50F /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BF71CAB9243E575900AEF50F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BF71CACA243E575F00AEF50F /* LaunchScreen.storyboard in Resources */,
+				BFB4D713243E736A0011CD78 /* PopCave in Resources */,
+				BF71CAC7243E575E00AEF50F /* PrebuiltAssets.xcassets in Resources */,
+				BF71CAC5243E575A00AEF50F /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		BF5EAF8B237F08CB0077BCF5 /* Sources */ = {
+		BF1826642422502B006FEB93 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BF5EB04023802F380077BCF5 /* main.mm in Sources */,
+				BF1826752422502D006FEB93 /* Main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BF71CAB7243E575900AEF50F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BFB4D711243E71F30011CD78 /* ViewController.m in Sources */,
+				BF71CADF243E57DD00AEF50F /* Main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		BF71CAA6243E503700AEF50F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = PopEngine_Osx;
+			targetProxy = BF71CAA5243E503700AEF50F /* PBXContainerItemProxy */;
+		};
+		BF71CADD243E57B500AEF50F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = PopEngine_Ios;
+			targetProxy = BF71CADC243E57B500AEF50F /* PBXContainerItemProxy */;
+		};
+		BFB4D733243F28330011CD78 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = PopEngine_Ios;
+			targetProxy = BFB4D732243F28330011CD78 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		BF71CAC3243E575A00AEF50F /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				BF71CAC4243E575A00AEF50F /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		BF71CAC8243E575F00AEF50F /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				BF71CAC9243E575F00AEF50F /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
 /* Begin XCBuildConfiguration section */
-		BF5EAF9E237F08CC0077BCF5 /* Debug */ = {
+		BF1826772422502D006FEB93 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -253,6 +483,10 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)",
+					"$(POPENGINE_DIR)/src/Libs/**",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -267,14 +501,18 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "$(BUILD_DIR)/Debug_JavascriptCore";
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				POPENGINE_DIR = "$(PROJECT_DIR)/../PopEngine";
+				POPENGINE_FRAMEWORKS_DIR = "${BUILD_PRODUCTS_DIR}";
 				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
-		BF5EAF9F237F08CC0077BCF5 /* Release */ = {
+		BF1826782422502D006FEB93 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -311,6 +549,10 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)",
+					"$(POPENGINE_DIR)/src/Libs/**",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -319,85 +561,126 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "$(BUILD_DIR)/Debug_JavascriptCore";
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				POPENGINE_DIR = "$(PROJECT_DIR)/../PopEngine";
+				POPENGINE_FRAMEWORKS_DIR = "${BUILD_PRODUCTS_DIR}";
 				SDKROOT = macosx;
 			};
 			name = Release;
 		};
-		BF5EAFA1237F08CC0077BCF5 /* Debug */ = {
+		BF18267A2422502D006FEB93 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ADDRESS_SANITIZER_CONTAINER_OVERFLOW = YES;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_ENTITLEMENTS = Source_Osx/PopCave.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = X52DR36JY2;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Src_Osx",
-				);
-				INFOPLIST_FILE = "$(SRCROOT)/Src_Osx/Info.plist";
+				DEVELOPMENT_TEAM = 2HGDT7H2KX;
+				INFOPLIST_FILE = "$(SRCROOT)/Source_Osx/Info_Osx.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.NewChromantics.PopCave;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Debug;
 		};
-		BF5EAFA2237F08CC0077BCF5 /* Release */ = {
+		BF18267B2422502D006FEB93 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ADDRESS_SANITIZER_CONTAINER_OVERFLOW = YES;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_ENTITLEMENTS = Source_Osx/PopCave.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = X52DR36JY2;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Src_Osx",
-				);
-				INFOPLIST_FILE = "$(SRCROOT)/Src_Osx/Info.plist";
+				DEVELOPMENT_TEAM = 2HGDT7H2KX;
+				INFOPLIST_FILE = "$(SRCROOT)/Source_Osx/Info_Osx.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.NewChromantics.PopCave;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+			};
+			name = Release;
+		};
+		BF71CACE243E575F00AEF50F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 2HGDT7H2KX;
+				HEADER_SEARCH_PATHS = "$(BUILD_DIR)/Debug_JavascriptCore-iphoneos/PopEngine_Ios.framework/Headers/**";
+				INFOPLIST_FILE = "$(SRCROOT)/PopCave_Ios/Info_Ios.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.NewChromantics.PopCave;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BF71CACF243E575F00AEF50F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 2HGDT7H2KX;
+				HEADER_SEARCH_PATHS = "$(BUILD_DIR)/Debug_JavascriptCore-iphoneos/PopEngine_Ios.framework/Headers/**";
+				INFOPLIST_FILE = "$(SRCROOT)/PopCave_Ios/Info_Ios.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.NewChromantics.PopCave;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		BF5EAF8A237F08CB0077BCF5 /* Build configuration list for PBXProject "PopCave" */ = {
+		BF1826632422502B006FEB93 /* Build configuration list for PBXProject "PopCave" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				BF5EAF9E237F08CC0077BCF5 /* Debug */,
-				BF5EAF9F237F08CC0077BCF5 /* Release */,
+				BF1826772422502D006FEB93 /* Debug */,
+				BF1826782422502D006FEB93 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		BF5EAFA0237F08CC0077BCF5 /* Build configuration list for PBXNativeTarget "PopCave" */ = {
+		BF1826792422502D006FEB93 /* Build configuration list for PBXNativeTarget "PopCave" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				BF5EAFA1237F08CC0077BCF5 /* Debug */,
-				BF5EAFA2237F08CC0077BCF5 /* Release */,
+				BF18267A2422502D006FEB93 /* Debug */,
+				BF18267B2422502D006FEB93 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BF71CAD3243E575F00AEF50F /* Build configuration list for PBXNativeTarget "PopCave_Ios" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BF71CACE243E575F00AEF50F /* Debug */,
+				BF71CACF243E575F00AEF50F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = BF5EAF87237F08CB0077BCF5 /* Project object */;
+	rootObject = BF1826602422502B006FEB93 /* Project object */;
 }
